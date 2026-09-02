@@ -1,16 +1,22 @@
-const REDIS_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-const REDIS_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
-const LIST_KEY = 'exam_submissions';
+const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const TABLE = 'exam_submissions';
 
-async function redisCommand(cmd) {
-  const r = await fetch(REDIS_URL, {
+async function upsertRecord(record) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?on_conflict=id`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${REDIS_TOKEN}` },
-    body: JSON.stringify(cmd)
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      Prefer: 'resolution=merge-duplicates,return=minimal'
+    },
+    body: JSON.stringify([record])
   });
-  const data = await r.json();
-  if (data.error) throw new Error(data.error);
-  return data.result;
+  if (!r.ok) {
+    const text = await r.text();
+    throw new Error(text || `Supabase error (${r.status})`);
+  }
 }
 
 export default async function handler(req, res) {
@@ -18,8 +24,8 @@ export default async function handler(req, res) {
     res.status(405).json({ error: 'Method not allowed' });
     return;
   }
-  if (!REDIS_URL || !REDIS_TOKEN) {
-    res.status(500).json({ error: 'Storage haijawekwa (KV_REST_API_URL / KV_REST_API_TOKEN hazipo). Ongeza Upstash Redis kwenye mradi wako wa Vercel.' });
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+    res.status(500).json({ error: 'Storage haijawekwa (SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY hazipo).' });
     return;
   }
 
@@ -35,28 +41,18 @@ export default async function handler(req, res) {
       name: String(body.student.name || '').slice(0, 120),
       cand: String(body.student.cand || '').slice(0, 60),
       cls: String(body.student.cls || '').slice(0, 60),
-      rawTotal: Number(body.rawTotal) || 0,
-      penaltyMarks: Number(body.penaltyMarks) || 0,
-      totalCorrect: Number(body.totalCorrect) || 0,
-      totalMarks: Number(body.totalMarks) || 0,
+      raw_total: Number(body.rawTotal) || 0,
+      penalty_marks: Number(body.penaltyMarks) || 0,
+      total_correct: Number(body.totalCorrect) || 0,
+      total_marks: Number(body.totalMarks) || 0,
       pct: Number(body.pct) || 0,
       grade: String(body.grade || ''),
-      tabSwitchCount: Number(body.tabSwitchCount) || 0,
-      submittedAt: Number(body.submittedAt) || Date.now(),
-      receivedAt: Date.now()
+      tab_switch_count: Number(body.tabSwitchCount) || 0,
+      submitted_at: Number(body.submittedAt) || Date.now(),
+      received_at: Date.now()
     };
 
-    await redisCommand(['LREM', LIST_KEY, 0, JSON.stringify(record)]);
-    const existing = await redisCommand(['LRANGE', LIST_KEY, 0, -1]);
-    const filtered = (existing || []).filter(s => {
-      try { return JSON.parse(s).id !== record.id; } catch (e) { return true; }
-    });
-    if (filtered.length !== (existing || []).length) {
-      await redisCommand(['DEL', LIST_KEY]);
-      if (filtered.length) await redisCommand(['RPUSH', LIST_KEY, ...filtered]);
-    }
-    await redisCommand(['RPUSH', LIST_KEY, JSON.stringify(record)]);
-
+    await upsertRecord(record);
     res.status(200).json({ ok: true, id: record.id });
   } catch (e) {
     res.status(500).json({ error: e.message || 'Server error' });
