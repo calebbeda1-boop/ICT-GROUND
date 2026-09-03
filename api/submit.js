@@ -1,6 +1,29 @@
+// POST /api/submit — inaitwa kiotomatiki na index.html baada ya mwanafunzi kuwasilisha mtihani.
+// Inahifadhi kila jaribio kama safu (row) kwenye jedwali la Supabase, na PDF ya "marked paper" kwenye Supabase Storage.
+
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const TABLE = 'exam_submissions';
+const BUCKET = 'marked-exams';
+
+async function uploadPdf(id, base64) {
+  const buf = Buffer.from(base64, 'base64');
+  const r = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${id}.pdf`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      apikey: SUPABASE_KEY,
+      'Content-Type': 'application/pdf',
+      'x-upsert': 'true'
+    },
+    body: buf
+  });
+  if (!r.ok) {
+    const text = await r.text();
+    throw new Error(text || `Supabase Storage error (${r.status})`);
+  }
+  return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${id}.pdf`;
+}
 
 async function upsertRecord(record) {
   const r = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?on_conflict=id`, {
@@ -52,8 +75,17 @@ export default async function handler(req, res) {
       received_at: Date.now()
     };
 
+    if (body.pdfBase64) {
+      try {
+        record.pdf_url = await uploadPdf(record.id, body.pdfBase64);
+      } catch (e) {
+        // Endelea kuhifadhi matokeo hata kama PDF imeshindikana kupakiwa
+        record.pdf_url = null;
+      }
+    }
+
     await upsertRecord(record);
-    res.status(200).json({ ok: true, id: record.id });
+    res.status(200).json({ ok: true, id: record.id, pdf_url: record.pdf_url || null });
   } catch (e) {
     res.status(500).json({ error: e.message || 'Server error' });
   }
