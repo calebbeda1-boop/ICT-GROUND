@@ -371,6 +371,8 @@ body.exam-lockdown input, body.exam-lockdown textarea{ -webkit-user-select:text;
 </style>
 </head>
 <body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <!-- ══ SECURITY OVERLAY ══ -->
 <div id="security-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;align-items:center;justify-content:center;flex-direction:column;color:#fff;text-align:center;padding:20px">
@@ -463,38 +465,6 @@ body.exam-lockdown input, body.exam-lockdown textarea{ -webkit-user-select:text;
           ⚠️ By starting this exam you agree that: (1) You will not copy or share answers. (2) You will not switch browser tabs during the exam. (3) Tab-switching will be recorded as a security violation.
         </div>
         <button class="btn btn-primary btn-lg" onclick="startExam()" style="width:100%">Start Examination →</button>
-      </div>
-      <div style="text-align:center;margin-top:16px">
-        <button class="btn btn-outline" style="font-size:.72rem;padding:6px 14px" onclick="openTeacherPanel()">👨‍🏫 Teacher Panel</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════ TEACHER PANEL MODAL ══════════════════════ -->
-<div class="modal-overlay" id="teacher-pw-modal">
-  <div class="modal-box">
-    <h3>👨‍🏫 Teacher Panel</h3>
-    <p>Enter the teacher password to view all submissions saved on this device.</p>
-    <input type="password" id="teacher-pw-input" class="short-input" placeholder="Password" style="margin-bottom:12px" onkeydown="if(event.key==='Enter'){checkTeacherPassword();}">
-    <div class="error-msg" id="teacher-pw-error">Incorrect password.</div>
-    <div class="modal-actions" style="margin-top:14px">
-      <button class="btn btn-primary" onclick="checkTeacherPassword()">Unlock</button>
-      <button class="btn btn-secondary" onclick="document.getElementById('teacher-pw-modal').classList.remove('show')">Cancel</button>
-    </div>
-  </div>
-</div>
-
-<div class="screen" id="teacher-panel-screen">
-  <div class="container" style="max-width:900px">
-    <div class="reg-card" style="max-width:100%">
-      <h2>👨‍🏫 Teacher Panel — Submissions on This Device</h2>
-      <p class="subtitle" style="text-align:left">Every result below was submitted on THIS tablet only. Export/collect this before wiping or reusing the device for another exam.</p>
-      <div id="teacher-panel-list" style="margin:18px 0"></div>
-      <div class="modal-actions">
-        <button class="btn btn-green" onclick="downloadResultsCSV()">⬇ Download CSV (Excel)</button>
-        <button class="btn btn-danger" onclick="clearAllDeviceResults()">🗑 Clear All Results On This Device</button>
-        <button class="btn btn-secondary" onclick="showScreen('reg-screen')">← Back</button>
       </div>
     </div>
   </div>
@@ -671,109 +641,7 @@ const TOTAL_QUESTIONS = SEC_A.length + SEC_B.length + SEC_C.length + SEC_D.lengt
 /* ════════════════════════════════════════════════
    STATE & SECURITY
 ════════════════════════════════════════════════ */
-const EXAM_KEY_PREFIX = 'almuntazir_y10_datarep_exam_2026';
-let STORAGE_KEY = null; // set only after the student's name+campus+class are known (per-student key)
-function slugify(s){ return (s||'').toString().trim().toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,''); }
-function makeStorageKey(name, cand, cls){ return EXAM_KEY_PREFIX + '__' + slugify(name) + '__' + slugify(cls); }
-
-/* ════════════════════════════════════════════════
-   TEACHER PANEL — view/export ALL submissions saved on this device
-════════════════════════════════════════════════ */
-const TEACHER_PASSWORD = 'BEDA2026';
-
-function openTeacherPanel(){
-  document.getElementById('teacher-pw-input').value = '';
-  document.getElementById('teacher-pw-error').classList.remove('show');
-  document.getElementById('teacher-pw-modal').classList.add('show');
-  setTimeout(()=>document.getElementById('teacher-pw-input').focus(), 100);
-}
-function checkTeacherPassword(){
-  const v = document.getElementById('teacher-pw-input').value;
-  if(v === TEACHER_PASSWORD){
-    document.getElementById('teacher-pw-modal').classList.remove('show');
-    renderTeacherPanel();
-    showScreen('teacher-panel-screen');
-  } else {
-    document.getElementById('teacher-pw-error').classList.add('show');
-  }
-}
-function getAllDeviceResults(){
-  const rows = [];
-  for(let i=0;i<localStorage.length;i++){
-    const key = localStorage.key(i);
-    if(!key || key.indexOf(EXAM_KEY_PREFIX+'__')!==0) continue;
-    try{
-      const data = JSON.parse(localStorage.getItem(key));
-      if(data) rows.push({key, data});
-    }catch(e){}
-  }
-  rows.sort((a,b)=> (b.data.timestamp||0) - (a.data.timestamp||0));
-  return rows;
-}
-function renderTeacherPanel(){
-  const rows = getAllDeviceResults();
-  const list = document.getElementById('teacher-panel-list');
-  if(rows.length===0){
-    list.innerHTML = '<p style="color:var(--muted);text-align:center;padding:20px">No submissions found on this device yet.</p>';
-    return;
-  }
-  let html = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.85rem">';
-  html += '<tr style="background:var(--primary);color:#fff;text-align:left">'+
-    '<th style="padding:8px">Name</th><th style="padding:8px">Campus</th><th style="padding:8px">Class</th>'+
-    '<th style="padding:8px">Status</th><th style="padding:8px">Score</th><th style="padding:8px">Grade</th><th style="padding:8px">Date</th></tr>';
-  rows.forEach(r=>{
-    const d = r.data;
-    const s = d.student || {};
-    const info = d.scoreInfo;
-    const status = d.submitted ? '✅ Submitted' : '⏳ In progress';
-    const scoreTxt = info ? `${info.totalCorrect}/${TOTAL_MARKS} (${info.pct}%)` : '—';
-    const gradeTxt = info ? info.grade : '—';
-    const dateTxt = d.timestamp ? new Date(d.timestamp).toLocaleString('en-GB') : '—';
-    html += `<tr style="border-bottom:1px solid var(--border)">
-      <td style="padding:8px">${esc(s.name||'')}</td>
-      <td style="padding:8px">${esc(s.cand||'')}</td>
-      <td style="padding:8px">${esc(s.cls||'')}</td>
-      <td style="padding:8px">${status}</td>
-      <td style="padding:8px">${scoreTxt}</td>
-      <td style="padding:8px">${gradeTxt}</td>
-      <td style="padding:8px">${dateTxt}</td>
-    </tr>`;
-  });
-  html += '</table></div>';
-  list.innerHTML = html;
-}
-function downloadResultsCSV(){
-  const rows = getAllDeviceResults();
-  let csv = 'Name,Campus,Class,Status,Score,Percentage,Grade,Date\n';
-  rows.forEach(r=>{
-    const d = r.data;
-    const s = d.student || {};
-    const info = d.scoreInfo;
-    const status = d.submitted ? 'Submitted' : 'In progress';
-    const score = info ? info.totalCorrect : '';
-    const pct = info ? info.pct : '';
-    const grade = info ? info.grade : '';
-    const date = d.timestamp ? new Date(d.timestamp).toLocaleString('en-GB') : '';
-    const esc2 = v => `"${(v||'').toString().replace(/"/g,'""')}"`;
-    csv += [esc2(s.name), esc2(s.cand), esc2(s.cls), esc2(status), score, pct, grade, esc2(date)].join(',') + '\n';
-  });
-  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'DataRepresentation_Results_' + new Date().toISOString().slice(0,10) + '.csv';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-function clearAllDeviceResults(){
-  if(!confirm('This will permanently delete ALL saved results on this device. Make sure you have downloaded the CSV first. Continue?')) return;
-  const rows = getAllDeviceResults();
-  rows.forEach(r=> localStorage.removeItem(r.key));
-  renderTeacherPanel();
-  alert('All results on this device have been cleared.');
-}
+const STORAGE_KEY = 'almuntazir_y10_datarep_exam_2026';
 let student = {name:'',cand:'',cls:''};
 let timerInterval = null;
 let timerStartEpoch = null;
@@ -807,7 +675,6 @@ function parseDenaryValue(v){
 }
 
 function saveState(){
-  if(!STORAGE_KEY) return;
   const state = {
     student,
     timerStart: timerStartEpoch,
@@ -821,11 +688,11 @@ function saveState(){
   };
   try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
 }
-function loadState(){ if(!STORAGE_KEY) return null; try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)); }catch(e){return null;} }
-function clearState(){ if(!STORAGE_KEY) return; try{ localStorage.removeItem(STORAGE_KEY); }catch(e){} }
-function isSubmitted(){ if(!STORAGE_KEY) return false; try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}').submitted===true; }catch(e){return false;} }
+function loadState(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)); }catch(e){return null;} }
+function clearState(){ try{ localStorage.removeItem(STORAGE_KEY); }catch(e){} }
+function isSubmitted(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}').submitted===true; }catch(e){return false;} }
 function getTimerStart(){ return timerStartEpoch; }
-function getStoredScoreInfo(){ if(!STORAGE_KEY) return null; try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}').scoreInfo||null; }catch(e){return null;} }
+function getStoredScoreInfo(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}').scoreInfo||null; }catch(e){return null;} }
 
 // ── collect / restore answers ──────────────────────────────────────
 function collectAllAnswers(){
@@ -1071,7 +938,93 @@ function gradeAndSubmit(){
   document.body.classList.remove('exam-lockdown');
   exitFullscreenSafely();
   showResults(LAST_RESULTS);
+  syncResultToServer();
 }
+
+/* ════════════════════════════════════════════════
+   SERVER SYNC (Vercel /api/submit) — best-effort, offline-safe
+════════════════════════════════════════════════ */
+const SYNC_QUEUE_KEY = 'almuntazir_y10_datarep_pending_sync';
+
+function buildSyncPayload(){
+  const state = loadState() || {};
+  return {
+    id: state.submissionId || (state.submissionId = (Date.now()+'-'+Math.random().toString(36).slice(2,9))),
+    student,
+    rawTotal: LAST_RESULTS.rawTotal,
+    penaltyMarks: LAST_RESULTS.penaltyMarks,
+    totalCorrect: LAST_RESULTS.totalCorrect,
+    totalMarks: TOTAL_MARKS,
+    pct: LAST_RESULTS.pct,
+    grade: LAST_RESULTS.grade,
+    tabSwitchCount: LAST_RESULTS.tabSwitchCount,
+    submittedAt: LAST_RESULTS.submittedAt
+  };
+}
+
+function queueForRetry(payload){
+  try{
+    const q = JSON.parse(localStorage.getItem(SYNC_QUEUE_KEY)||'[]');
+    if(!q.some(p=>p.id===payload.id)) q.push(payload);
+    localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(q));
+  }catch(e){}
+}
+function clearFromRetryQueue(id){
+  try{
+    const q = JSON.parse(localStorage.getItem(SYNC_QUEUE_KEY)||'[]').filter(p=>p.id!==id);
+    localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(q));
+  }catch(e){}
+}
+
+async function sendPayload(payload){
+  const res = await fetch('/api/submit', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  });
+  if(!res.ok) throw new Error('bad status');
+}
+
+async function generateMarkedPdfBase64(){
+  if(!window.jspdf || !window.jspdf.jsPDF) throw new Error('PDF library not loaded');
+  const { jsPDF } = window.jspdf;
+  const holder = document.createElement('div');
+  holder.style.position='fixed';
+  holder.style.left='-9999px';
+  holder.style.top='0';
+  holder.style.width='780px';
+  holder.style.background='#ffffff';
+  holder.style.padding='16px';
+  holder.innerHTML = buildMarkedPaperHTML(LAST_RESULTS);
+  document.body.appendChild(holder);
+  try{
+    const doc = new jsPDF({ unit:'pt', format:'a4' });
+    await doc.html(holder, { margin:[24,24,24,24], autoPaging:'text', width:547, windowWidth:780 });
+    const dataUri = doc.output('datauristring');
+    return dataUri.split(',')[1];
+  } finally {
+    document.body.removeChild(holder);
+  }
+}
+
+async function syncResultToServer(){
+  const payload = buildSyncPayload();
+  try{ payload.pdfBase64 = await generateMarkedPdfBase64(); }catch(e){ /* endelea bila PDF */ }
+  const st = loadState() || {};
+  st.submissionId = payload.id;
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(st)); }catch(e){}
+  try{ await sendPayload(payload); }catch(e){ queueForRetry(payload); }
+}
+
+function flushPendingSync(){
+  let q = [];
+  try{ q = JSON.parse(localStorage.getItem(SYNC_QUEUE_KEY)||'[]'); }catch(e){}
+  q.forEach(payload=>{
+    sendPayload(payload).then(()=>clearFromRetryQueue(payload.id)).catch(()=>{});
+  });
+}
+window.addEventListener('online', flushPendingSync);
+document.addEventListener('DOMContentLoaded', flushPendingSync);
 
 /* ════════════════════════════════════════════════
    RESULTS SCREEN
@@ -1133,10 +1086,7 @@ function showLockedResults(){
 /* ════════════════════════════════════════════════
    FEEDBACK / REVIEWED EXAM
 ════════════════════════════════════════════════ */
-function showFeedback(){
-  const info = LAST_RESULTS;
-  if(!info) return;
-  const area = document.getElementById('cert-container');
+function buildMarkedPaperHTML(info){
   let html = `
     <div class="results-card">
       <div class="print-report-header" style="display:none">
@@ -1191,13 +1141,21 @@ function showFeedback(){
   block('SECTION C – Denary to Binary (15 marks)', info.results.C, q=> q.ans);
   block('SECTION D – Addition of Binary (20 marks)', info.results.D, q=> q.ans);
 
-  html += `</div>
+  html += `</div>`;
+  return html;
+}
+
+function showFeedback(){
+  const info = LAST_RESULTS;
+  if(!info) return;
+  const area = document.getElementById('cert-container');
+  let html = buildMarkedPaperHTML(info);
+  html += `
     <div class="flex-actions no-print">
       <button class="btn btn-gold btn-lg" onclick="showCert()">🏅 View Certificate</button>
       <button class="btn btn-secondary" onclick="showScreen('results-screen')">← Back</button>
       <button class="btn btn-primary" onclick="printFeedback()">🖨 Print</button>
     </div>`;
-
   area.innerHTML = html;
   showScreen('cert-screen');
 }
@@ -1255,45 +1213,11 @@ function startExam(){
   document.getElementById('err-class').classList.toggle('show', !cls); if(!cls) ok=false;
   if(!ok) return;
 
-  STORAGE_KEY = makeStorageKey(name, cand, cls);
-  const existing = loadState();
-
-  // Reset any lock message left over from a previous name typed in this session
-  document.getElementById('reg-form').style.display = 'block';
-  document.getElementById('locked-msg').style.display = 'none';
-
-  if(existing && existing.submitted){
-    document.getElementById('reg-form').style.display = 'none';
-    document.getElementById('locked-msg').style.display = 'block';
-    const info = existing.scoreInfo;
-    document.getElementById('locked-text').textContent = info
-      ? `Hi ${name}, this exam was already submitted on ${existing.timerStart?new Date(existing.timerStart).toLocaleDateString('en-GB'):'a previous date'}. Score: ${info.totalCorrect}/${TOTAL_MARKS} (${info.pct}%) – Grade ${info.grade}.`
-      : `Hi ${name}, this exam has already been submitted from this device.`;
-    return;
-  }
-
   student = {name, cand, cls};
   document.getElementById('student-chip').textContent = name;
   document.getElementById('student-chip').style.display = 'block';
-  unlockAlarmAudio();
 
-  if(existing && existing.timerStart){
-    // Resume this specific student's in-progress attempt (same device, e.g. after a reload)
-    timerStartEpoch = existing.timerStart;
-    securityLog = existing.securityLog || [];
-    tabSwitchCount = existing.tabSwitchCount || 0;
-    penaltyMarks = existing.penaltyMarks || 0;
-    document.body.classList.add('exam-lockdown');
-    requestExamFullscreen();
-    buildQuiz();
-    restoreAnswers(existing.answers);
-    showSection(0);
-    showScreen('quiz-screen');
-    startTimer(timerStartEpoch);
-    updateAnsweredCount();
-    logSecurity('Exam resumed for ' + name);
-    return;
-  }
+  unlockAlarmAudio();
 
   tabSwitchCount = 0;
   penaltyMarks = 0;
@@ -1498,10 +1422,42 @@ function dismissOverlay(){
 (function init(){
   setupSecurity();
   syncTimerBannerPosition();
-  // We can no longer pre-check "already submitted" at page load, because the
-  // lock is now per-student (name+class), not per-device. The check happens
-  // inside startExam() once the student has typed their name/campus/class.
-  showScreen('reg-screen');
+
+  const state = loadState();
+  if(!state){ showScreen('reg-screen'); return; }
+
+  student = state.student || {name:'',cand:'',cls:''};
+  securityLog = state.securityLog || [];
+  tabSwitchCount = state.tabSwitchCount || 0;
+  penaltyMarks = state.penaltyMarks || 0;
+
+  if(state.submitted){
+    document.getElementById('reg-form').style.display = 'none';
+    document.getElementById('locked-msg').style.display = 'block';
+    const info = state.scoreInfo;
+    document.getElementById('locked-text').textContent = info
+      ? `This exam was submitted on ${state.timerStart?new Date(state.timerStart).toLocaleDateString('en-GB'):'a previous date'}. Score: ${info.totalCorrect}/${TOTAL_MARKS} (${info.pct}%) – Grade ${info.grade}.`
+      : 'This exam has already been submitted.';
+    showScreen('reg-screen');
+    return;
+  }
+
+  if(state.timerStart && student.name){
+    timerStartEpoch = state.timerStart;
+    document.getElementById('student-chip').textContent = student.name;
+    document.getElementById('student-chip').style.display = 'block';
+    document.body.classList.add('exam-lockdown');
+    buildQuiz();
+    restoreAnswers(state.answers);
+    showSection(0);
+    showScreen('quiz-screen');
+    startTimer(state.timerStart);
+    updateAnsweredCount();
+    logSecurity('Exam resumed after page reload');
+    requestExamFullscreen();
+  } else {
+    showScreen('reg-screen');
+  }
 })();
 </script>
 <div class="footer-credit no-print">⚡ DESIGNED BY MR. BEDA (COMPUTER SCIENCE MASTER) ⚡</div>
