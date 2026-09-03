@@ -371,7 +371,6 @@ body.exam-lockdown input, body.exam-lockdown textarea{ -webkit-user-select:text;
 </style>
 </head>
 <body>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <!-- ══ SECURITY OVERLAY ══ -->
@@ -985,31 +984,96 @@ async function sendPayload(payload){
   if(!res.ok) throw new Error('bad status');
 }
 
-async function generateMarkedPdfBase64(){
-  if(!window.jspdf || !window.jspdf.jsPDF) throw new Error('PDF library not loaded');
-  const { jsPDF } = window.jspdf;
-  const holder = document.createElement('div');
-  holder.style.position='fixed';
-  holder.style.left='-9999px';
-  holder.style.top='0';
-  holder.style.width='780px';
-  holder.style.background='#ffffff';
-  holder.style.padding='16px';
-  holder.innerHTML = buildMarkedPaperHTML(LAST_RESULTS);
-  document.body.appendChild(holder);
-  try{
-    const doc = new jsPDF({ unit:'pt', format:'a4' });
-    await doc.html(holder, { margin:[24,24,24,24], autoPaging:'text', width:547, windowWidth:780 });
-    const dataUri = doc.output('datauristring');
-    return dataUri.split(',')[1];
-  } finally {
-    document.body.removeChild(holder);
-  }
+function generateMarkedPdfBase64(){
+  return new Promise((resolve)=>{
+    try{
+      const info = LAST_RESULTS;
+      if(!window.jspdf || !window.jspdf.jsPDF || !info){ resolve(null); return; }
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit:'pt', format:'a4' });
+      const marginX = 40;
+      const pageW = doc.internal.pageSize.getWidth();
+      const pageH = doc.internal.pageSize.getHeight();
+      const maxW = pageW - marginX*2;
+      let y = 50;
+
+      function ensureSpace(lineCount){
+        if(y + lineCount*13 > pageH - 40){ doc.addPage(); y = 50; }
+      }
+      function addWrapped(text, size, style, color){
+        doc.setFont('helvetica', style||'normal');
+        doc.setFontSize(size||10);
+        const c = color||[30,30,30];
+        doc.setTextColor(c[0],c[1],c[2]);
+        const lines = doc.splitTextToSize(String(text||''), maxW);
+        ensureSpace(lines.length);
+        doc.text(lines, marginX, y);
+        y += lines.length*(size*1.15) + 4;
+      }
+
+      doc.setFont('helvetica','bold'); doc.setFontSize(14); doc.setTextColor(26,58,107);
+      doc.text("Al Muntazir Islamic Int'l School", marginX, y); y+=18;
+      doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(80,80,80);
+      doc.text('Computer Science – Data Representation Test – Marked Paper', marginX, y); y+=22;
+      doc.setDrawColor(220,220,220); doc.line(marginX, y, pageW-marginX, y); y+=16;
+
+      addWrapped(`Student: ${student.name}    Class: ${student.cls||''}    Campus: ${student.cand||''}`, 11, 'bold');
+      addWrapped(`Total: ${info.totalCorrect}/${TOTAL_MARKS}    Percentage: ${info.pct}%    Grade: ${info.grade}`, 11, 'bold');
+      y += 6;
+
+      function section(title, items, correctText){
+        ensureSpace(2);
+        doc.setFillColor(26,58,107);
+        doc.rect(marginX, y-11, maxW, 18, 'F');
+        doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(10.5);
+        doc.text(title, marginX+6, y+1);
+        y += 20;
+
+        items.forEach((item, idx)=>{
+          const {q,given,ok} = item;
+          const earned = (typeof item.earned==='number') ? item.earned : (ok?q.marks:0);
+          const statusLabel = ok ? 'CORRECT' : (earned>0 ? 'PARTIAL' : 'WRONG');
+          const statusColor = ok ? [22,163,74] : (earned>0 ? [180,83,9] : [220,38,38]);
+
+          addWrapped(`${idx+1}. ${q.prompt||q.shortQ||''}`, 10, 'bold', [20,20,20]);
+          const givenTxt = given && given.toString().trim() ? given.toString() : 'No answer given';
+          addWrapped(`Your answer: ${givenTxt}`, 9.5, 'normal', [60,60,60]);
+
+          ensureSpace(1);
+          doc.setFont('helvetica','bold'); doc.setFontSize(9.5);
+          doc.setTextColor(statusColor[0],statusColor[1],statusColor[2]);
+          doc.text(`${statusLabel} (${earned}/${q.marks} mark${q.marks>1?'s':''})`, marginX, y);
+          y += 13;
+
+          if(q.kind==='keyword'){
+            (item.matchedGroups||[]).forEach(l=> addWrapped(`  + ${l}`, 9, 'normal', [22,163,74]));
+            (item.missedGroups||[]).forEach(l=> addWrapped(`  - ${l}`, 9, 'normal', [220,38,38]));
+            if(!ok) addWrapped(`Model answer: ${q.model||''}`, 9, 'italic', [90,90,90]);
+          } else if(!ok){
+            addWrapped(`Correct answer: ${correctText(q)}`, 9, 'italic', [90,90,90]);
+          }
+          y += 6;
+        });
+        y += 4;
+      }
+
+      section('SECTION A - Introduction & Definitions (10 marks)', info.results.A, q=> q.correctAnswerText || 'See model answer above.');
+      section('SECTION B - Binary to Denary (15 marks)', info.results.B, q=> q.ans.toString());
+      section('SECTION C - Denary to Binary (15 marks)', info.results.C, q=> q.ans);
+      section('SECTION D - Addition of Binary (20 marks)', info.results.D, q=> q.ans);
+
+      const dataUri = doc.output('datauristring');
+      resolve(dataUri.split(',')[1]);
+    }catch(e){
+      resolve(null);
+    }
+  });
 }
 
 async function syncResultToServer(){
   const payload = buildSyncPayload();
-  try{ payload.pdfBase64 = await generateMarkedPdfBase64(); }catch(e){ /* endelea bila PDF */ }
+  const pdf = await generateMarkedPdfBase64();
+  if(pdf) payload.pdfBase64 = pdf;
   const st = loadState() || {};
   st.submissionId = payload.id;
   try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(st)); }catch(e){}
