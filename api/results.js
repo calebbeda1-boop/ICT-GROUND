@@ -1,3 +1,6 @@
+// GET /api/results — inatumiwa na admin.html kuonyesha matokeo ya wanafunzi wote.
+// Inahitaji password sahihi (ADMIN_PASSWORD env var) kwenye header 'x-admin-password'.
+
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const TABLE = 'exam_submissions';
@@ -26,6 +29,7 @@ export default async function handler(req, res) {
     }
     const rows = await r.json();
 
+    // Badilisha snake_case (Postgres) kuwa camelCase (kama admin.html inavyotarajia)
     const submissions = rows.map(row => ({
       id: row.id,
       name: row.name,
@@ -39,7 +43,8 @@ export default async function handler(req, res) {
       grade: row.grade,
       tabSwitchCount: row.tab_switch_count,
       submittedAt: row.submitted_at,
-      receivedAt: row.received_at
+      receivedAt: row.received_at,
+      pdfUrl: row.pdf_url || null
     }));
 
     res.status(200).json({ submissions });
