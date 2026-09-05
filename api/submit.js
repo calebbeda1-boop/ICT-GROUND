@@ -1,45 +1,19 @@
 // POST /api/submit — inaitwa kiotomatiki na index.html baada ya mwanafunzi kuwasilisha mtihani.
-// Inahifadhi kila jaribio kama safu (row) kwenye jedwali la Supabase, na PDF ya "marked paper" kwenye Supabase Storage.
+// Inahifadhi kila jaribio kama ujumbe mmoja ndani ya orodha ya Redis (Upstash), atomiki (hakuna coalition/race).
 
-const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const TABLE = 'exam_submissions';
-const BUCKET = 'marked-exams';
+const REDIS_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+const REDIS_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+const LIST_KEY = 'exam_submissions';
 
-async function uploadPdf(id, base64) {
-  const buf = Buffer.from(base64, 'base64');
-  const r = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${id}.pdf`, {
+async function redisCommand(cmd) {
+  const r = await fetch(REDIS_URL, {
     method: 'POST',
-    headers: {
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-      apikey: SUPABASE_KEY,
-      'Content-Type': 'application/pdf',
-      'x-upsert': 'true'
-    },
-    body: buf
+    headers: { Authorization: `Bearer ${REDIS_TOKEN}` },
+    body: JSON.stringify(cmd)
   });
-  if (!r.ok) {
-    const text = await r.text();
-    throw new Error(text || `Supabase Storage error (${r.status})`);
-  }
-  return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${id}.pdf`;
-}
-
-async function upsertRecord(record) {
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?on_conflict=id`, {
-    method: 'POST',
-    headers: {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-      'Content-Type': 'application/json',
-      Prefer: 'resolution=merge-duplicates,return=minimal'
-    },
-    body: JSON.stringify([record])
-  });
-  if (!r.ok) {
-    const text = await r.text();
-    throw new Error(text || `Supabase error (${r.status})`);
-  }
+  const data = await r.json();
+  if (data.error) throw new Error(data.error);
+  return data.result;
 }
 
 export default async function handler(req, res) {
@@ -47,8 +21,8 @@ export default async function handler(req, res) {
     res.status(405).json({ error: 'Method not allowed' });
     return;
   }
-  if (!SUPABASE_URL || !SUPABASE_KEY) {
-    res.status(500).json({ error: 'Storage haijawekwa (SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY hazipo).' });
+  if (!REDIS_URL || !REDIS_TOKEN) {
+    res.status(500).json({ error: 'Storage haijawekwa (KV_REST_API_URL / KV_REST_API_TOKEN hazipo). Ongeza Upstash Redis kwenye mradi wako wa Vercel.' });
     return;
   }
 
@@ -64,28 +38,30 @@ export default async function handler(req, res) {
       name: String(body.student.name || '').slice(0, 120),
       cand: String(body.student.cand || '').slice(0, 60),
       cls: String(body.student.cls || '').slice(0, 60),
-      raw_total: Number(body.rawTotal) || 0,
-      penalty_marks: Number(body.penaltyMarks) || 0,
-      total_correct: Number(body.totalCorrect) || 0,
-      total_marks: Number(body.totalMarks) || 0,
+      rawTotal: Number(body.rawTotal) || 0,
+      penaltyMarks: Number(body.penaltyMarks) || 0,
+      totalCorrect: Number(body.totalCorrect) || 0,
+      totalMarks: Number(body.totalMarks) || 0,
       pct: Number(body.pct) || 0,
       grade: String(body.grade || ''),
-      tab_switch_count: Number(body.tabSwitchCount) || 0,
-      submitted_at: Number(body.submittedAt) || Date.now(),
-      received_at: Date.now()
+      tabSwitchCount: Number(body.tabSwitchCount) || 0,
+      submittedAt: Number(body.submittedAt) || Date.now(),
+      receivedAt: Date.now()
     };
 
-    if (body.pdfBase64) {
-      try {
-        record.pdf_url = await uploadPdf(record.id, body.pdfBase64);
-      } catch (e) {
-        // Endelea kuhifadhi matokeo hata kama PDF imeshindikana kupakiwa
-        record.pdf_url = null;
-      }
+    // Ondoa nakala ya awali yenye id sawa (mfano: retry baada ya mtandao kukatika), kisha weka mpya.
+    await redisCommand(['LREM', LIST_KEY, 0, JSON.stringify(record)]);
+    const existing = await redisCommand(['LRANGE', LIST_KEY, 0, -1]);
+    const filtered = (existing || []).filter(s => {
+      try { return JSON.parse(s).id !== record.id; } catch (e) { return true; }
+    });
+    if (filtered.length !== (existing || []).length) {
+      await redisCommand(['DEL', LIST_KEY]);
+      if (filtered.length) await redisCommand(['RPUSH', LIST_KEY, ...filtered]);
     }
+    await redisCommand(['RPUSH', LIST_KEY, JSON.stringify(record)]);
 
-    await upsertRecord(record);
-    res.status(200).json({ ok: true, id: record.id, pdf_url: record.pdf_url || null });
+    res.status(200).json({ ok: true, id: record.id });
   } catch (e) {
     res.status(500).json({ error: e.message || 'Server error' });
   }
