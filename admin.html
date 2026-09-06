@@ -4,350 +4,260 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#050505">
-<title>ICT Ground | Admin</title>
+<title>ICT Ground | ALMIIS Computer Science</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/orbital/tooplate-2167-orbital-style.css">
 <style>
-:root{
-  --void:#050505; --violet:#8b5cf6; --cyan:#06b6d4; --green:#39ff8c; --gold:#e8c468;
-  --white:#fff; --dim:rgba(255,255,255,.6); --faint:rgba(255,255,255,.34);
-  --card:rgba(255,255,255,.035); --border:rgba(255,255,255,.1);
-  --ease:cubic-bezier(.16,1,.3,1);
-}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth}
-body{background:var(--void);color:var(--white);font-family:'Space Grotesk',sans-serif;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
-a{color:inherit}
-.mono{font-family:'JetBrains Mono',monospace}
+  .panel-locked .panel-face--text .p-label::after{
+    content:'SOON'; font-size:.6rem; letter-spacing:1.5px; color:#8892a6;
+    border:1px solid #3a4256; border-radius:20px; padding:2px 8px; margin-left:8px; vertical-align:middle;
+  }
+  .panel-locked .panel-cap::after{ content:' · SOON'; opacity:.7; font-size:.7em; }
+  .assess-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:18px; margin-top:36px}
+  .assess-card{
+    background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); border-radius:14px;
+    padding:24px; text-decoration:none; display:block; position:relative; overflow:hidden;
+    transition:transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+  }
+  .assess-card::before{
+    content:''; position:absolute; inset:0; border-radius:inherit; padding:1px; pointer-events:none;
+    background:linear-gradient(135deg, rgba(139,92,246,.55), rgba(6,182,212,.35));
+    -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude; opacity:0; transition:opacity .25s ease;
+  }
+  .assess-card:hover, .assess-card:active{
+    transform:translateY(-3px); border-color:rgba(120,170,255,.4); background:rgba(255,255,255,.055);
+    box-shadow:0 0 30px rgba(120,170,255,.22), 0 0 60px rgba(139,92,246,.12);
+  }
+  .assess-card:hover::before, .assess-card:active::before{ opacity:1; }
+  @media (hover:none){ .assess-card:active{ transform:translateY(-1px) scale(.98); } }
+  .assess-subject{ font:600 .68rem/1 'JetBrains Mono',monospace; letter-spacing:1.5px; text-transform:uppercase; color:#8fb3ff; margin-bottom:10px; }
+  .assess-card h3{ font-family:'Space Grotesk',sans-serif; font-size:1.15rem; color:#05631b; margin-bottom:8px; }
+  .assess-card p{ font-family:'Space Grotesk',sans-serif; font-size:.85rem; color:#a7afc2; line-height:1.55; margin-bottom:16px; }
+  .assess-cta{ font:700 .72rem/1 'JetBrains Mono',monospace; letter-spacing:1px; color:#8fb3ff; }
+  .staff-login{
+    position:fixed; bottom:max(20px, env(safe-area-inset-bottom)); right:max(20px, env(safe-area-inset-right)); z-index:50;
+    font:600 .72rem/1 'JetBrains Mono',monospace; letter-spacing:1px; text-transform:uppercase;
+    color:#a7afc2; text-decoration:none; border:1px solid rgba(255,255,255,.15); border-radius:20px;
+    padding:10px 18px; background:rgba(10,12,20,.5); backdrop-filter:blur(6px);
+    transition:color .25s ease, border-color .25s ease, box-shadow .25s ease, transform .15s ease;
+  }
+  .staff-login:hover, .staff-login:active{
+    color:#fff; border-color:rgba(143,179,255,.6);
+    box-shadow:0 0 18px rgba(143,179,255,.35), 0 0 34px rgba(139,92,246,.2);
+  }
+  @media (hover:none){ .staff-login:active{ transform:scale(.96); } }
 
-.aura{position:fixed;inset:-25%;z-index:0;pointer-events:none;
-  background:radial-gradient(circle at 50% 40%, rgba(232,196,104,.14), rgba(58,28,92,.35) 30%, transparent 65%);
-  animation:drift 22s ease-in-out infinite alternate}
-@keyframes drift{from{transform:translate3d(-2%,-1%,0) scale(1)}to{transform:translate3d(2%,3%,0) scale(1.12)}}
+  .footer-grid{display:flex; justify-content:center; grid-template-columns:1fr; padding-top:0; padding-bottom:28px; border-top:1px solid rgba(255,255,255,.08); margin-top:-6px;}
+  .founder-card{display:flex; align-items:center; gap:16px; padding-top:24px;}
+  .founder-avatar{
+    width:56px; height:56px; border-radius:50%; overflow:hidden; flex-shrink:0;
+    border:2px solid rgba(255,255,255,.15); background:rgba(255,255,255,.05);
+    box-shadow:0 0 0 1px rgba(139,92,246,.25), 0 0 22px rgba(57,255,140,.35);
+    transition:box-shadow .4s ease, border-color .4s ease, transform .3s ease;
+  }
+  .founder-card:hover .founder-avatar, .founder-card:active .founder-avatar{
+    border-color:rgba(57,255,140,.6);
+    box-shadow:0 0 0 1px rgba(57,255,140,.5), 0 0 34px rgba(57,255,140,.5), 0 0 50px rgba(139,92,246,.25);
+    transform:scale(1.04);
+  }
+  .founder-avatar img{width:100%; height:100%; object-fit:cover; object-position:top center; border-radius:50%;}
+  .founder-text{display:flex; flex-direction:column; text-align:left;}
+  .founder-text small{font:600 .62rem/1 'JetBrains Mono',monospace; letter-spacing:1.5px; text-transform:uppercase; color:#8fb3ff; margin-bottom:4px;}
+  .founder-text b{font-family:'Space Grotesk',sans-serif; font-size:.95rem; color:#f2f4fa;}
+  .founder-text span{font-family:'Space Grotesk',sans-serif; font-size:.75rem; color:#a7afc2; display:block;}
 
-.brand-name{color:var(--green);text-shadow:0 0 10px rgba(57,255,140,.6),0 0 22px rgba(57,255,140,.25)}
-::selection{background:rgba(139,92,246,.45);color:#fff}
-::-webkit-scrollbar{width:10px}
-::-webkit-scrollbar-track{background:var(--void)}
-::-webkit-scrollbar-thumb{background:linear-gradient(var(--violet),var(--cyan));border-radius:10px;box-shadow:0 0 10px rgba(6,182,212,.6)}
-:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+  /* ============ TOUCH / HOVER GLOW ON RING PANELS ============ */
+  .panel{ cursor:pointer; }
+  .panel .panel-glow{
+    position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:5;
+    opacity:0; transition:opacity .35s ease;
+    background:radial-gradient(140px circle at var(--gx,50%) var(--gy,50%), rgba(143,179,255,.65), rgba(143,179,255,.12) 45%, transparent 70%);
+    mix-blend-mode:screen;
+  }
+  .panel.is-glowing .panel-glow{ opacity:1; }
+  .panel.is-glowing{
+    box-shadow:0 0 0 1px rgba(143,179,255,.55), 0 0 26px 4px rgba(143,179,255,.35);
+  }
+  .panel-locked.is-glowing{
+    box-shadow:0 0 0 1px rgba(167,175,194,.4), 0 0 18px 2px rgba(167,175,194,.22);
+  }
+  @media (prefers-reduced-motion: reduce){
+    .panel .panel-glow{ transition:none; }
+  }
 
-#gate{
-  position:relative;z-index:2;max-width:380px;margin:12vh auto;padding:38px 32px;border-radius:18px;
-  background:#0b0d14;border:1px solid rgba(232,196,104,.25);
-  box-shadow:0 30px 70px rgba(0,0,0,.6),0 0 60px rgba(139,92,246,.12),0 0 30px rgba(232,196,104,.08);
-}
-#gate .crown{font-size:2rem;text-align:center;margin-bottom:6px;filter:drop-shadow(0 0 12px rgba(232,196,104,.6))}
-#gate .eyebrow{text-align:center;font:600 11px/1 'JetBrains Mono',monospace;letter-spacing:3px;color:var(--gold);margin-bottom:18px}
-#gate h2{font-size:1.3rem;text-align:center;margin-bottom:22px;font-weight:700}
-#gate input{
-  width:100%;padding:13px 14px;border:1px solid var(--border);border-radius:10px;font-size:.95rem;
-  margin-bottom:12px;background:rgba(255,255,255,.04);color:#fff;font-family:'Space Grotesk',sans-serif;
-  transition:border-color .3s ease,box-shadow .3s ease;
-}
-#gate input:focus{border-color:rgba(232,196,104,.6);box-shadow:0 0 18px rgba(232,196,104,.2);outline:none}
-#gate button{
-  width:100%;padding:13px;border:none;border-radius:10px;color:#0b0d14;font-weight:700;cursor:pointer;font-size:.92rem;
-  background:linear-gradient(120deg,var(--gold),var(--cyan));transition:transform .15s ease,box-shadow .3s ease;
-}
-#gate button:hover,#gate button:active{box-shadow:0 0 30px rgba(232,196,104,.4),0 0 50px rgba(6,182,212,.25);transform:translateY(-1px)}
-#gate .err{color:#ff6b6b;font-size:.82rem;margin-top:10px;text-align:center;display:none}
+  /* ============ TOPIC → SUBTOPIC MODAL ============ */
+  .topic-modal-overlay{
+    position:fixed; inset:0; z-index:300; display:none; align-items:center; justify-content:center;
+    padding:20px; background:rgba(5,6,12,.72); backdrop-filter:blur(4px);
+  }
+  .topic-modal-overlay.show{ display:flex; }
+  @keyframes modalUp{ from{opacity:0; transform:translateY(16px);} to{opacity:1; transform:translateY(0);} }
+  .topic-modal{
+    width:100%; max-width:560px; max-height:min(82vh, 720px); overflow-y:auto; border-radius:16px;
+    background:#0e1119; border:1px solid rgba(143,179,255,.22);
+    box-shadow:0 30px 70px rgba(0,0,0,.55), 0 0 50px rgba(143,179,255,.16), 0 0 90px rgba(139,92,246,.08);
+    animation:modalUp .25s ease;
+  }
+  .topic-modal-head{
+    position:sticky; top:0; background:linear-gradient(150deg, rgba(143,179,255,.14), rgba(14,17,25,.9) 70%);
+    padding:22px 24px; display:flex; align-items:flex-start; justify-content:space-between; gap:14px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .topic-modal-head .p-num{ font:600 .7rem/1 'JetBrains Mono',monospace; color:#8fb3ff; letter-spacing:1.5px; margin-bottom:6px; }
+  .topic-modal-head h3{ font-family:'Space Grotesk',sans-serif; font-size:1.25rem; color:#f2f4fa; }
+  .topic-modal-head span{ font-family:'Space Grotesk',sans-serif; font-size:.8rem; color:#a7afc2; display:block; margin-top:4px; }
+  .topic-modal-close{
+    position:relative; width:36px; height:36px; flex-shrink:0; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,.06); color:#f2f4fa; font-size:16px; line-height:1; border:1px solid rgba(255,255,255,.1);
+    transition:background .2s ease, box-shadow .2s ease, transform .15s ease; cursor:pointer;
+  }
+  .topic-modal-close::before{ content:''; position:absolute; inset:-8px; }
+  .topic-modal-close:hover, .topic-modal-close:active{ background:rgba(255,255,255,.14); box-shadow:0 0 16px rgba(143,179,255,.3); }
+  @media (hover:none){ .topic-modal-close:active{ transform:scale(.9); } }
+  .topic-modal-body{ padding:18px 24px 26px; display:flex; flex-direction:column; gap:12px; }
+  .subtopic-link{
+    display:flex; align-items:center; justify-content:space-between; gap:14px;
+    padding:16px 18px; border-radius:12px; text-decoration:none;
+    background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08);
+    transition:transform .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
+  }
+  .subtopic-link:hover, .subtopic-link:active{
+    transform:translateX(3px); border-color:rgba(143,179,255,.45); background:rgba(255,255,255,.055);
+    box-shadow:0 0 22px rgba(143,179,255,.18);
+  }
+  @media (hover:none){ .subtopic-link:active{ transform:translateX(1px) scale(.99); } }
+  .subtopic-link .st-info b{ font-family:'Space Grotesk',sans-serif; font-size:.95rem; color:#f2f4fa; display:block; margin-bottom:4px; }
+  .subtopic-link .st-info small{ font-family:'Space Grotesk',sans-serif; font-size:.78rem; color:#a7afc2; line-height:1.5; }
+  .subtopic-link .st-go{ font:700 .68rem/1 'JetBrains Mono',monospace; letter-spacing:1px; color:#8fb3ff; white-space:nowrap; }
+  .topic-modal-soon{
+    padding:26px 4px 6px; text-align:center; font-family:'Space Grotesk',sans-serif; color:#a7afc2; font-size:.9rem; line-height:1.6;
+  }
 
-#dash{display:none;position:relative;z-index:2}
-.topbar{
-  position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
-  padding:18px clamp(18px,4vw,44px);background:rgba(5,5,5,.75);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);
-}
-.logo{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;letter-spacing:3px}
-.btn-ghost{
-  font:600 12px/1 'JetBrains Mono',monospace;letter-spacing:1px;color:var(--dim);text-transform:uppercase;
-  background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:20px;padding:9px 18px;cursor:pointer;
-  transition:color .2s ease,border-color .2s ease,box-shadow .2s ease;
-}
-.btn-ghost:hover,.btn-ghost:active{color:#fff;border-color:rgba(255,255,255,.35);box-shadow:0 0 16px rgba(255,255,255,.1)}
-
-main{max-width:1180px;margin:0 auto;padding:28px clamp(16px,4vw,32px) 60px}
-
-.tabs{display:flex;gap:8px;margin-bottom:26px;padding:5px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;width:fit-content;max-width:100%;overflow-x:auto}
-.tab-btn{
-  font:700 12px/1 'JetBrains Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);
-  background:none;border:none;border-radius:10px;padding:12px 20px;cursor:pointer;white-space:nowrap;
-  transition:color .25s ease,background .25s ease,box-shadow .25s ease;
-}
-.tab-btn.active{color:#0b0d14;background:linear-gradient(120deg,var(--gold),var(--violet));box-shadow:0 0 24px rgba(139,92,246,.35)}
-.tab-panel{display:none}
-.tab-panel.active{display:block;animation:fadeUp .35s var(--ease)}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-
-.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:22px}
-.stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;transition:box-shadow .25s ease,border-color .25s ease}
-.stat:hover{border-color:rgba(232,196,104,.35);box-shadow:0 0 26px rgba(232,196,104,.12)}
-.stat .n{font-size:1.7rem;font-weight:700;background:linear-gradient(120deg,var(--gold),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
-.stat .l{font-size:.74rem;color:var(--dim);margin-top:2px}
-
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
-.toolbar input[type=text]{
-  flex:1;min-width:180px;padding:11px 14px;border:1px solid var(--border);border-radius:10px;font-size:.88rem;
-  background:rgba(255,255,255,.04);color:#fff;font-family:'Space Grotesk',sans-serif;
-}
-.toolbar input[type=text]:focus{border-color:rgba(6,182,212,.5);outline:none;box-shadow:0 0 14px rgba(6,182,212,.15)}
-.btn{
-  padding:11px 18px;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:.8rem;
-  font-family:'JetBrains Mono',monospace;letter-spacing:.5px;color:#0b0d14;background:linear-gradient(120deg,var(--cyan),var(--violet));
-  transition:transform .15s ease,box-shadow .25s ease;
-}
-.btn:hover,.btn:active{box-shadow:0 0 22px rgba(6,182,212,.35);transform:translateY(-1px)}
-.btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;transform:none}
-.btn.secondary{background:rgba(255,255,255,.07);color:var(--dim)}
-.btn.secondary:hover,.btn.secondary:active{color:#fff}
-.btn.danger{background:rgba(220,38,38,.12);color:#ff8787;border:1px solid rgba(220,38,38,.3)}
-.btn.danger:hover,.btn.danger:active{box-shadow:0 0 18px rgba(220,38,38,.3)}
-
-.table-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:640px}
-th,td{padding:12px 14px;text-align:left;font-size:.84rem;border-bottom:1px solid var(--border);white-space:nowrap}
-th{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--gold);cursor:pointer;background:rgba(255,255,255,.03)}
-th:hover{color:#fff}
-tbody tr{transition:background .15s ease}
-tbody tr:hover{background:rgba(255,255,255,.035)}
-.grade-pill{display:inline-block;padding:3px 11px;border-radius:20px;font-weight:700;font-size:.72rem;font-family:'JetBrains Mono',monospace}
-.g-A{background:rgba(57,255,140,.12);color:var(--green)} .g-B{background:rgba(6,182,212,.14);color:var(--cyan)}
-.g-C{background:rgba(232,196,104,.15);color:var(--gold)} .g-D,.g-E,.g-F{background:rgba(220,38,38,.14);color:#ff8787}
-.flag{color:#ff8787;font-weight:700}
-.type-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:.68rem;font-family:'JetBrains Mono',monospace;background:rgba(255,255,255,.06);color:var(--dim)}
-.empty{text-align:center;padding:50px 20px;color:var(--faint);font-size:.9rem}
-.pdf-link{
-  display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;
-  background:linear-gradient(120deg,var(--cyan),var(--violet));color:#0b0d14;
-  font:700 .74rem/1 'JetBrains Mono',monospace;text-decoration:none;transition:transform .15s ease,box-shadow .2s ease;
-}
-.pdf-link:hover,.pdf-link:active{box-shadow:0 0 18px rgba(6,182,212,.4);transform:translateY(-1px)}
-.pdf-missing{color:var(--faint);font-size:.78rem;font-style:italic}
-.btn-icon-sm{
-  padding:6px 12px;border-radius:8px;font-size:.68rem;font-family:'JetBrains Mono',monospace;font-weight:700;
-  cursor:pointer;border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--dim);margin-right:6px;
-  transition:all .15s ease;
-}
-.btn-icon-sm:hover{color:#fff;border-color:rgba(255,255,255,.3)}
-.btn-icon-sm.danger{background:rgba(220,38,38,.1);color:#ff8787;border-color:rgba(220,38,38,.25)}
-.btn-icon-sm.danger:hover{box-shadow:0 0 14px rgba(220,38,38,.3)}
-
-.upload-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:26px clamp(18px,4vw,30px);margin-bottom:26px}
-.upload-card h3{font-size:1.05rem;margin-bottom:18px;font-weight:600;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.editing-badge{
-  font:700 10px/1 'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase;color:#0b0d14;
-  background:linear-gradient(120deg,var(--gold),var(--cyan));padding:5px 12px;border-radius:20px;
-}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-@media (max-width:560px){.form-row{grid-template-columns:1fr}}
-.field label{display:block;font:700 10px/1 'JetBrains Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
-.field select,.field input[type=text],.field input[type=url]{
-  width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:10px;font-size:.9rem;
-  background:rgba(255,255,255,.04);color:#fff;font-family:'Space Grotesk',sans-serif;
-}
-.field select:focus,.field input:focus{border-color:rgba(6,182,212,.5);outline:none}
-.field select{appearance:none;-webkit-appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2306b6d4'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 14px center;padding-right:34px}
-
-.type-toggle{display:flex;gap:8px;margin-bottom:16px}
-.type-toggle button{
-  flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.03);color:var(--dim);
-  font:700 12px/1 'JetBrains Mono',monospace;letter-spacing:1px;cursor:pointer;transition:all .2s ease;
-}
-.type-toggle button.active{color:#0b0d14;background:linear-gradient(120deg,var(--green),var(--cyan));border-color:transparent;box-shadow:0 0 20px rgba(57,255,140,.25)}
-
-.dropzone{
-  border:1.5px dashed rgba(255,255,255,.2);border-radius:12px;padding:34px 20px;text-align:center;cursor:pointer;
-  transition:border-color .25s ease,box-shadow .25s ease,background .25s ease;background:rgba(255,255,255,.015);
-}
-.dropzone.drag,.dropzone:hover{border-color:rgba(6,182,212,.5);box-shadow:0 0 26px rgba(6,182,212,.12);background:rgba(6,182,212,.03)}
-.dropzone .dz-icon{font-size:1.8rem;margin-bottom:8px}
-.dropzone .dz-main{font-size:.92rem;font-weight:600}
-.dropzone .dz-sub{font-size:.76rem;color:var(--faint);margin-top:6px}
-.dropzone input[type=file]{display:none}
-.file-chip{
-  display:inline-flex;align-items:center;gap:10px;margin-top:12px;padding:9px 14px;border-radius:10px;
-  background:rgba(57,255,140,.08);border:1px solid rgba(57,255,140,.25);font-size:.82rem;color:var(--green);
-}
-
-.progress-wrap{margin-top:14px;height:6px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden;display:none}
-.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--gold),var(--cyan),var(--violet));background-size:200% 100%;animation:sweep 1.4s linear infinite;transition:width .2s ease}
-@keyframes sweep{from{background-position:0% 0}to{background-position:200% 0}}
-
-.upload-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
-.msg{font-size:.82rem;margin-top:12px;display:none}
-.msg.ok{color:var(--green)} .msg.err{color:#ff8787}
-
-.footer{position:relative;z-index:2;border-top:1px solid var(--border);padding:44px clamp(20px,6vw,64px) 60px;display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center}
-.footer .credit{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--faint)}
-.founder-card{display:flex;align-items:center;gap:16px}
-.founder-avatar{width:56px;height:56px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid rgba(255,255,255,.15);
-  box-shadow:0 0 0 1px rgba(139,92,246,.25),0 0 22px rgba(57,255,140,.35);}
-.founder-avatar img{width:100%;height:100%;object-fit:cover;object-position:top center}
-.founder-text{display:flex;flex-direction:column;text-align:left}
-.founder-text small{font:600 .62rem/1 'JetBrains Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
-.founder-text b{font-size:.95rem}
-.founder-text span{font-size:.75rem;color:var(--dim);display:block}
-
-@media (max-width:480px){
-  #gate{margin:16vh 18px;padding:30px 22px}
-  .founder-card{flex-direction:column;text-align:center}
-  .founder-text{align-items:center;text-align:center}
-}
+  @media (max-width: 480px){
+    .assess-grid{ grid-template-columns:1fr; gap:14px; }
+    .topic-modal-overlay{ padding:0; align-items:flex-end; }
+    .topic-modal{ max-width:100%; max-height:88vh; border-radius:20px 20px 0 0; animation:modalUpSheet .25s ease; }
+    .topic-modal-head{ padding:20px 18px; }
+    .topic-modal-body{ padding:16px 18px 22px; }
+    .founder-card{ flex-direction:column; text-align:center; }
+    .founder-text{ align-items:center; text-align:center; }
+    .staff-login{ padding:9px 14px; font-size:.65rem; }
+  }
+  @keyframes modalUpSheet{ from{opacity:0; transform:translateY(40px);} to{opacity:1; transform:translateY(0);} }
 </style>
 </head>
-<body>
+
+<body class="visuals-on">
 
 <div class="aura"></div>
+<div class="stars"></div>
 
-<div id="gate">
-  <div class="crown">👑</div>
-  <div class="eyebrow">ICT GROUND // ADMIN</div>
-  <h2>Sign in to manage</h2>
-  <input type="password" id="pw" placeholder="Admin password" autocomplete="off" onkeydown="if(event.key==='Enter') login()">
-  <button onclick="login()">Sign in</button>
-  <div class="err" id="gate-err">Incorrect password.</div>
+<nav class="nav">
+  <div class="logo"><a href="#" class="logo">ICT GROUND <span>// ALMIIS</span></a></div>
+  <ul class="nav-links">
+    <li><a href="#system">System</a></li>
+    <li><a href="#assessments">Assessments</a></li>
+  </ul>
+  <button class="menu-toggle" aria-label="Open menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-menu">
+  <a href="#system">System</a>
+  <a href="#assessments">Assessments</a>
 </div>
 
-<div id="dash">
-  <header class="topbar">
-    <div class="logo">ICT GROUND <span class="brand-name">// ADMIN</span></div>
-    <button class="btn-ghost" onclick="logout()">Sign out</button>
-  </header>
-
-  <main>
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="results" onclick="switchTab('results')">Results</button>
-      <button class="tab-btn" data-tab="pdfs" onclick="switchTab('pdfs')">Marked Papers (PDF)</button>
-      <button class="tab-btn" data-tab="upload" onclick="switchTab('upload')">Manage Resources</button>
+<header class="hero">
+  <div class="stage">
+    <div class="parallax">
+      <div class="ring-tilt">
+        <div class="ring" id="ring">
+          <!-- panels are rendered by renderRingPanels() below, from the TOPICS array -->
+        </div>
+      </div>
+      <div class="hero-text">
+        <div class="eyebrow">ICT GROUND</div>
+        <h1>COMPUTER SCIENCE</h1>
+        <p>For Year 10 and Year 11 — ready for IGCSE. A project by the ICT Department, <span class="brand-name">Al Muntazir Islamic International School (ALMIIS)</span>.</p>
+      </div>
     </div>
-
-    <section id="tab-results" class="tab-panel active">
-      <div class="summary" id="summary"></div>
-      <div class="toolbar">
-        <input type="text" id="search" placeholder="Search by name, campus or class..." oninput="renderResults()">
-        <button class="btn secondary" onclick="loadResults()">Refresh</button>
-        <button class="btn" onclick="exportCsv()">Download CSV</button>
+  </div>
+  <div class="hero-controls">
+    <div class="ctrl">
+      <span class="ctrl-label">VISUALS</span>
+      <button class="switch" id="visualsSwitch" role="switch" aria-checked="true" aria-label="Toggle image visuals">
+        <span class="knob"></span>
+      </button>
+    </div>
+    <div class="ctrl">
+      <span class="ctrl-label">ZOOM</span>
+      <button class="switch" id="zoomSwitch" role="switch" aria-checked="false" aria-label="Zoom ring 24 percent larger">
+        <span class="knob"></span>
+      </button>
+    </div>
+    <div class="ctrl">
+      <span class="ctrl-label">SPACING</span>
+      <div class="spacing" role="group" aria-label="Ring spacing">
+        <button class="spacing-step" data-space="0" aria-label="Tight spacing"><i></i></button>
+        <button class="spacing-step is-active" data-space="1" aria-label="Default spacing"><i></i></button>
+        <button class="spacing-step" data-space="2" aria-label="Wide spacing"><i></i></button>
       </div>
-      <div class="table-wrap">
-        <table id="tbl">
-          <thead>
-            <tr>
-              <th onclick="sortBy('name')">Name</th>
-              <th onclick="sortBy('cand')">Campus/Wing</th>
-              <th onclick="sortBy('cls')">Class</th>
-              <th onclick="sortBy('totalCorrect')">Score</th>
-              <th onclick="sortBy('pct')">%</th>
-              <th onclick="sortBy('grade')">Grade</th>
-              <th onclick="sortBy('penaltyMarks')">Penalty</th>
-              <th onclick="sortBy('tabSwitchCount')">Tab-switch</th>
-              <th onclick="sortBy('submittedAt')">Submitted</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
-      <div class="empty" id="empty" style="display:none">No results yet.</div>
-    </section>
+    </div>
+  </div>
+  <div class="scroll-cue">
+    <span>SCROLL</span>
+    <div class="line"></div>
+  </div>
+</header>
 
-    <section id="tab-pdfs" class="tab-panel">
-      <div class="toolbar">
-        <input type="text" id="pdf-search" placeholder="Search by name, campus or class..." oninput="renderPdfs()">
-        <button class="btn secondary" onclick="loadResults()">Refresh</button>
-        <button class="btn" id="btn-download-all" onclick="downloadAllPdfs()">Download All (ZIP)</button>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Name</th><th>Campus/Wing</th><th>Class</th><th>Score</th><th>Grade</th><th>PDF</th><th></th></tr>
-          </thead>
-          <tbody id="pdf-tbody"></tbody>
-        </table>
-      </div>
-      <div class="empty" id="pdf-empty" style="display:none">No PDFs yet.</div>
-    </section>
+<section class="section" id="system">
+  <div class="section-head reveal">
+    <div class="eyebrow">// THE SYSTEM</div>
+    <h2>One place for every ICT assessment.</h2>
+    <p>ICT Ground hosts every Computer Science assessment for Year 10 and 11 (IGCSE) — auto-marked on submission, with results and marked papers collected in one dashboard for staff.</p>
+  </div>
+  <div class="features">
+    <div class="feature reveal">
+      <div class="f-index">01 // AUTO-MARK</div>
+      <h3>Instant grading</h3>
+      <p>Every test is marked the moment a student submits — no manual marking, no delay.</p>
+    </div>
+    <div class="feature reveal">
+      <div class="f-index">02 // OFFLINE-SAFE</div>
+      <h3>Works without WiFi</h3>
+      <p>Answers are saved on-device as students work, so a dropped connection never loses a result.</p>
+    </div>
+    <div class="feature reveal">
+      <div class="f-index">03 // CENTRALISED</div>
+      <h3>One results dashboard</h3>
+      <p>Every submission, score and marked paper lands in a single staff-only panel — sortable, searchable, exportable.</p>
+    </div>
+  </div>
+</section>
 
-    <section id="tab-upload" class="tab-panel">
-      <div class="upload-card">
-        <h3><span id="formTitle">Upload a new resource</span><span class="editing-badge" id="editingBadge" style="display:none">EDITING</span></h3>
+<section class="section" id="assessments">
+  <div class="section-head reveal">
+    <div class="eyebrow">// ASSESSMENTS</div>
+    <h2>Available now</h2>
+    <p>More topics are added here as they're built.</p>
+  </div>
+  <div class="assess-grid" id="assess-grid"></div>
+</section>
 
-        <div class="form-row">
-          <div class="field">
-            <label>Topic</label>
-            <select id="f-topic" onchange="onTopicChange()"></select>
-          </div>
-          <div class="field">
-            <label>Subtopic</label>
-            <select id="f-subtopic" onchange="onSubtopicChange()"></select>
-          </div>
-        </div>
-        <div class="form-row" id="customTitleRow" style="display:none">
-          <div class="field" style="grid-column:1/-1">
-            <label>Custom subtopic name</label>
-            <input type="text" id="f-title-custom" placeholder="e.g. Revision Worksheet">
-          </div>
-        </div>
+<footer class="footer">
+  <div class="logo"><a href="#" class="logo">ICT GROUND <span>// ALMIIS</span></a></div>
+  <div class="credit"><span class="brand-name">ALMIIS</span> — Computer Science for Year 10 &amp; 11, ready for IGCSE</div>
 
-        <div class="type-toggle">
-          <button type="button" class="active" id="btn-type-file" onclick="setContentType('file')">Upload File</button>
-          <button type="button" id="btn-type-link" onclick="setContentType('link')">Add Link</button>
-        </div>
-
-        <div id="file-block">
-          <div class="dropzone" id="dropzone" onclick="document.getElementById('f-file').click()">
-            <div class="dz-icon">&#8679;</div>
-            <div class="dz-main">Click or drag a file here</div>
-            <div class="dz-sub">Excel, Word, PDF, images, video, HTML, Scratch — any file type</div>
-            <input type="file" id="f-file"
-              accept=".xlsx,.xls,.csv,.doc,.docx,.pdf,.png,.jpg,.jpeg,.gif,.webp,.mp4,.mov,.webm,.html,.htm,.zip,.ppt,.pptx,.sb3">
-          </div>
-          <div id="file-chip-wrap"></div>
-        </div>
-
-        <div id="link-block" style="display:none">
-          <div class="field">
-            <label>Link (Google Sheet, Scratch project, or other URL)</label>
-            <input type="url" id="f-link" placeholder="https://...">
-          </div>
-        </div>
-
-        <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
-        <div class="msg" id="uploadMsg"></div>
-
-        <div class="upload-actions">
-          <button class="btn secondary" id="btn-cancel-edit" onclick="cancelEdit()" style="display:none">Cancel</button>
-          <button class="btn" id="btn-submit" onclick="submitUpload()">Upload</button>
-        </div>
-      </div>
-
-      <div class="toolbar">
-        <input type="text" id="res-search" placeholder="Search uploaded resources..." oninput="renderSubtopics(LAST_SUBTOPICS)">
-        <button class="btn secondary" onclick="loadSubtopics()">Refresh</button>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Topic</th><th>Subtopic</th><th>Type</th><th>Link</th><th>Date</th><th></th></tr>
-          </thead>
-          <tbody id="subtopicsBody"></tbody>
-        </table>
-      </div>
-      <div class="empty" id="subtopicsEmpty" style="display:none">Nothing uploaded yet.</div>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <div class="logo"><span>ICT GROUND <span class="brand-name">// ALMIIS</span></span></div>
-    <div class="credit"><span class="brand-name">ALMIIS</span> — Computer Science for Year 10 &amp; 11, ready for IGCSE</div>
+  <div class="footer-grid">
     <div class="founder-card">
-      <div class="founder-avatar"><img src="assets/orbital/images/bedaphoto.png" alt="Beda Issaya Msoffe"></div>
+      <div class="founder-avatar">
+        <img src="assets/orbital/images/bedaphoto.png" alt="Beda Issaya Msoffe">
+      </div>
       <div class="founder-text">
         <small>Designed by</small>
         <b>BEDA ISSAYA MSOFFE</b>
@@ -355,385 +265,280 @@ tbody tr:hover{background:rgba(255,255,255,.035)}
         <span class="brand-name">ICT GROUND</span>
       </div>
     </div>
-  </footer>
+  </div>
+</footer>
+
+<a class="staff-login" href="/admin.html">Staff Login</a>
+
+<!-- ============ TOPIC → SUBTOPIC MODAL ============ -->
+<div class="topic-modal-overlay" id="topicModalOverlay" onclick="if(event.target===this) closeTopicModal()">
+  <div class="topic-modal">
+    <div class="topic-modal-head">
+      <div>
+        <div class="p-num" id="topicModalNum">01</div>
+        <h3 id="topicModalTitle">Data Representation</h3>
+        <span id="topicModalSub">3 subtopics</span>
+      </div>
+      <button class="topic-modal-close" onclick="closeTopicModal()" aria-label="Close">&times;</button>
+    </div>
+    <div class="topic-modal-body" id="topicModalBody"></div>
+  </div>
 </div>
 
 <script>
-const SUPABASE_URL = 'https://https://hhfqugtiarlxsanwyori.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhoZnF1Z3RpYXJseHNhbnd5b3JpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNjY3NjUsImV4cCI6MjEwMzk0Mjc2NX0.hgVXwjyYUwOkRCL1FJY-_W37UjjF6kShlab387Pm3XE';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+/* ============================================================
+   TOPICS: one entry per ring panel. Edit `subtopics[].url` to
+   point at each subtopic's real assessment page once it exists.
+   `locked:false` = clickable now, `locked:true` = shows "coming soon".
+   ============================================================ */
 const TOPICS = [
-  { id:1, label:'DATA REPRESENTATION', subtopics:['Number Systems','Text, Sound & Images','Compression'] },
-  { id:2, label:'DATA TRANSMISSION', subtopics:['Transmission Methods','Error Detection','Encryption'] },
-  { id:3, label:'HARDWARE', subtopics:['Computer Architecture','Input & Output Devices','Sensors','Storage','Network Concepts'] },
-  { id:4, label:'SOFTWARE', subtopics:['System & Application Software','Operating Systems & Interrupts','Programming Languages','Translators','IDEs'] },
-  { id:5, label:'THE INTERNET', subtopics:['Internet & WWW','Digital Currency','Cyber Security'] },
-  { id:6, label:'EMERGING TECHNOLOGIES', subtopics:['Automated Systems','Robotics','Artificial Intelligence'] },
-  { id:7, label:'ALGORITHMS', subtopics:['PDLC','Decomposition','Algorithms','Validation & Verification','Test Data','Flowcharts & Pseudocode','Trace Tables'] },
-  { id:8, label:'PROGRAMMING', subtopics:['Variables & Data Types','Input & Output','Selection','Iteration','Arrays','Searching & Sorting','File Handling','Procedures & Functions'] },
-  { id:9, label:'DATABASES', subtopics:['Tables','Primary Keys','Data Types','SQL','SELECT, WHERE & ORDER BY','SUM & COUNT'] },
-  { id:10, label:'BOOLEAN LOGIC', subtopics:['Logic Gates','Truth Tables','Logic Expressions','Logic Circuits'] }
-];
-document.getElementById('f-topic').innerHTML = TOPICS.map(t => `<option value="${t.id}">${t.label}</option>`).join('');
-
-function onTopicChange(){
-  const topicId = parseInt(document.getElementById('f-topic').value, 10);
-  const topic = TOPICS.find(t => t.id === topicId);
-  const subSel = document.getElementById('f-subtopic');
-  const opts = (topic ? topic.subtopics : []).map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
-  subSel.innerHTML = opts + '<option value="__custom__">+ Custom subtopic...</option>';
-  onSubtopicChange();
-}
-function onSubtopicChange(){
-  const isCustom = document.getElementById('f-subtopic').value === '__custom__';
-  document.getElementById('customTitleRow').style.display = isCustom ? 'grid' : 'none';
-}
-function currentTitle(){
-  const subSel = document.getElementById('f-subtopic');
-  if(subSel.value === '__custom__') return document.getElementById('f-title-custom').value.trim();
-  return subSel.value;
-}
-onTopicChange();
-
-function login(){
-  const pw = document.getElementById('pw').value;
-  sessionStorage.setItem('admin_pw', pw);
-  loadResults();
-  loadSubtopics();
-}
-function logout(){
-  sessionStorage.removeItem('admin_pw');
-  document.getElementById('dash').style.display='none';
-  document.getElementById('gate').style.display='block';
-}
-function authHeaders(){
-  return { 'x-admin-password': sessionStorage.getItem('admin_pw') || '' };
-}
-function showDash(){
-  document.getElementById('gate').style.display='none';
-  document.getElementById('dash').style.display='block';
-}
-function showGateError(){
-  document.getElementById('gate-err').style.display='block';
-  document.getElementById('gate').style.display='block';
-  document.getElementById('dash').style.display='none';
-}
-
-function switchTab(name){
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab===name));
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id==='tab-'+name));
-}
-
-let DATA = [];
-let sortKey = 'submittedAt', sortDir = -1;
-
-async function loadResults(){
-  try{
-    const res = await fetch('/api/results', { headers: authHeaders() });
-    if(res.status === 401){ showGateError(); return; }
-    const data = await res.json();
-    DATA = data.submissions || [];
-    showDash();
-    renderSummary();
-    renderResults();
-    renderPdfs();
-  }catch(e){ console.error(e); }
-}
-function renderSummary(){
-  const n = DATA.length;
-  const avg = n ? Math.round(DATA.reduce((a,d)=>a+d.pct,0)/n) : 0;
-  const flagged = DATA.filter(d=>d.tabSwitchCount>=3).length;
-  document.getElementById('summary').innerHTML =
-    '<div class="stat"><div class="n">' + n + '</div><div class="l">Submitted</div></div>' +
-    '<div class="stat"><div class="n">' + avg + '%</div><div class="l">Class average</div></div>' +
-    '<div class="stat"><div class="n">' + flagged + '</div><div class="l">Tab-switched &ge;3</div></div>';
-}
-function sortBy(key){ sortDir = (sortKey===key) ? -sortDir : 1; sortKey = key; renderResults(); }
-function renderResults(){
-  const q = (document.getElementById('search').value||'').toLowerCase();
-  let rows = DATA.filter(d => !q || (d.name||'').toLowerCase().includes(q) || (d.cand||'').toLowerCase().includes(q) || (d.cls||'').toLowerCase().includes(q));
-  rows.sort((a,b)=>{ const va=a[sortKey], vb=b[sortKey]; if(typeof va==='string') return sortDir*va.localeCompare(vb); return sortDir*((va||0)-(vb||0)); });
-  const tbody = document.getElementById('tbody');
-  document.getElementById('empty').style.display = rows.length ? 'none':'block';
-  tbody.innerHTML = rows.map(d=>
-    '<tr>' +
-      '<td>'+esc(d.name)+'</td><td>'+esc(d.cand)+'</td><td>'+esc(d.cls)+'</td>' +
-      '<td>'+d.totalCorrect+'/'+d.totalMarks+'</td><td>'+d.pct+'%</td>' +
-      '<td><span class="grade-pill g-'+esc(d.grade)+'">'+esc(d.grade)+'</span></td>' +
-      '<td>'+(d.penaltyMarks||0)+'</td>' +
-      '<td>'+(d.tabSwitchCount>=3?'<span class="flag">'+d.tabSwitchCount+'</span>':d.tabSwitchCount)+'</td>' +
-      '<td>'+new Date(d.submittedAt).toLocaleString('en-GB')+'</td>' +
-      '<td><button class="btn-icon-sm danger" onclick="deleteResult(\''+d.id+'\')">Delete</button></td>' +
-    '</tr>').join('');
-}
-function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
-
-function renderPdfs(){
-  const q = (document.getElementById('pdf-search').value||'').toLowerCase();
-  let rows = DATA.filter(d => !q || (d.name||'').toLowerCase().includes(q) || (d.cand||'').toLowerCase().includes(q) || (d.cls||'').toLowerCase().includes(q));
-  const tbody = document.getElementById('pdf-tbody');
-  document.getElementById('pdf-empty').style.display = rows.length ? 'none':'block';
-  tbody.innerHTML = rows.map(d=>
-    '<tr>' +
-      '<td>'+esc(d.name)+'</td><td>'+esc(d.cand)+'</td><td>'+esc(d.cls)+'</td>' +
-      '<td>'+d.totalCorrect+'/'+d.totalMarks+'</td>' +
-      '<td><span class="grade-pill g-'+esc(d.grade)+'">'+esc(d.grade)+'</span></td>' +
-      '<td>'+(d.pdfUrl ? '<a class="pdf-link" href="'+esc(d.pdfUrl)+'" target="_blank" rel="noopener">Open PDF</a>' : '<span class="pdf-missing">None</span>')+'</td>' +
-      '<td><button class="btn-icon-sm danger" onclick="deleteResult(\''+d.id+'\')">Delete</button></td>' +
-    '</tr>').join('');
-}
-
-async function deleteResult(id){
-  if(!confirm('Delete this result permanently? This also removes its marked-paper PDF. This cannot be undone.')) return;
-  try{
-    const res = await fetch('/api/delete-result?id=' + encodeURIComponent(id), { method:'DELETE', headers: authHeaders() });
-    if(res.status === 401) return showGateError();
-    if(!res.ok) throw new Error('Server error');
-    DATA = DATA.filter(function(d){ return d.id !== id; });
-    renderSummary(); renderResults(); renderPdfs();
-  }catch(e){ alert('Could not delete: ' + e.message); }
-}
-
-async function downloadAllPdfs(){
-  const rows = DATA.filter(function(d){ return d.pdfUrl; });
-  if(!rows.length){ alert('No PDFs to download yet.'); return; }
-  const btn = document.getElementById('btn-download-all');
-  btn.disabled = true; const original = btn.textContent; btn.textContent = 'Zipping 0/' + rows.length + '...';
-  try{
-    const zip = new JSZip();
-    let done = 0;
-    for(const d of rows){
-      try{
-        const resp = await fetch(d.pdfUrl);
-        const blob = await resp.blob();
-        const safeName = (d.name||'unknown').replace(/[^a-z0-9]+/gi,'_') + '_' + (d.cls||'').replace(/[^a-z0-9]+/gi,'_') + '.pdf';
-        zip.file(safeName, blob);
-      }catch(e){ console.error('Failed to fetch', d.name, e); }
-      done++; btn.textContent = 'Zipping ' + done + '/' + rows.length + '...';
-    }
-    const content = await zip.generateAsync({ type:'blob' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(content);
-    a.download = 'marked_papers_' + new Date().toISOString().slice(0,10) + '.zip';
-    a.click();
-  }catch(e){
-    alert('Could not create ZIP: ' + e.message);
-  }finally{
-    btn.disabled = false; btn.textContent = original;
+  { id:1, label:'DATA REPRESENTATION', img:'image-01.png', locked:false,
+    subtopics:[
+      { t:'Number Systems',       url:'/exams/data-representation-number-systems.html' },
+      { t:'Text, Sound & Images', url:'/exams/data-representation-text-sound-images.html' },
+      { t:'Compression',          url:'/exams/data-representation-compression.html' }
+    ]
+  },
+  { id:2, label:'DATA TRANSMISSION', img:'image-02.png', locked:false,
+    subtopics:[
+      { t:'Transmission Methods', url:'/exams/data-transmission-methods.html' },
+      { t:'Error Detection',      url:'/exams/data-transmission-error-detection.html' },
+      { t:'Encryption',           url:'/exams/data-transmission-encryption.html' }
+    ]
+  },
+  { id:3, label:'HARDWARE', img:'image-03.png', locked:false,
+    subtopics:[
+      { t:'Computer Architecture',  url:'/exams/hardware-computer-architecture.html' },
+      { t:'Input & Output Devices', url:'/exams/hardware-input-output-devices.html' },
+      { t:'Sensors',                url:'/exams/hardware-sensors.html' },
+      { t:'Storage',                url:'/exams/hardware-storage.html' },
+      { t:'Network Concepts',       url:'/exams/hardware-network-concepts.html' }
+    ]
+  },
+  { id:4, label:'SOFTWARE', img:'image-04.png', locked:false,
+    subtopics:[
+      { t:'System & Application Software', url:'/exams/software-system-application.html' },
+      { t:'Operating Systems & Interrupts', url:'/exams/software-os-interrupts.html' },
+      { t:'Programming Languages',         url:'/exams/software-programming-languages.html' },
+      { t:'Translators',                   url:'/exams/software-translators.html' },
+      { t:'IDEs',                          url:'/exams/software-ides.html' }
+    ]
+  },
+  { id:5, label:'THE INTERNET', img:'image-05.png', locked:false,
+    subtopics:[
+      { t:'Internet & WWW',   url:'/exams/internet-www.html' },
+      { t:'Digital Currency', url:'/exams/internet-digital-currency.html' },
+      { t:'Cyber Security',   url:'/exams/internet-cyber-security.html' }
+    ]
+  },
+  { id:6, label:'EMERGING TECHNOLOGIES', img:'image-06.png', locked:false,
+    subtopics:[
+      { t:'Automated Systems',       url:'/exams/emerging-automated-systems.html' },
+      { t:'Robotics',                url:'/exams/emerging-robotics.html' },
+      { t:'Artificial Intelligence', url:'/exams/emerging-ai.html' }
+    ]
+  },
+  { id:7, label:'ALGORITHMS', img:'image-07.png', locked:false,
+    subtopics:[
+      { t:'PDLC',                      url:'/exams/algorithms-pdlc.html' },
+      { t:'Decomposition',             url:'/exams/algorithms-decomposition.html' },
+      { t:'Algorithms',                url:'/exams/algorithms-algorithms.html' },
+      { t:'Validation & Verification', url:'/exams/algorithms-validation-verification.html' },
+      { t:'Test Data',                 url:'/exams/algorithms-test-data.html' },
+      { t:'Flowcharts & Pseudocode',   url:'/exams/algorithms-flowcharts-pseudocode.html' },
+      { t:'Trace Tables',              url:'/exams/algorithms-trace-tables.html' }
+    ]
+  },
+  { id:8, label:'PROGRAMMING', img:'image-08.png', locked:false,
+    subtopics:[
+      { t:'Variables & Data Types', url:'/exams/programming-variables-data-types.html' },
+      { t:'Input & Output',         url:'/exams/programming-input-output.html' },
+      { t:'Selection',              url:'/exams/programming-selection.html' },
+      { t:'Iteration',              url:'/exams/programming-iteration.html' },
+      { t:'Arrays',                 url:'/exams/programming-arrays.html' },
+      { t:'Searching & Sorting',    url:'/exams/programming-searching-sorting.html' },
+      { t:'File Handling',          url:'/exams/programming-file-handling.html' },
+      { t:'Procedures & Functions', url:'/exams/programming-procedures-functions.html' }
+    ]
+  },
+  { id:9, label:'DATABASES', img:'image-09.png', locked:false,
+    subtopics:[
+      { t:'Tables',                   url:'/exams/databases-tables.html' },
+      { t:'Primary Keys',             url:'/exams/databases-primary-keys.html' },
+      { t:'Data Types',               url:'/exams/databases-data-types.html' },
+      { t:'SQL',                      url:'/exams/databases-sql.html' },
+      { t:'SELECT, WHERE & ORDER BY', url:'/exams/databases-select-where-orderby.html' },
+      { t:'SUM & COUNT',              url:'/exams/databases-sum-count.html' }
+    ]
+  },
+  { id:10, label:'BOOLEAN LOGIC', img:'image-10.png', locked:false,
+    subtopics:[
+      { t:'Logic Gates',       url:'/exams/boolean-logic-gates.html' },
+      { t:'Truth Tables',      url:'/exams/boolean-truth-tables.html' },
+      { t:'Logic Expressions', url:'/exams/boolean-logic-expressions.html' },
+      { t:'Logic Circuits',    url:'/exams/boolean-logic-circuits.html' }
+    ]
   }
-}
+];
 
-function exportCsv(){
-  const headers = ['Name','Campus','Class','Score','Total','Percent','Grade','Penalty','TabSwitches','SubmittedAt'];
-  const lines = [headers.join(',')];
-  DATA.forEach(function(d){
-    lines.push([d.name,d.cand,d.cls,d.totalCorrect,d.totalMarks,d.pct,d.grade,d.penaltyMarks||0,d.tabSwitchCount,new Date(d.submittedAt).toISOString()]
-      .map(function(v){ return '"' + String(v==null?'':v).replace(/"/g,'""') + '"'; }).join(','));
+/* ============ ADMIN-UPLOADED SUBTOPICS (dynamic, from /api/subtopics) ============
+   Anything the teacher uploads via /admin.html lands here automatically —
+   merged into the matching topic's modal, no code edits needed. If the
+   request fails (offline, first load), the site still works fine using
+   just the static TOPICS list above. */
+let DYNAMIC_SUBTOPICS = {};
+async function loadDynamicSubtopics(){
+  try{
+    const res = await fetch('/api/subtopics');
+    if(!res.ok) return;
+    const data = await res.json();
+    const map = {};
+    (data.subtopics || []).forEach(s => {
+      (map[s.topic_id] ||= []).push(s);
+    });
+    DYNAMIC_SUBTOPICS = map;
+  }catch(e){ /* silent — static list still works */ }
+}
+loadDynamicSubtopics();
+
+/* ============ RENDER RING PANELS FROM TOPICS ============ */
+const ringEl = document.getElementById('ring');
+const pad = n => String(n).padStart(2,'0');
+ringEl.innerHTML = TOPICS.map(topic => `
+  <div class="panel${topic.locked ? ' panel-locked' : ''}" data-topic-id="${topic.id}">
+    <div class="panel-glow"></div>
+    <div class="panel-face panel-face--text">
+      <div class="p-num">${pad(topic.id)}</div>
+      <div>
+        <div class="p-label">${topic.label}</div>
+        <div class="p-meta">${topic.locked ? 'UPCOMING' : 'LIVE NOW'}</div>
+      </div>
+    </div>
+    <div class="panel-face panel-face--image">
+      <img src="assets/orbital/images/${topic.img}" alt="${topic.label}" loading="lazy">
+      <div class="panel-scrim"></div>
+      <div class="panel-cap"><span class="p-num">${pad(topic.id)}</span>${topic.label}</div>
+    </div>
+  </div>
+`).join('');
+
+/* ============ TOPIC MODAL: subtopics with links to their assessment pages ============ */
+function normTitle(s){ return String(s||'').trim().toLowerCase().replace(/\s+/g,' '); }
+
+function openTopicModal(topicId){
+  const topic = TOPICS.find(t => t.id === topicId);
+  if(!topic) return;
+
+  // Merge: an admin upload whose title matches an existing subtopic REPLACES
+  // its placeholder url (so it opens correctly from Home). Anything with a
+  // new title is appended as an extra subtopic. Nothing is ever duplicated.
+  const uploaded = DYNAMIC_SUBTOPICS[topicId] || [];
+  const merged = topic.subtopics.map(s => {
+    const match = uploaded.find(u => normTitle(u.title) === normTitle(s.t));
+    return match
+      ? { t: s.t, url: match.url, d: match.content_type === 'link' ? 'Link' : (match.file_ext ? match.file_ext.toUpperCase() + ' file' : 'File') }
+      : { t: s.t, url: s.url, d: null };
   });
-  const blob = new Blob([lines.join('\n')], {type:'text/csv'});
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'exam_results.csv'; a.click();
-}
+  uploaded.forEach(u => {
+    if(!topic.subtopics.some(s => normTitle(s.t) === normTitle(u.title))){
+      merged.push({ t: u.title, url: u.url, d: u.content_type === 'link' ? 'Link' : (u.file_ext ? u.file_ext.toUpperCase() + ' file' : 'File') });
+    }
+  });
 
-let contentType = 'file';
-let pickedFile = null;
-let editingId = null;
+  document.getElementById('topicModalNum').textContent = pad(topic.id);
+  document.getElementById('topicModalTitle').textContent = topic.label.charAt(0) + topic.label.slice(1).toLowerCase();
+  document.getElementById('topicModalSub').textContent = merged.length
+    ? `${merged.length} subtopic${merged.length === 1 ? '' : 's'}`
+    : 'Not published yet';
 
-function setContentType(t){
-  contentType = t;
-  document.getElementById('btn-type-file').classList.toggle('active', t==='file');
-  document.getElementById('btn-type-link').classList.toggle('active', t==='link');
-  document.getElementById('file-block').style.display = t==='file' ? 'block' : 'none';
-  document.getElementById('link-block').style.display = t==='link' ? 'block' : 'none';
-}
-
-const dz = document.getElementById('dropzone');
-const fileInput = document.getElementById('f-file');
-fileInput.addEventListener('change', function(e){ handleFile(e.target.files[0]); });
-['dragover','dragenter'].forEach(function(ev){ dz.addEventListener(ev, function(e){ e.preventDefault(); dz.classList.add('drag'); }); });
-['dragleave','drop'].forEach(function(ev){ dz.addEventListener(ev, function(e){ e.preventDefault(); dz.classList.remove('drag'); }); });
-dz.addEventListener('drop', function(e){ if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
-
-function handleFile(file){
-  if(!file) return;
-  pickedFile = file;
-  const kb = (file.size/1024).toFixed(0);
-  document.getElementById('file-chip-wrap').innerHTML =
-    '<div class="file-chip">' + esc(file.name) + ' <span class="mono" style="opacity:.7">(' + kb + ' KB)</span></div>';
-}
-
-function fileExt(name){ const m = /\.([a-z0-9]+)$/i.exec(name||''); return m ? m[1].toLowerCase() : ''; }
-
-async function submitUpload(){
-  const msg = document.getElementById('uploadMsg');
-  msg.style.display='none';
-  const topicId = parseInt(document.getElementById('f-topic').value, 10);
-  const title = currentTitle();
-  if(!title){ return showMsg('Choose or type a subtopic name first.', 'err'); }
-
-  let url, type, ext = null;
-
-  if(contentType === 'link'){
-    url = document.getElementById('f-link').value.trim();
-    if(!url){ return showMsg('Enter a link first.', 'err'); }
-    type = 'link';
+  const body = document.getElementById('topicModalBody');
+  if(!merged.length){
+    body.innerHTML = `<div class="topic-modal-soon">This topic isn't published yet — check back soon.</div>`;
   } else {
-    if(!pickedFile && !editingId){ return showMsg('Choose a file first.', 'err'); }
-    if(pickedFile){
-      type = 'file';
-      ext = fileExt(pickedFile.name);
-      try{
-        url = await uploadFileToStorage(pickedFile, topicId);
-      }catch(e){
-        console.error(e);
-        return showMsg('Failed to upload file: ' + e.message, 'err');
+    body.innerHTML = merged.map(s => `
+      <a class="subtopic-link" href="${s.url}"${s.url.startsWith('http') && !s.url.includes(location.host) ? ' target="_blank" rel="noopener"' : ''}>
+        <div class="st-info"><b>${s.t}</b>${s.d ? `<small>${s.d}</small>` : ''}</div>
+        <span class="st-go">OPEN →</span>
+      </a>
+    `).join('');
+  }
+  document.getElementById('topicModalOverlay').classList.add('show');
+}
+function closeTopicModal(){
+  document.getElementById('topicModalOverlay').classList.remove('show');
+}
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeTopicModal(); });
+
+/* ============ CLICK-TO-OPEN + GLOW ON TOUCH/HOVER FOR EACH PANEL ============
+   Uses its own low-threshold "was this a drag or a tap" check so it plays
+   nicely alongside the ring's own drag-to-rotate script. */
+(function wirePanelInteractions(){
+  const panels = ringEl.querySelectorAll('.panel');
+  panels.forEach(panel => {
+    let downX = 0, downY = 0, moved = 0, isDown = false;
+
+    function setGlowPos(clientX, clientY){
+      const r = panel.getBoundingClientRect();
+      const x = ((clientX - r.left) / r.width) * 100;
+      const y = ((clientY - r.top) / r.height) * 100;
+      panel.style.setProperty('--gx', x + '%');
+      panel.style.setProperty('--gy', y + '%');
+    }
+
+    panel.addEventListener('pointerenter', e => {
+      setGlowPos(e.clientX, e.clientY);
+      panel.classList.add('is-glowing');
+    });
+    panel.addEventListener('pointermove', e => {
+      if(panel.classList.contains('is-glowing')) setGlowPos(e.clientX, e.clientY);
+    });
+    panel.addEventListener('pointerleave', () => panel.classList.remove('is-glowing'));
+
+    panel.addEventListener('pointerdown', e => {
+      isDown = true; moved = 0; downX = e.clientX; downY = e.clientY;
+      setGlowPos(e.clientX, e.clientY);
+      panel.classList.add('is-glowing');
+    });
+    window.addEventListener('pointermove', e => {
+      if(!isDown) return;
+      moved += Math.abs(e.clientX - downX) + Math.abs(e.clientY - downY);
+      downX = e.clientX; downY = e.clientY;
+    });
+    function release(e){
+      if(!isDown) return;
+      isDown = false;
+      panel.classList.remove('is-glowing');
+      if(moved < 8){
+        openTopicModal(parseInt(panel.dataset.topicId, 10));
       }
     }
-  }
-
-  try{
-    let res;
-    if(editingId){
-      const body = { id: editingId, topic_id: topicId, title: title, content_type: type };
-      if(ext !== null) body.file_ext = ext;
-      if(url !== undefined) body.url = url;
-      res = await fetch('/api/subtopics', {
-        method:'PUT',
-        headers: Object.assign({ 'Content-Type':'application/json' }, authHeaders()),
-        body: JSON.stringify(body)
-      });
-    } else {
-      res = await fetch('/api/subtopics', {
-        method:'POST',
-        headers: Object.assign({ 'Content-Type':'application/json' }, authHeaders()),
-        body: JSON.stringify({ topic_id: topicId, title: title, content_type: type, file_ext: ext, url: url })
-      });
-    }
-    if(res.status === 401) return showGateError();
-    if(!res.ok) throw new Error('Server error');
-    showMsg(editingId ? 'Updated! Changes are live on the site now.' : 'Uploaded! It will appear on the site right away.', 'ok');
-    resetForm();
-    loadSubtopics();
-  }catch(e){
-    console.error(e);
-    showMsg('Failed to save: ' + e.message, 'err');
-  }
-}
-
-async function uploadFileToStorage(file, topicId){
-  const progressWrap = document.getElementById('progressWrap');
-  const progressBar = document.getElementById('progressBar');
-  progressWrap.style.display='block'; progressBar.style.width='30%';
-
-  const path = ('topic-' + topicId + '/' + Date.now() + '-' + file.name).replace(/\s+/g,'-');
-  const res = await fetch('/api/upload-url', {
-    method:'POST',
-    headers: Object.assign({ 'Content-Type':'application/json' }, authHeaders()),
-    body: JSON.stringify({ path: path })
+    window.addEventListener('pointerup', release);
+    window.addEventListener('pointercancel', () => { isDown = false; panel.classList.remove('is-glowing'); });
   });
-  if(res.status === 401){ progressWrap.style.display='none'; throw new Error('Incorrect password'); }
-  const data = await res.json();
-  const token = data.token, bucket = data.bucket, publicUrl = data.publicUrl;
-  progressBar.style.width='65%';
+})();
 
-  const result = await sb.storage.from(bucket).uploadToSignedUrl(path, token, file);
-  progressBar.style.width='100%';
-  setTimeout(function(){ progressWrap.style.display='none'; progressBar.style.width='0%'; }, 500);
-  if(result.error) throw result.error;
-  return publicUrl;
-}
-
-function showMsg(text, kind){
-  const msg = document.getElementById('uploadMsg');
-  msg.textContent = text; msg.className = 'msg ' + kind; msg.style.display='block';
-}
-
-function resetForm(){
-  editingId = null;
-  document.getElementById('formTitle').textContent = 'Upload a new resource';
-  document.getElementById('editingBadge').style.display = 'none';
-  document.getElementById('btn-cancel-edit').style.display = 'none';
-  document.getElementById('btn-submit').textContent = 'Upload';
-  document.getElementById('f-title-custom').value = '';
-  document.getElementById('f-link').value = '';
-  pickedFile = null;
-  document.getElementById('file-chip-wrap').innerHTML = '';
-  onTopicChange();
-}
-function cancelEdit(){ resetForm(); }
-
-let LAST_SUBTOPICS = [];
-async function loadSubtopics(){
-  try{
-    const res = await fetch('/api/subtopics', { headers: authHeaders() });
-    if(res.status === 401) return;
-    const data = await res.json();
-    LAST_SUBTOPICS = data.subtopics || [];
-    renderSubtopics(LAST_SUBTOPICS);
-  }catch(e){ console.error(e); }
-}
-function renderSubtopics(rows){
-  const q = (document.getElementById('res-search').value||'').toLowerCase();
-  const filtered = rows.filter(function(r){
-    if(!q) return true;
-    const topic = TOPICS.find(function(t){ return t.id === r.topic_id; });
-    return (r.title||'').toLowerCase().includes(q) || (topic ? topic.label.toLowerCase().includes(q) : false);
-  });
-  const tbody = document.getElementById('subtopicsBody');
-  document.getElementById('subtopicsEmpty').style.display = filtered.length ? 'none' : 'block';
-  tbody.innerHTML = filtered.map(function(r){
-    const topic = TOPICS.find(function(t){ return t.id === r.topic_id; });
-    const typeLabel = r.content_type === 'link' ? 'Link' : (r.file_ext || 'file').toUpperCase();
-    const rJson = esc(JSON.stringify(r)).replace(/"/g,'&quot;');
-    return '<tr>' +
-      '<td>'+esc(topic ? topic.label : r.topic_id)+'</td>' +
-      '<td>'+esc(r.title)+'</td>' +
-      '<td><span class="type-pill">'+typeLabel+'</span></td>' +
-      '<td><a href="'+r.url+'" target="_blank" class="mono" style="color:var(--cyan)">Open</a></td>' +
-      '<td class="mono" style="font-size:.72rem;color:var(--faint)">'+new Date(r.created_at).toLocaleDateString('en-GB')+'</td>' +
-      '<td>' +
-        '<button class="btn-icon-sm" data-row="'+rJson+'" onclick="editSubtopicFromBtn(this)">Edit</button>' +
-        '<button class="btn-icon-sm danger" onclick="deleteSubtopic(\''+r.id+'\')">Delete</button>' +
-      '</td>' +
-    '</tr>';
-  }).join('');
-}
-
-function editSubtopicFromBtn(btn){
-  const r = JSON.parse(btn.getAttribute('data-row').replace(/&quot;/g,'"'));
-  editSubtopic(r);
-}
-
-function editSubtopic(r){
-  editingId = r.id;
-  document.getElementById('f-topic').value = r.topic_id;
-  onTopicChange();
-  const subSel = document.getElementById('f-subtopic');
-  const hasOption = Array.from(subSel.options).some(function(o){ return o.value === r.title; });
-  if(hasOption){ subSel.value = r.title; }
-  else { subSel.value = '__custom__'; document.getElementById('f-title-custom').value = r.title; }
-  onSubtopicChange();
-
-  setContentType(r.content_type === 'link' ? 'link' : 'file');
-  if(r.content_type === 'link') document.getElementById('f-link').value = r.url;
-  else document.getElementById('file-chip-wrap').innerHTML = '<div class="file-chip">Current file: ' + esc(r.url.split('/').pop()) + ' <span class="mono" style="opacity:.7">(leave as-is, or choose a new file to replace it)</span></div>';
-
-  document.getElementById('formTitle').textContent = 'Edit resource';
-  document.getElementById('editingBadge').style.display = 'inline-block';
-  document.getElementById('btn-cancel-edit').style.display = 'inline-block';
-  document.getElementById('btn-submit').textContent = 'Save changes';
-  switchTab('upload');
-  document.getElementById('tab-upload').scrollIntoView({behavior:'smooth', block:'start'});
-}
-
-async function deleteSubtopic(id){
-  if(!confirm('Delete this resource? This cannot be undone.')) return;
-  const res = await fetch('/api/subtopics?id=' + encodeURIComponent(id), { method:'DELETE', headers: authHeaders() });
-  if(res.status === 401) return showGateError();
-  loadSubtopics();
-}
-
-if(sessionStorage.getItem('admin_pw')){ loadResults(); loadSubtopics(); }
+/* ============ ASSESSMENTS SECTION (existing exam list) ============ */
+const EXAMS = [
+  {
+    subject: 'Year 10 · Computer Science',
+    title: 'Data Representation Test',
+    description: 'Baseline assessment covering binary conversion, denary conversion, and binary addition.',
+    url: '/exams/data-representation.html'
+  }
+];
+const grid = document.getElementById('assess-grid');
+function esc(s){ return String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+grid.innerHTML = EXAMS.map(e => `
+  <a class="assess-card reveal" href="${e.url}">
+    <div class="assess-subject">${esc(e.subject)}</div>
+    <h3>${esc(e.title)}</h3>
+    <p>${esc(e.description)}</p>
+    <div class="assess-cta">START →</div>
+  </a>
+`).join('');
 </script>
+
+<script src="assets/orbital/tooplate-2167-orbital-script.js"></script>
+
 </body>
 </html>
