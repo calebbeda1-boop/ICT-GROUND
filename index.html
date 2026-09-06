@@ -294,7 +294,7 @@
 const TOPICS = [
   { id:1, label:'DATA REPRESENTATION', img:'image-01.png', locked:false,
     subtopics:[
-      { t:'Number Systems',       url:'/exams/data-representation.html' },
+      { t:'Number Systems',       url:'/exams/data-representation-number-systems.html' },
       { t:'Text, Sound & Images', url:'/exams/data-representation-text-sound-images.html' },
       { t:'Compression',          url:'/exams/data-representation-compression.html' }
     ]
@@ -423,29 +423,39 @@ ringEl.innerHTML = TOPICS.map(topic => `
 `).join('');
 
 /* ============ TOPIC MODAL: subtopics with links to their assessment pages ============ */
+function normTitle(s){ return String(s||'').trim().toLowerCase().replace(/\s+/g,' '); }
+
 function openTopicModal(topicId){
   const topic = TOPICS.find(t => t.id === topicId);
   if(!topic) return;
 
-  // Changanya subtopics tuli (kwenye code) na zile alizopandisha admin (kutoka database)
-  const uploaded = (DYNAMIC_SUBTOPICS[topicId] || []).map(s => ({
-    t: s.title,
-    url: s.url,
-    d: s.content_type === 'link' ? 'Link' : (s.file_ext ? s.file_ext.toUpperCase() + ' file' : 'File')
-  }));
-  const allSubtopics = [...topic.subtopics, ...uploaded];
+  // Merge: an admin upload whose title matches an existing subtopic REPLACES
+  // its placeholder url (so it opens correctly from Home). Anything with a
+  // new title is appended as an extra subtopic. Nothing is ever duplicated.
+  const uploaded = DYNAMIC_SUBTOPICS[topicId] || [];
+  const merged = topic.subtopics.map(s => {
+    const match = uploaded.find(u => normTitle(u.title) === normTitle(s.t));
+    return match
+      ? { t: s.t, url: match.url, d: match.content_type === 'link' ? 'Link' : (match.file_ext ? match.file_ext.toUpperCase() + ' file' : 'File') }
+      : { t: s.t, url: s.url, d: null };
+  });
+  uploaded.forEach(u => {
+    if(!topic.subtopics.some(s => normTitle(s.t) === normTitle(u.title))){
+      merged.push({ t: u.title, url: u.url, d: u.content_type === 'link' ? 'Link' : (u.file_ext ? u.file_ext.toUpperCase() + ' file' : 'File') });
+    }
+  });
 
   document.getElementById('topicModalNum').textContent = pad(topic.id);
   document.getElementById('topicModalTitle').textContent = topic.label.charAt(0) + topic.label.slice(1).toLowerCase();
-  document.getElementById('topicModalSub').textContent = allSubtopics.length
-    ? `${allSubtopics.length} subtopic${allSubtopics.length === 1 ? '' : 's'}`
+  document.getElementById('topicModalSub').textContent = merged.length
+    ? `${merged.length} subtopic${merged.length === 1 ? '' : 's'}`
     : 'Not published yet';
 
   const body = document.getElementById('topicModalBody');
-  if(!allSubtopics.length){
+  if(!merged.length){
     body.innerHTML = `<div class="topic-modal-soon">This topic isn't published yet — check back soon.</div>`;
   } else {
-    body.innerHTML = allSubtopics.map(s => `
+    body.innerHTML = merged.map(s => `
       <a class="subtopic-link" href="${s.url}"${s.url.startsWith('http') && !s.url.includes(location.host) ? ' target="_blank" rel="noopener"' : ''}>
         <div class="st-info"><b>${s.t}</b>${s.d ? `<small>${s.d}</small>` : ''}</div>
         <span class="st-go">OPEN →</span>
