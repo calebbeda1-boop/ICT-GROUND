@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="sw">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <style>
 :root{
@@ -36,7 +37,6 @@ a{color:inherit}
 ::-webkit-scrollbar-thumb{background:linear-gradient(var(--violet),var(--cyan));border-radius:10px;box-shadow:0 0 10px rgba(6,182,212,.6)}
 :focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
 
-/* ============ LOGIN GATE ============ */
 #gate{
   position:relative;z-index:2;max-width:380px;margin:12vh auto;padding:38px 32px;border-radius:18px;
   background:#0b0d14;border:1px solid rgba(232,196,104,.25);
@@ -58,7 +58,6 @@ a{color:inherit}
 #gate button:hover,#gate button:active{box-shadow:0 0 30px rgba(232,196,104,.4),0 0 50px rgba(6,182,212,.25);transform:translateY(-1px)}
 #gate .err{color:#ff6b6b;font-size:.82rem;margin-top:10px;text-align:center;display:none}
 
-/* ============ DASHBOARD SHELL ============ */
 #dash{display:none;position:relative;z-index:2}
 .topbar{
   position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
@@ -74,7 +73,6 @@ a{color:inherit}
 
 main{max-width:1180px;margin:0 auto;padding:28px clamp(16px,4vw,32px) 60px}
 
-/* Tabs */
 .tabs{display:flex;gap:8px;margin-bottom:26px;padding:5px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;width:fit-content;max-width:100%;overflow-x:auto}
 .tab-btn{
   font:700 12px/1 'JetBrains Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);
@@ -86,14 +84,12 @@ main{max-width:1180px;margin:0 auto;padding:28px clamp(16px,4vw,32px) 60px}
 .tab-panel.active{display:block;animation:fadeUp .35s var(--ease)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-/* Stat cards */
 .summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:22px}
 .stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;transition:box-shadow .25s ease,border-color .25s ease}
 .stat:hover{border-color:rgba(232,196,104,.35);box-shadow:0 0 26px rgba(232,196,104,.12)}
 .stat .n{font-size:1.7rem;font-weight:700;background:linear-gradient(120deg,var(--gold),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
 .stat .l{font-size:.74rem;color:var(--dim);margin-top:2px}
 
-/* Toolbar */
 .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
 .toolbar input[type=text]{
   flex:1;min-width:180px;padding:11px 14px;border:1px solid var(--border);border-radius:10px;font-size:.88rem;
@@ -106,12 +102,12 @@ main{max-width:1180px;margin:0 auto;padding:28px clamp(16px,4vw,32px) 60px}
   transition:transform .15s ease,box-shadow .25s ease;
 }
 .btn:hover,.btn:active{box-shadow:0 0 22px rgba(6,182,212,.35);transform:translateY(-1px)}
+.btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;transform:none}
 .btn.secondary{background:rgba(255,255,255,.07);color:var(--dim)}
 .btn.secondary:hover,.btn.secondary:active{color:#fff}
 .btn.danger{background:rgba(220,38,38,.12);color:#ff8787;border:1px solid rgba(220,38,38,.3)}
 .btn.danger:hover,.btn.danger:active{box-shadow:0 0 18px rgba(220,38,38,.3)}
 
-/* Tables */
 .table-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;overflow-x:auto}
 table{width:100%;border-collapse:collapse;min-width:640px}
 th,td{padding:12px 14px;text-align:left;font-size:.84rem;border-bottom:1px solid var(--border);white-space:nowrap}
@@ -132,10 +128,21 @@ tbody tr:hover{background:rgba(255,255,255,.035)}
 }
 .pdf-link:hover,.pdf-link:active{box-shadow:0 0 18px rgba(6,182,212,.4);transform:translateY(-1px)}
 .pdf-missing{color:var(--faint);font-size:.78rem;font-style:italic}
+.btn-icon-sm{
+  padding:6px 12px;border-radius:8px;font-size:.68rem;font-family:'JetBrains Mono',monospace;font-weight:700;
+  cursor:pointer;border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--dim);margin-right:6px;
+  transition:all .15s ease;
+}
+.btn-icon-sm:hover{color:#fff;border-color:rgba(255,255,255,.3)}
+.btn-icon-sm.danger{background:rgba(220,38,38,.1);color:#ff8787;border-color:rgba(220,38,38,.25)}
+.btn-icon-sm.danger:hover{box-shadow:0 0 14px rgba(220,38,38,.3)}
 
-/* Upload card */
 .upload-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:26px clamp(18px,4vw,30px);margin-bottom:26px}
-.upload-card h3{font-size:1.05rem;margin-bottom:18px;font-weight:600}
+.upload-card h3{font-size:1.05rem;margin-bottom:18px;font-weight:600;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.editing-badge{
+  font:700 10px/1 'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase;color:#0b0d14;
+  background:linear-gradient(120deg,var(--gold),var(--cyan));padding:5px 12px;border-radius:20px;
+}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 @media (max-width:560px){.form-row{grid-template-columns:1fr}}
 .field label{display:block;font:700 10px/1 'JetBrains Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
@@ -177,7 +184,6 @@ tbody tr:hover{background:rgba(255,255,255,.035)}
 .msg{font-size:.82rem;margin-top:12px;display:none}
 .msg.ok{color:var(--green)} .msg.err{color:#ff8787}
 
-/* Footer — mirrors index.html */
 .footer{position:relative;z-index:2;border-top:1px solid var(--border);padding:44px clamp(20px,6vw,64px) 60px;display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center}
 .footer .credit{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--faint)}
 .founder-card{display:flex;align-items:center;gap:16px}
@@ -200,37 +206,34 @@ tbody tr:hover{background:rgba(255,255,255,.035)}
 
 <div class="aura"></div>
 
-<!-- ============ LOGIN GATE ============ -->
 <div id="gate">
   <div class="crown">👑</div>
   <div class="eyebrow">ICT GROUND // ADMIN</div>
-  <h2>Login tO Manage</h2>
+  <h2>Sign in to manage</h2>
   <input type="password" id="pw" placeholder="Admin password" autocomplete="off" onkeydown="if(event.key==='Enter') login()">
-  <button onclick="login()">Login</button>
-  <div class="err" id="gate-err">Wrong Password.</div>
+  <button onclick="login()">Sign in</button>
+  <div class="err" id="gate-err">Incorrect password.</div>
 </div>
 
-<!-- ============ DASHBOARD ============ -->
 <div id="dash">
   <header class="topbar">
     <div class="logo">ICT GROUND <span class="brand-name">// ADMIN</span></div>
-    <button class="btn-ghost" onclick="logout()">LOGOUT</button>
+    <button class="btn-ghost" onclick="logout()">Sign out</button>
   </header>
 
   <main>
     <div class="tabs">
       <button class="tab-btn active" data-tab="results" onclick="switchTab('results')">Results</button>
-      <button class="tab-btn" data-tab="pdfs" onclick="switchTab('pdfs')">Exam PDF</button>
-      <button class="tab-btn" data-tab="upload" onclick="switchTab('upload')">Upload exam</button>
+      <button class="tab-btn" data-tab="pdfs" onclick="switchTab('pdfs')">Marked Papers (PDF)</button>
+      <button class="tab-btn" data-tab="upload" onclick="switchTab('upload')">Manage Resources</button>
     </div>
 
-    <!-- ===== TAB: RESULTS (existing dashboard, restyled) ===== -->
     <section id="tab-results" class="tab-panel active">
       <div class="summary" id="summary"></div>
       <div class="toolbar">
-        <input type="text" id="search" placeholder="Find name, campus or class..." oninput="renderResults()">
-        <button class="btn secondary" onclick="loadResults()">↻ Reload</button>
-        <button class="btn" onclick="exportCsv()">⬇ Download CSV</button>
+        <input type="text" id="search" placeholder="Search by name, campus or class..." oninput="renderResults()">
+        <button class="btn secondary" onclick="loadResults()">Refresh</button>
+        <button class="btn" onclick="exportCsv()">Download CSV</button>
       </div>
       <div class="table-wrap">
         <table id="tbl">
@@ -239,72 +242,78 @@ tbody tr:hover{background:rgba(255,255,255,.035)}
               <th onclick="sortBy('name')">Name</th>
               <th onclick="sortBy('cand')">Campus/Wing</th>
               <th onclick="sortBy('cls')">Class</th>
-              <th onclick="sortBy('totalCorrect')">Marks</th>
+              <th onclick="sortBy('totalCorrect')">Score</th>
               <th onclick="sortBy('pct')">%</th>
-              <th onclick="sortBy('grade')">Class</th>
+              <th onclick="sortBy('grade')">Grade</th>
               <th onclick="sortBy('penaltyMarks')">Penalty</th>
               <th onclick="sortBy('tabSwitchCount')">Tab-switch</th>
-              <th onclick="sortBy('submittedAt')">Time</th>
+              <th onclick="sortBy('submittedAt')">Submitted</th>
+              <th></th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
         </table>
       </div>
-      <div class="empty" id="empty" style="display:none">No Results yet.</div>
+      <div class="empty" id="empty" style="display:none">No results yet.</div>
     </section>
 
-    <!-- ===== TAB: MARKED-PAPER PDFs ===== -->
     <section id="tab-pdfs" class="tab-panel">
       <div class="toolbar">
-        <input type="text" id="pdf-search" placeholder="Find name, campus or Class..." oninput="renderPdfs()">
-        <button class="btn secondary" onclick="loadResults()">↻ Reload</button>
+        <input type="text" id="pdf-search" placeholder="Search by name, campus or class..." oninput="renderPdfs()">
+        <button class="btn secondary" onclick="loadResults()">Refresh</button>
+        <button class="btn" id="btn-download-all" onclick="downloadAllPdfs()">Download All (ZIP)</button>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>Name</th><th>Campus/Wing</th><th>Class</th><th>Marks</th><th>Grade</th><th>PDF</th></tr>
+            <tr><th>Name</th><th>Campus/Wing</th><th>Class</th><th>Score</th><th>Grade</th><th>PDF</th><th></th></tr>
           </thead>
           <tbody id="pdf-tbody"></tbody>
         </table>
       </div>
-      <div class="empty" id="pdf-empty" style="display:none">No PDF yet.</div>
+      <div class="empty" id="pdf-empty" style="display:none">No PDFs yet.</div>
     </section>
 
-    <!-- ===== TAB: UPLOAD SUBTOPICS ===== -->
     <section id="tab-upload" class="tab-panel">
       <div class="upload-card">
-        <h3>Upload file / New resource</h3>
+        <h3><span id="formTitle">Upload a new resource</span><span class="editing-badge" id="editingBadge" style="display:none">EDITING</span></h3>
 
         <div class="form-row">
           <div class="field">
             <label>Topic</label>
-            <select id="f-topic"></select>
+            <select id="f-topic" onchange="onTopicChange()"></select>
           </div>
           <div class="field">
-            <label>Subtopic Name</label>
-            <input type="text" id="f-title" placeholder="mf. Number Systems">
+            <label>Subtopic</label>
+            <select id="f-subtopic" onchange="onSubtopicChange()"></select>
+          </div>
+        </div>
+        <div class="form-row" id="customTitleRow" style="display:none">
+          <div class="field" style="grid-column:1/-1">
+            <label>Custom subtopic name</label>
+            <input type="text" id="f-title-custom" placeholder="e.g. Revision Worksheet">
           </div>
         </div>
 
         <div class="type-toggle">
-          <button type="button" class="active" id="btn-type-file" onclick="setContentType('file')">📁 Upload</button>
-          <button type="button" id="btn-type-link" onclick="setContentType('link')">🔗 Put Link</button>
+          <button type="button" class="active" id="btn-type-file" onclick="setContentType('file')">Upload File</button>
+          <button type="button" id="btn-type-link" onclick="setContentType('link')">Add Link</button>
         </div>
 
         <div id="file-block">
           <div class="dropzone" id="dropzone" onclick="document.getElementById('f-file').click()">
-            <div class="dz-icon">⬆️</div>
-            <div class="dz-main">Click OR Drag file here</div>
-            <div class="dz-sub">Excel, Word, PDF, picture, video, HTML — Any file</div>
+            <div class="dz-icon">&#8679;</div>
+            <div class="dz-main">Click or drag a file here</div>
+            <div class="dz-sub">Excel, Word, PDF, images, video, HTML, Scratch — any file type</div>
             <input type="file" id="f-file"
-              accept=".xlsx,.xls,.csv,.doc,.docx,.pdf,.png,.jpg,.jpeg,.gif,.webp,.mp4,.mov,.webm,.html,.htm,.zip,.ppt,.pptx">
+              accept=".xlsx,.xls,.csv,.doc,.docx,.pdf,.png,.jpg,.jpeg,.gif,.webp,.mp4,.mov,.webm,.html,.htm,.zip,.ppt,.pptx,.sb3">
           </div>
           <div id="file-chip-wrap"></div>
         </div>
 
         <div id="link-block" style="display:none">
           <div class="field">
-            <label>Link (Google Sheet, Scratch, or another Link)</label>
+            <label>Link (Google Sheet, Scratch project, or other URL)</label>
             <input type="url" id="f-link" placeholder="https://...">
           </div>
         </div>
@@ -313,19 +322,24 @@ tbody tr:hover{background:rgba(255,255,255,.035)}
         <div class="msg" id="uploadMsg"></div>
 
         <div class="upload-actions">
+          <button class="btn secondary" id="btn-cancel-edit" onclick="cancelEdit()" style="display:none">Cancel</button>
           <button class="btn" id="btn-submit" onclick="submitUpload()">Upload</button>
         </div>
       </div>
 
+      <div class="toolbar">
+        <input type="text" id="res-search" placeholder="Search uploaded resources..." oninput="renderSubtopics(LAST_SUBTOPICS)">
+        <button class="btn secondary" onclick="loadSubtopics()">Refresh</button>
+      </div>
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>Topic</th><th>Name</th><th>Type</th><th>Link</th><th>Date</th><th></th></tr>
+            <tr><th>Topic</th><th>Subtopic</th><th>Type</th><th>Link</th><th>Date</th><th></th></tr>
           </thead>
           <tbody id="subtopicsBody"></tbody>
         </table>
       </div>
-      <div class="empty" id="subtopicsEmpty" style="display:none">No uploaded file yet.</div>
+      <div class="empty" id="subtopicsEmpty" style="display:none">Nothing uploaded yet.</div>
     </section>
   </main>
 
@@ -345,24 +359,43 @@ tbody tr:hover{background:rgba(255,255,255,.035)}
 </div>
 
 <script>
-/* ============================================================
-   FILL THESE IN — safe to expose in the browser (public/anon key,
-   protected by RLS + signed upload URLs, not the secret service key)
-   ============================================================ */
-const SUPABASE_URL = 'https://hhfqugtiarlxsanwyori.supabase.co';
+const SUPABASE_URL = 'https://https://hhfqugtiarlxsanwyori.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhoZnF1Z3RpYXJseHNhbnd5b3JpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNjY3NjUsImV4cCI6MjEwMzk0Mjc2NX0.hgVXwjyYUwOkRCL1FJY-_W37UjjF6kShlab387Pm3XE';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* Must match the topics/ids used in index.html's TOPICS array */
 const TOPICS = [
-  { id:1, label:'DATA REPRESENTATION' }, { id:2, label:'DATA TRANSMISSION' },
-  { id:3, label:'HARDWARE' }, { id:4, label:'SOFTWARE' }, { id:5, label:'THE INTERNET' },
-  { id:6, label:'EMERGING TECHNOLOGIES' }, { id:7, label:'ALGORITHMS' },
-  { id:8, label:'PROGRAMMING' }, { id:9, label:'DATABASES' }, { id:10, label:'BOOLEAN LOGIC' }
+  { id:1, label:'DATA REPRESENTATION', subtopics:['Number Systems','Text, Sound & Images','Compression'] },
+  { id:2, label:'DATA TRANSMISSION', subtopics:['Transmission Methods','Error Detection','Encryption'] },
+  { id:3, label:'HARDWARE', subtopics:['Computer Architecture','Input & Output Devices','Sensors','Storage','Network Concepts'] },
+  { id:4, label:'SOFTWARE', subtopics:['System & Application Software','Operating Systems & Interrupts','Programming Languages','Translators','IDEs'] },
+  { id:5, label:'THE INTERNET', subtopics:['Internet & WWW','Digital Currency','Cyber Security'] },
+  { id:6, label:'EMERGING TECHNOLOGIES', subtopics:['Automated Systems','Robotics','Artificial Intelligence'] },
+  { id:7, label:'ALGORITHMS', subtopics:['PDLC','Decomposition','Algorithms','Validation & Verification','Test Data','Flowcharts & Pseudocode','Trace Tables'] },
+  { id:8, label:'PROGRAMMING', subtopics:['Variables & Data Types','Input & Output','Selection','Iteration','Arrays','Searching & Sorting','File Handling','Procedures & Functions'] },
+  { id:9, label:'DATABASES', subtopics:['Tables','Primary Keys','Data Types','SQL','SELECT, WHERE & ORDER BY','SUM & COUNT'] },
+  { id:10, label:'BOOLEAN LOGIC', subtopics:['Logic Gates','Truth Tables','Logic Expressions','Logic Circuits'] }
 ];
 document.getElementById('f-topic').innerHTML = TOPICS.map(t => `<option value="${t.id}">${t.label}</option>`).join('');
 
-/* ============ AUTH GATE (same password pattern as before) ============ */
+function onTopicChange(){
+  const topicId = parseInt(document.getElementById('f-topic').value, 10);
+  const topic = TOPICS.find(t => t.id === topicId);
+  const subSel = document.getElementById('f-subtopic');
+  const opts = (topic ? topic.subtopics : []).map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
+  subSel.innerHTML = opts + '<option value="__custom__">+ Custom subtopic...</option>';
+  onSubtopicChange();
+}
+function onSubtopicChange(){
+  const isCustom = document.getElementById('f-subtopic').value === '__custom__';
+  document.getElementById('customTitleRow').style.display = isCustom ? 'grid' : 'none';
+}
+function currentTitle(){
+  const subSel = document.getElementById('f-subtopic');
+  if(subSel.value === '__custom__') return document.getElementById('f-title-custom').value.trim();
+  return subSel.value;
+}
+onTopicChange();
+
 function login(){
   const pw = document.getElementById('pw').value;
   sessionStorage.setItem('admin_pw', pw);
@@ -392,7 +425,6 @@ function switchTab(name){
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id==='tab-'+name));
 }
 
-/* ============ RESULTS TAB (existing /api/results, restyled) ============ */
 let DATA = [];
 let sortKey = 'submittedAt', sortDir = -1;
 
@@ -412,11 +444,10 @@ function renderSummary(){
   const n = DATA.length;
   const avg = n ? Math.round(DATA.reduce((a,d)=>a+d.pct,0)/n) : 0;
   const flagged = DATA.filter(d=>d.tabSwitchCount>=3).length;
-  document.getElementById('summary').innerHTML = `
-    <div class="stat"><div class="n">${n}</div><div class="l">Submit</div></div>
-    <div class="stat"><div class="n">${avg}%</div><div class="l">Class Average</div></div>
-    <div class="stat"><div class="n">${flagged}</div><div class="l">Tab switch tab ≥3</div></div>
-  `;
+  document.getElementById('summary').innerHTML =
+    '<div class="stat"><div class="n">' + n + '</div><div class="l">Submitted</div></div>' +
+    '<div class="stat"><div class="n">' + avg + '%</div><div class="l">Class average</div></div>' +
+    '<div class="stat"><div class="n">' + flagged + '</div><div class="l">Tab-switched &ge;3</div></div>';
 }
 function sortBy(key){ sortDir = (sortKey===key) ? -sortDir : 1; sortKey = key; renderResults(); }
 function renderResults(){
@@ -425,45 +456,88 @@ function renderResults(){
   rows.sort((a,b)=>{ const va=a[sortKey], vb=b[sortKey]; if(typeof va==='string') return sortDir*va.localeCompare(vb); return sortDir*((va||0)-(vb||0)); });
   const tbody = document.getElementById('tbody');
   document.getElementById('empty').style.display = rows.length ? 'none':'block';
-  tbody.innerHTML = rows.map(d=>`
-    <tr>
-      <td>${esc(d.name)}</td><td>${esc(d.cand)}</td><td>${esc(d.cls)}</td>
-      <td>${d.totalCorrect}/${d.totalMarks}</td><td>${d.pct}%</td>
-      <td><span class="grade-pill g-${esc(d.grade)}">${esc(d.grade)}</span></td>
-      <td>${d.penaltyMarks||0}</td>
-      <td>${d.tabSwitchCount>=3?'<span class="flag">'+d.tabSwitchCount+'</span>':d.tabSwitchCount}</td>
-      <td>${new Date(d.submittedAt).toLocaleString('en-GB')}</td>
-    </tr>`).join('');
+  tbody.innerHTML = rows.map(d=>
+    '<tr>' +
+      '<td>'+esc(d.name)+'</td><td>'+esc(d.cand)+'</td><td>'+esc(d.cls)+'</td>' +
+      '<td>'+d.totalCorrect+'/'+d.totalMarks+'</td><td>'+d.pct+'%</td>' +
+      '<td><span class="grade-pill g-'+esc(d.grade)+'">'+esc(d.grade)+'</span></td>' +
+      '<td>'+(d.penaltyMarks||0)+'</td>' +
+      '<td>'+(d.tabSwitchCount>=3?'<span class="flag">'+d.tabSwitchCount+'</span>':d.tabSwitchCount)+'</td>' +
+      '<td>'+new Date(d.submittedAt).toLocaleString('en-GB')+'</td>' +
+      '<td><button class="btn-icon-sm danger" onclick="deleteResult(\''+d.id+'\')">Delete</button></td>' +
+    '</tr>').join('');
 }
-function esc(s){ return String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 
 function renderPdfs(){
   const q = (document.getElementById('pdf-search').value||'').toLowerCase();
   let rows = DATA.filter(d => !q || (d.name||'').toLowerCase().includes(q) || (d.cand||'').toLowerCase().includes(q) || (d.cls||'').toLowerCase().includes(q));
   const tbody = document.getElementById('pdf-tbody');
   document.getElementById('pdf-empty').style.display = rows.length ? 'none':'block';
-  tbody.innerHTML = rows.map(d=>`
-    <tr>
-      <td>${esc(d.name)}</td><td>${esc(d.cand)}</td><td>${esc(d.cls)}</td>
-      <td>${d.totalCorrect}/${d.totalMarks}</td>
-      <td><span class="grade-pill g-${esc(d.grade)}">${esc(d.grade)}</span></td>
-      <td>${d.pdfUrl ? `<a class="pdf-link" href="${esc(d.pdfUrl)}" target="_blank" rel="noopener">📄 Open PDF</a>` : '<span class="pdf-missing">Haipo</span>'}</td>
-    </tr>`).join('');
+  tbody.innerHTML = rows.map(d=>
+    '<tr>' +
+      '<td>'+esc(d.name)+'</td><td>'+esc(d.cand)+'</td><td>'+esc(d.cls)+'</td>' +
+      '<td>'+d.totalCorrect+'/'+d.totalMarks+'</td>' +
+      '<td><span class="grade-pill g-'+esc(d.grade)+'">'+esc(d.grade)+'</span></td>' +
+      '<td>'+(d.pdfUrl ? '<a class="pdf-link" href="'+esc(d.pdfUrl)+'" target="_blank" rel="noopener">Open PDF</a>' : '<span class="pdf-missing">None</span>')+'</td>' +
+      '<td><button class="btn-icon-sm danger" onclick="deleteResult(\''+d.id+'\')">Delete</button></td>' +
+    '</tr>').join('');
 }
+
+async function deleteResult(id){
+  if(!confirm('Delete this result permanently? This also removes its marked-paper PDF. This cannot be undone.')) return;
+  try{
+    const res = await fetch('/api/delete-result?id=' + encodeURIComponent(id), { method:'DELETE', headers: authHeaders() });
+    if(res.status === 401) return showGateError();
+    if(!res.ok) throw new Error('Server error');
+    DATA = DATA.filter(function(d){ return d.id !== id; });
+    renderSummary(); renderResults(); renderPdfs();
+  }catch(e){ alert('Could not delete: ' + e.message); }
+}
+
+async function downloadAllPdfs(){
+  const rows = DATA.filter(function(d){ return d.pdfUrl; });
+  if(!rows.length){ alert('No PDFs to download yet.'); return; }
+  const btn = document.getElementById('btn-download-all');
+  btn.disabled = true; const original = btn.textContent; btn.textContent = 'Zipping 0/' + rows.length + '...';
+  try{
+    const zip = new JSZip();
+    let done = 0;
+    for(const d of rows){
+      try{
+        const resp = await fetch(d.pdfUrl);
+        const blob = await resp.blob();
+        const safeName = (d.name||'unknown').replace(/[^a-z0-9]+/gi,'_') + '_' + (d.cls||'').replace(/[^a-z0-9]+/gi,'_') + '.pdf';
+        zip.file(safeName, blob);
+      }catch(e){ console.error('Failed to fetch', d.name, e); }
+      done++; btn.textContent = 'Zipping ' + done + '/' + rows.length + '...';
+    }
+    const content = await zip.generateAsync({ type:'blob' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(content);
+    a.download = 'marked_papers_' + new Date().toISOString().slice(0,10) + '.zip';
+    a.click();
+  }catch(e){
+    alert('Could not create ZIP: ' + e.message);
+  }finally{
+    btn.disabled = false; btn.textContent = original;
+  }
+}
+
 function exportCsv(){
   const headers = ['Name','Campus','Class','Score','Total','Percent','Grade','Penalty','TabSwitches','SubmittedAt'];
   const lines = [headers.join(',')];
-  DATA.forEach(d=>{
+  DATA.forEach(function(d){
     lines.push([d.name,d.cand,d.cls,d.totalCorrect,d.totalMarks,d.pct,d.grade,d.penaltyMarks||0,d.tabSwitchCount,new Date(d.submittedAt).toISOString()]
-      .map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(','));
+      .map(function(v){ return '"' + String(v==null?'':v).replace(/"/g,'""') + '"'; }).join(','));
   });
   const blob = new Blob([lines.join('\n')], {type:'text/csv'});
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'data_rep_results.csv'; a.click();
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'exam_results.csv'; a.click();
 }
 
-/* ============ UPLOAD TAB ============ */
 let contentType = 'file';
 let pickedFile = null;
+let editingId = null;
 
 function setContentType(t){
   contentType = t;
@@ -475,17 +549,17 @@ function setContentType(t){
 
 const dz = document.getElementById('dropzone');
 const fileInput = document.getElementById('f-file');
-fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
-['dragover','dragenter'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('drag'); }));
-['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('drag'); }));
-dz.addEventListener('drop', e => { if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+fileInput.addEventListener('change', function(e){ handleFile(e.target.files[0]); });
+['dragover','dragenter'].forEach(function(ev){ dz.addEventListener(ev, function(e){ e.preventDefault(); dz.classList.add('drag'); }); });
+['dragleave','drop'].forEach(function(ev){ dz.addEventListener(ev, function(e){ e.preventDefault(); dz.classList.remove('drag'); }); });
+dz.addEventListener('drop', function(e){ if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
 
 function handleFile(file){
   if(!file) return;
   pickedFile = file;
   const kb = (file.size/1024).toFixed(0);
   document.getElementById('file-chip-wrap').innerHTML =
-    `<div class="file-chip">📎 ${esc(file.name)} <span class="mono" style="opacity:.7">(${kb} KB)</span></div>`;
+    '<div class="file-chip">' + esc(file.name) + ' <span class="mono" style="opacity:.7">(' + kb + ' KB)</span></div>';
 }
 
 function fileExt(name){ const m = /\.([a-z0-9]+)$/i.exec(name||''); return m ? m[1].toLowerCase() : ''; }
@@ -494,44 +568,55 @@ async function submitUpload(){
   const msg = document.getElementById('uploadMsg');
   msg.style.display='none';
   const topicId = parseInt(document.getElementById('f-topic').value, 10);
-  const title = document.getElementById('f-title').value.trim();
-  if(!title){ return showMsg('Write subtopic name First.', 'err'); }
+  const title = currentTitle();
+  if(!title){ return showMsg('Choose or type a subtopic name first.', 'err'); }
 
   let url, type, ext = null;
 
   if(contentType === 'link'){
     url = document.getElementById('f-link').value.trim();
-    if(!url){ return showMsg('Put link firts.', 'err'); }
+    if(!url){ return showMsg('Enter a link first.', 'err'); }
     type = 'link';
   } else {
-    if(!pickedFile){ return showMsg('Choose file.', 'err'); }
-    type = 'file';
-    ext = fileExt(pickedFile.name);
-    try{
-      url = await uploadFileToStorage(pickedFile, topicId);
-    }catch(e){
-      console.error(e);
-      return showMsg('Fail to upload: ' + e.message, 'err');
+    if(!pickedFile && !editingId){ return showMsg('Choose a file first.', 'err'); }
+    if(pickedFile){
+      type = 'file';
+      ext = fileExt(pickedFile.name);
+      try{
+        url = await uploadFileToStorage(pickedFile, topicId);
+      }catch(e){
+        console.error(e);
+        return showMsg('Failed to upload file: ' + e.message, 'err');
+      }
     }
   }
 
   try{
-    const res = await fetch('/api/subtopics', {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json', ...authHeaders() },
-      body: JSON.stringify({ topic_id: topicId, title, content_type: type, file_ext: ext, url })
-    });
+    let res;
+    if(editingId){
+      const body = { id: editingId, topic_id: topicId, title: title, content_type: type };
+      if(ext !== null) body.file_ext = ext;
+      if(url !== undefined) body.url = url;
+      res = await fetch('/api/subtopics', {
+        method:'PUT',
+        headers: Object.assign({ 'Content-Type':'application/json' }, authHeaders()),
+        body: JSON.stringify(body)
+      });
+    } else {
+      res = await fetch('/api/subtopics', {
+        method:'POST',
+        headers: Object.assign({ 'Content-Type':'application/json' }, authHeaders()),
+        body: JSON.stringify({ topic_id: topicId, title: title, content_type: type, file_ext: ext, url: url })
+      });
+    }
     if(res.status === 401) return showGateError();
     if(!res.ok) throw new Error('Server error');
-    showMsg('Uploaded! Soon will be seen soon.', 'ok');
-    document.getElementById('f-title').value = '';
-    document.getElementById('f-link').value = '';
-    pickedFile = null;
-    document.getElementById('file-chip-wrap').innerHTML = '';
+    showMsg(editingId ? 'Updated! Changes are live on the site now.' : 'Uploaded! It will appear on the site right away.', 'ok');
+    resetForm();
     loadSubtopics();
   }catch(e){
     console.error(e);
-    showMsg('Fail to save. ' + e.message, 'err');
+    showMsg('Failed to save: ' + e.message, 'err');
   }
 }
 
@@ -540,22 +625,21 @@ async function uploadFileToStorage(file, topicId){
   const progressBar = document.getElementById('progressBar');
   progressWrap.style.display='block'; progressBar.style.width='30%';
 
-  // 1. ask our server (which holds the secret service key) for a one-time signed upload slot
-  const path = `topic-${topicId}/${Date.now()}-${file.name}`.replace(/\s+/g,'-');
+  const path = ('topic-' + topicId + '/' + Date.now() + '-' + file.name).replace(/\s+/g,'-');
   const res = await fetch('/api/upload-url', {
     method:'POST',
-    headers:{ 'Content-Type':'application/json', ...authHeaders() },
-    body: JSON.stringify({ path })
+    headers: Object.assign({ 'Content-Type':'application/json' }, authHeaders()),
+    body: JSON.stringify({ path: path })
   });
-  if(res.status === 401){ progressWrap.style.display='none'; throw new Error('Wrong Password.'); }
-  const { token, bucket, publicUrl } = await res.json();
+  if(res.status === 401){ progressWrap.style.display='none'; throw new Error('Incorrect password'); }
+  const data = await res.json();
+  const token = data.token, bucket = data.bucket, publicUrl = data.publicUrl;
   progressBar.style.width='65%';
 
-  // 2. upload straight to Supabase Storage using that signed token (bypasses server body-size limits)
-  const { error } = await sb.storage.from(bucket).uploadToSignedUrl(path, token, file);
+  const result = await sb.storage.from(bucket).uploadToSignedUrl(path, token, file);
   progressBar.style.width='100%';
-  setTimeout(()=>{ progressWrap.style.display='none'; progressBar.style.width='0%'; }, 500);
-  if(error) throw error;
+  setTimeout(function(){ progressWrap.style.display='none'; progressBar.style.width='0%'; }, 500);
+  if(result.error) throw result.error;
   return publicUrl;
 }
 
@@ -564,32 +648,86 @@ function showMsg(text, kind){
   msg.textContent = text; msg.className = 'msg ' + kind; msg.style.display='block';
 }
 
+function resetForm(){
+  editingId = null;
+  document.getElementById('formTitle').textContent = 'Upload a new resource';
+  document.getElementById('editingBadge').style.display = 'none';
+  document.getElementById('btn-cancel-edit').style.display = 'none';
+  document.getElementById('btn-submit').textContent = 'Upload';
+  document.getElementById('f-title-custom').value = '';
+  document.getElementById('f-link').value = '';
+  pickedFile = null;
+  document.getElementById('file-chip-wrap').innerHTML = '';
+  onTopicChange();
+}
+function cancelEdit(){ resetForm(); }
+
+let LAST_SUBTOPICS = [];
 async function loadSubtopics(){
   try{
     const res = await fetch('/api/subtopics', { headers: authHeaders() });
     if(res.status === 401) return;
     const data = await res.json();
-    renderSubtopics(data.subtopics || []);
+    LAST_SUBTOPICS = data.subtopics || [];
+    renderSubtopics(LAST_SUBTOPICS);
   }catch(e){ console.error(e); }
 }
 function renderSubtopics(rows){
+  const q = (document.getElementById('res-search').value||'').toLowerCase();
+  const filtered = rows.filter(function(r){
+    if(!q) return true;
+    const topic = TOPICS.find(function(t){ return t.id === r.topic_id; });
+    return (r.title||'').toLowerCase().includes(q) || (topic ? topic.label.toLowerCase().includes(q) : false);
+  });
   const tbody = document.getElementById('subtopicsBody');
-  document.getElementById('subtopicsEmpty').style.display = rows.length ? 'none' : 'block';
-  tbody.innerHTML = rows.map(r => {
-    const topic = TOPICS.find(t => t.id === r.topic_id);
-    const typeLabel = r.content_type === 'link' ? '🔗 Link' : '📁 ' + (r.file_ext || 'faili').toUpperCase();
-    return `<tr>
-      <td>${esc(topic ? topic.label : r.topic_id)}</td>
-      <td>${esc(r.title)}</td>
-      <td><span class="type-pill">${typeLabel}</span></td>
-      <td><a href="${r.url}" target="_blank" class="mono" style="color:var(--cyan)">Open ↗</a></td>
-      <td class="mono" style="font-size:.72rem;color:var(--faint)">${new Date(r.created_at).toLocaleDateString('en-GB')}</td>
-      <td><button class="btn danger" style="padding:6px 12px;font-size:.68rem" onclick="deleteSubtopic('${r.id}')">Futa</button></td>
-    </tr>`;
+  document.getElementById('subtopicsEmpty').style.display = filtered.length ? 'none' : 'block';
+  tbody.innerHTML = filtered.map(function(r){
+    const topic = TOPICS.find(function(t){ return t.id === r.topic_id; });
+    const typeLabel = r.content_type === 'link' ? 'Link' : (r.file_ext || 'file').toUpperCase();
+    const rJson = esc(JSON.stringify(r)).replace(/"/g,'&quot;');
+    return '<tr>' +
+      '<td>'+esc(topic ? topic.label : r.topic_id)+'</td>' +
+      '<td>'+esc(r.title)+'</td>' +
+      '<td><span class="type-pill">'+typeLabel+'</span></td>' +
+      '<td><a href="'+r.url+'" target="_blank" class="mono" style="color:var(--cyan)">Open</a></td>' +
+      '<td class="mono" style="font-size:.72rem;color:var(--faint)">'+new Date(r.created_at).toLocaleDateString('en-GB')+'</td>' +
+      '<td>' +
+        '<button class="btn-icon-sm" data-row="'+rJson+'" onclick="editSubtopicFromBtn(this)">Edit</button>' +
+        '<button class="btn-icon-sm danger" onclick="deleteSubtopic(\''+r.id+'\')">Delete</button>' +
+      '</td>' +
+    '</tr>';
   }).join('');
 }
+
+function editSubtopicFromBtn(btn){
+  const r = JSON.parse(btn.getAttribute('data-row').replace(/&quot;/g,'"'));
+  editSubtopic(r);
+}
+
+function editSubtopic(r){
+  editingId = r.id;
+  document.getElementById('f-topic').value = r.topic_id;
+  onTopicChange();
+  const subSel = document.getElementById('f-subtopic');
+  const hasOption = Array.from(subSel.options).some(function(o){ return o.value === r.title; });
+  if(hasOption){ subSel.value = r.title; }
+  else { subSel.value = '__custom__'; document.getElementById('f-title-custom').value = r.title; }
+  onSubtopicChange();
+
+  setContentType(r.content_type === 'link' ? 'link' : 'file');
+  if(r.content_type === 'link') document.getElementById('f-link').value = r.url;
+  else document.getElementById('file-chip-wrap').innerHTML = '<div class="file-chip">Current file: ' + esc(r.url.split('/').pop()) + ' <span class="mono" style="opacity:.7">(leave as-is, or choose a new file to replace it)</span></div>';
+
+  document.getElementById('formTitle').textContent = 'Edit resource';
+  document.getElementById('editingBadge').style.display = 'inline-block';
+  document.getElementById('btn-cancel-edit').style.display = 'inline-block';
+  document.getElementById('btn-submit').textContent = 'Save changes';
+  switchTab('upload');
+  document.getElementById('tab-upload').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
 async function deleteSubtopic(id){
-  if(!confirm('Are you sure you want to delete?')) return;
+  if(!confirm('Delete this resource? This cannot be undone.')) return;
   const res = await fetch('/api/subtopics?id=' + encodeURIComponent(id), { method:'DELETE', headers: authHeaders() });
   if(res.status === 401) return showGateError();
   loadSubtopics();
