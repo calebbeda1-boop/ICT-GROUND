@@ -204,76 +204,76 @@ tbody tr:hover{background:rgba(255,255,255,.035)}
 <div id="gate">
   <div class="crown">👑</div>
   <div class="eyebrow">ICT GROUND // ADMIN</div>
-  <h2>Ingia kusimamia</h2>
+  <h2>Login tO Manage</h2>
   <input type="password" id="pw" placeholder="Admin password" autocomplete="off" onkeydown="if(event.key==='Enter') login()">
-  <button onclick="login()">Ingia</button>
-  <div class="err" id="gate-err">Password si sahihi.</div>
+  <button onclick="login()">Login</button>
+  <div class="err" id="gate-err">Wrong Password.</div>
 </div>
 
 <!-- ============ DASHBOARD ============ -->
 <div id="dash">
   <header class="topbar">
     <div class="logo">ICT GROUND <span class="brand-name">// ADMIN</span></div>
-    <button class="btn-ghost" onclick="logout()">Toka</button>
+    <button class="btn-ghost" onclick="logout()">LOGOUT</button>
   </header>
 
   <main>
     <div class="tabs">
-      <button class="tab-btn active" data-tab="results" onclick="switchTab('results')">Matokeo</button>
-      <button class="tab-btn" data-tab="pdfs" onclick="switchTab('pdfs')">PDF za Mitihani</button>
-      <button class="tab-btn" data-tab="upload" onclick="switchTab('upload')">Pandisha Mitihani</button>
+      <button class="tab-btn active" data-tab="results" onclick="switchTab('results')">Results</button>
+      <button class="tab-btn" data-tab="pdfs" onclick="switchTab('pdfs')">Exam PDF</button>
+      <button class="tab-btn" data-tab="upload" onclick="switchTab('upload')">Upload exam</button>
     </div>
 
     <!-- ===== TAB: RESULTS (existing dashboard, restyled) ===== -->
     <section id="tab-results" class="tab-panel active">
       <div class="summary" id="summary"></div>
       <div class="toolbar">
-        <input type="text" id="search" placeholder="Tafuta jina, campus au darasa..." oninput="renderResults()">
-        <button class="btn secondary" onclick="loadResults()">↻ Onyesha upya</button>
-        <button class="btn" onclick="exportCsv()">⬇ Pakua CSV</button>
+        <input type="text" id="search" placeholder="Find name, campus or class..." oninput="renderResults()">
+        <button class="btn secondary" onclick="loadResults()">↻ Reload</button>
+        <button class="btn" onclick="exportCsv()">⬇ Download CSV</button>
       </div>
       <div class="table-wrap">
         <table id="tbl">
           <thead>
             <tr>
-              <th onclick="sortBy('name')">Jina</th>
+              <th onclick="sortBy('name')">Name</th>
               <th onclick="sortBy('cand')">Campus/Wing</th>
-              <th onclick="sortBy('cls')">Darasa</th>
-              <th onclick="sortBy('totalCorrect')">Alama</th>
+              <th onclick="sortBy('cls')">Class</th>
+              <th onclick="sortBy('totalCorrect')">Marks</th>
               <th onclick="sortBy('pct')">%</th>
-              <th onclick="sortBy('grade')">Daraja</th>
-              <th onclick="sortBy('penaltyMarks')">Adhabu</th>
+              <th onclick="sortBy('grade')">Class</th>
+              <th onclick="sortBy('penaltyMarks')">Penalty</th>
               <th onclick="sortBy('tabSwitchCount')">Tab-switch</th>
-              <th onclick="sortBy('submittedAt')">Wakati</th>
+              <th onclick="sortBy('submittedAt')">Time</th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
         </table>
       </div>
-      <div class="empty" id="empty" style="display:none">Hakuna matokeo bado.</div>
+      <div class="empty" id="empty" style="display:none">No Results yet.</div>
     </section>
 
     <!-- ===== TAB: MARKED-PAPER PDFs ===== -->
     <section id="tab-pdfs" class="tab-panel">
       <div class="toolbar">
-        <input type="text" id="pdf-search" placeholder="Tafuta jina, campus au darasa..." oninput="renderPdfs()">
-        <button class="btn secondary" onclick="loadResults()">↻ Onyesha upya</button>
+        <input type="text" id="pdf-search" placeholder="Find name, campus or Class..." oninput="renderPdfs()">
+        <button class="btn secondary" onclick="loadResults()">↻ Reload</button>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>Jina</th><th>Campus/Wing</th><th>Darasa</th><th>Alama</th><th>Daraja</th><th>PDF</th></tr>
+            <tr><th>Name</th><th>Campus/Wing</th><th>Class</th><th>Marks</th><th>Grade</th><th>PDF</th></tr>
           </thead>
           <tbody id="pdf-tbody"></tbody>
         </table>
       </div>
-      <div class="empty" id="pdf-empty" style="display:none">Hakuna PDF bado.</div>
+      <div class="empty" id="pdf-empty" style="display:none">No PDF yet.</div>
     </section>
 
     <!-- ===== TAB: UPLOAD SUBTOPICS ===== -->
     <section id="tab-upload" class="tab-panel">
       <div class="upload-card">
-        <h3>Pandisha mtihani / rasilimali mpya</h3>
+        <h3>Upload file / New resource</h3>
 
         <div class="form-row">
           <div class="field">
@@ -281,21 +281,21 @@ tbody tr:hover{background:rgba(255,255,255,.035)}
             <select id="f-topic"></select>
           </div>
           <div class="field">
-            <label>Jina la Subtopic</label>
+            <label>Subtopic Name</label>
             <input type="text" id="f-title" placeholder="mf. Number Systems">
           </div>
         </div>
 
         <div class="type-toggle">
-          <button type="button" class="active" id="btn-type-file" onclick="setContentType('file')">📁 Pakia Faili</button>
-          <button type="button" id="btn-type-link" onclick="setContentType('link')">🔗 Weka Link</button>
+          <button type="button" class="active" id="btn-type-file" onclick="setContentType('file')">📁 Upload</button>
+          <button type="button" id="btn-type-link" onclick="setContentType('link')">🔗 Put Link</button>
         </div>
 
         <div id="file-block">
           <div class="dropzone" id="dropzone" onclick="document.getElementById('f-file').click()">
             <div class="dz-icon">⬆️</div>
-            <div class="dz-main">Bofya au buruta faili hapa</div>
-            <div class="dz-sub">Excel, Word, PDF, picha, video, HTML — faili yoyote muhimu</div>
+            <div class="dz-main">Click OR Drag file here</div>
+            <div class="dz-sub">Excel, Word, PDF, picture, video, HTML — Any file</div>
             <input type="file" id="f-file"
               accept=".xlsx,.xls,.csv,.doc,.docx,.pdf,.png,.jpg,.jpeg,.gif,.webp,.mp4,.mov,.webm,.html,.htm,.zip,.ppt,.pptx">
           </div>
@@ -304,7 +304,7 @@ tbody tr:hover{background:rgba(255,255,255,.035)}
 
         <div id="link-block" style="display:none">
           <div class="field">
-            <label>Kiungo (Google Sheet, Scratch, au link nyingine)</label>
+            <label>Link (Google Sheet, Scratch, or another Link)</label>
             <input type="url" id="f-link" placeholder="https://...">
           </div>
         </div>
@@ -313,19 +313,19 @@ tbody tr:hover{background:rgba(255,255,255,.035)}
         <div class="msg" id="uploadMsg"></div>
 
         <div class="upload-actions">
-          <button class="btn" id="btn-submit" onclick="submitUpload()">Pandisha</button>
+          <button class="btn" id="btn-submit" onclick="submitUpload()">Upload</button>
         </div>
       </div>
 
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>Topic</th><th>Jina</th><th>Aina</th><th>Kiungo</th><th>Tarehe</th><th></th></tr>
+            <tr><th>Topic</th><th>Name</th><th>Type</th><th>Link</th><th>Date</th><th></th></tr>
           </thead>
           <tbody id="subtopicsBody"></tbody>
         </table>
       </div>
-      <div class="empty" id="subtopicsEmpty" style="display:none">Bado hujapandisha chochote.</div>
+      <div class="empty" id="subtopicsEmpty" style="display:none">No uploaded file yet.</div>
     </section>
   </main>
 
@@ -413,9 +413,9 @@ function renderSummary(){
   const avg = n ? Math.round(DATA.reduce((a,d)=>a+d.pct,0)/n) : 0;
   const flagged = DATA.filter(d=>d.tabSwitchCount>=3).length;
   document.getElementById('summary').innerHTML = `
-    <div class="stat"><div class="n">${n}</div><div class="l">Wamewasilisha</div></div>
-    <div class="stat"><div class="n">${avg}%</div><div class="l">Wastani wa darasa</div></div>
-    <div class="stat"><div class="n">${flagged}</div><div class="l">Waliobadili tab ≥3</div></div>
+    <div class="stat"><div class="n">${n}</div><div class="l">Submit</div></div>
+    <div class="stat"><div class="n">${avg}%</div><div class="l">Class Average</div></div>
+    <div class="stat"><div class="n">${flagged}</div><div class="l">Tab switch tab ≥3</div></div>
   `;
 }
 function sortBy(key){ sortDir = (sortKey===key) ? -sortDir : 1; sortKey = key; renderResults(); }
@@ -447,7 +447,7 @@ function renderPdfs(){
       <td>${esc(d.name)}</td><td>${esc(d.cand)}</td><td>${esc(d.cls)}</td>
       <td>${d.totalCorrect}/${d.totalMarks}</td>
       <td><span class="grade-pill g-${esc(d.grade)}">${esc(d.grade)}</span></td>
-      <td>${d.pdfUrl ? `<a class="pdf-link" href="${esc(d.pdfUrl)}" target="_blank" rel="noopener">📄 Fungua PDF</a>` : '<span class="pdf-missing">Haipo</span>'}</td>
+      <td>${d.pdfUrl ? `<a class="pdf-link" href="${esc(d.pdfUrl)}" target="_blank" rel="noopener">📄 Open PDF</a>` : '<span class="pdf-missing">Haipo</span>'}</td>
     </tr>`).join('');
 }
 function exportCsv(){
@@ -495,23 +495,23 @@ async function submitUpload(){
   msg.style.display='none';
   const topicId = parseInt(document.getElementById('f-topic').value, 10);
   const title = document.getElementById('f-title').value.trim();
-  if(!title){ return showMsg('Weka jina la subtopic kwanza.', 'err'); }
+  if(!title){ return showMsg('Write subtopic name First.', 'err'); }
 
   let url, type, ext = null;
 
   if(contentType === 'link'){
     url = document.getElementById('f-link').value.trim();
-    if(!url){ return showMsg('Weka link kwanza.', 'err'); }
+    if(!url){ return showMsg('Put link firts.', 'err'); }
     type = 'link';
   } else {
-    if(!pickedFile){ return showMsg('Chagua faili kwanza.', 'err'); }
+    if(!pickedFile){ return showMsg('Choose file.', 'err'); }
     type = 'file';
     ext = fileExt(pickedFile.name);
     try{
       url = await uploadFileToStorage(pickedFile, topicId);
     }catch(e){
       console.error(e);
-      return showMsg('Imeshindikana kupakia faili: ' + e.message, 'err');
+      return showMsg('Fail to upload: ' + e.message, 'err');
     }
   }
 
@@ -523,7 +523,7 @@ async function submitUpload(){
     });
     if(res.status === 401) return showGateError();
     if(!res.ok) throw new Error('Server error');
-    showMsg('Imepandishwa! Itaonekana kwenye site kuu papo hapo.', 'ok');
+    showMsg('Uploaded! Soon will be seen soon.', 'ok');
     document.getElementById('f-title').value = '';
     document.getElementById('f-link').value = '';
     pickedFile = null;
@@ -531,7 +531,7 @@ async function submitUpload(){
     loadSubtopics();
   }catch(e){
     console.error(e);
-    showMsg('Imeshindikana kuhifadhi taarifa. ' + e.message, 'err');
+    showMsg('Fail to save. ' + e.message, 'err');
   }
 }
 
@@ -547,7 +547,7 @@ async function uploadFileToStorage(file, topicId){
     headers:{ 'Content-Type':'application/json', ...authHeaders() },
     body: JSON.stringify({ path })
   });
-  if(res.status === 401){ progressWrap.style.display='none'; throw new Error('Password si sahihi'); }
+  if(res.status === 401){ progressWrap.style.display='none'; throw new Error('Wrong Password.'); }
   const { token, bucket, publicUrl } = await res.json();
   progressBar.style.width='65%';
 
@@ -582,14 +582,14 @@ function renderSubtopics(rows){
       <td>${esc(topic ? topic.label : r.topic_id)}</td>
       <td>${esc(r.title)}</td>
       <td><span class="type-pill">${typeLabel}</span></td>
-      <td><a href="${r.url}" target="_blank" class="mono" style="color:var(--cyan)">Fungua ↗</a></td>
+      <td><a href="${r.url}" target="_blank" class="mono" style="color:var(--cyan)">Open ↗</a></td>
       <td class="mono" style="font-size:.72rem;color:var(--faint)">${new Date(r.created_at).toLocaleDateString('en-GB')}</td>
       <td><button class="btn danger" style="padding:6px 12px;font-size:.68rem" onclick="deleteSubtopic('${r.id}')">Futa</button></td>
     </tr>`;
   }).join('');
 }
 async function deleteSubtopic(id){
-  if(!confirm('Una uhakika unataka kufuta hii?')) return;
+  if(!confirm('Are you sure you want to delete?')) return;
   const res = await fetch('/api/subtopics?id=' + encodeURIComponent(id), { method:'DELETE', headers: authHeaders() });
   if(res.status === 401) return showGateError();
   loadSubtopics();
