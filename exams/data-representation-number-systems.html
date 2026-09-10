@@ -276,7 +276,7 @@ table.match-tbl select{padding:8px 10px;border-radius:8px;border:1px solid var(-
 const DURATION_SECONDS = 35 * 60;
 const TAB_SWITCH_FREE = 2;      // first 2 switches are free
 const TAB_SWITCH_PENALTY_PER = 1; // marks deducted per switch beyond that
-const RESULTS_ENDPOINT = '/api/results';
+const SUBMIT_ENDPOINT = '/api/submit';
 
 const ANSWER_KEY = {
   mcq: { 1:'B', 2:'A', 3:'B', 4:'C', 5:'B' },
@@ -415,6 +415,10 @@ function confirmSubmit(){
   }
 }
 
+function makeSubmissionId(){
+  return 'sub_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+}
+
 async function submitExam(auto){
   if (examSubmitted) return;
   examSubmitted = true;
@@ -426,41 +430,57 @@ async function submitExam(auto){
   const pct = Math.round((totalCorrect / TOTAL_MARKS) * 100);
   const grade = gradeFor(pct);
 
-  const payload = {
-    name: candidate.name,
-    cand: candidate.cand,
-    cls: candidate.cls,
+  const record = {
+    id: makeSubmissionId(),
+    student: { name: candidate.name, cand: candidate.cand, cls: candidate.cls },
+    rawTotal: rawCorrect,
+    penaltyMarks,
     totalCorrect,
     totalMarks: TOTAL_MARKS,
     pct,
     grade,
-    penaltyMarks,
     tabSwitchCount,
-    submittedAt: new Date().toISOString(),
-    testId: 'binary-data-representation'
+    submittedAt: Date.now()
   };
 
+  let saved = false;
   try{
-    await fetch(RESULTS_ENDPOINT, {
+    const res = await fetch(SUBMIT_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(record)
     });
+    saved = res.ok;
+    if (!res.ok) console.error('Submit failed:', res.status, await res.text());
   }catch(e){
     console.error('Failed to submit results:', e);
   }
 
-  showResult(payload, auto);
+  if (!saved){
+    // Keep a local backup so the result isn't lost if the network/server request failed.
+    try{
+      const backups = JSON.parse(localStorage.getItem('ictground_failed_submissions') || '[]');
+      backups.push(record);
+      localStorage.setItem('ictground_failed_submissions', JSON.stringify(backups));
+    }catch(e){}
+  }
+
+  showResult({ name: candidate.name, totalCorrect, totalMarks: TOTAL_MARKS, pct, grade, penaltyMarks }, auto, saved);
 }
 
-function showResult(payload, auto){
+function showResult(payload, auto, saved){
   document.getElementById('exam').style.display = 'none';
   document.getElementById('result').style.display = 'block';
   document.getElementById('res-score').textContent = `${payload.totalCorrect}/${payload.totalMarks}`;
   document.getElementById('res-grade').textContent = `${payload.pct}% · Grade ${payload.grade}` + (auto ? ' · Time is up' : '');
-  let note = 'Your result has been saved.';
-  if (payload.penaltyMarks > 0){
-    note += ' Your marks were slightly reduced because you switched tabs multiple times during the test.';
+  let note;
+  if (saved === false){
+    note = 'Your result could not be saved automatically — please tell your teacher right away and show them this screen so your score isn\'t lost.';
+  } else {
+    note = 'Your result has been saved.';
+    if (payload.penaltyMarks > 0){
+      note += ' Your marks were slightly reduced because you switched tabs multiple times during the test.';
+    }
   }
   document.getElementById('res-note').textContent = note;
 }
