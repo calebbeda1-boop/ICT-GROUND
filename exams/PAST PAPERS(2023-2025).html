@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cambridge IGCSE COMPUTER SCIENCE 0478/11 Paper 1 (2023 TO 2025 ALL DATA REPRESENTATION) Computer Systems</title>
+<style>
+:root{
+  --ink:#12203a; --ink-soft:#4b5b76; --paper:#ffffff; --desk:#e6ebf2; --line:#c5cfdd; --tint:#f0f4fa;
+  --mark:#a3162c; --ok:#14784a; --ok-bg:#e4f4eb; --bad:#b3261e; --bad-bg:#fdebe9; --focus:#1a56db;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --ink:#e8edf6; --ink-soft:#a8b5ca; --paper:#152033; --desk:#0b1320; --line:#34445f; --tint:#1b2a43;
+    --mark:#ff8f9f; --ok:#63d59f; --ok-bg:#12352a; --bad:#ff9088; --bad-bg:#3e1b1a; --focus:#82abff; }
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html{scroll-padding-top:5.5rem}
+body{margin:0;background:var(--desk);color:var(--ink);font:16px/1.55 "Helvetica Neue",Arial,"Segoe UI",system-ui,sans-serif}
+.sheet{max-width:900px;margin:0 auto;background:var(--paper);box-shadow:0 0 0 1px var(--line),0 16px 48px rgba(10,20,40,.10)}
+@media (min-width:960px){ .sheet{margin:1.5rem auto 3rem} }
+
+/* cover */
+.cover{padding:2.6rem 2.5rem 2rem;border-top:10px solid var(--ink)}
+.board{margin:0 0 1.6rem;font-weight:700;font-size:1.1rem}
+.cover h1{margin:0;font-size:clamp(1.55rem,4.4vw,2.35rem);line-height:1.15;font-weight:800;letter-spacing:-.01em}
+.cover h1 .paperline{display:block;margin-top:.55rem;font-size:clamp(1.05rem,2.6vw,1.35rem);font-weight:600;letter-spacing:0;color:var(--ink-soft)}
+.cover .meta{margin:1.2rem 0 0;font-weight:600}
+.cover .meta span{margin-right:1.6rem}
+.info{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:1.8rem;border-top:1px solid var(--ink)}
+.info>div{padding:1rem 1.2rem 0 0}
+.info>div+div{padding-left:1.4rem;padding-right:0;border-left:1px solid var(--line)}
+.info h2{margin:0 0 .4rem;font-size:1rem}
+.info ul{margin:0;padding-left:1.15rem;font-size:.94rem}
+.info li{margin:.25rem 0}
+.papers{margin:1.2rem 0 0;font-size:.88rem;color:var(--ink-soft)}
+
+/* toolbar */
+.toolbar{padding:.7rem 2.5rem;background:var(--paper);border-top:1px solid var(--ink);border-bottom:1px solid var(--line);display:grid;gap:.6rem;z-index:5}
+@media (min-width:720px){ .toolbar{position:sticky;top:0} }
+.tb-top{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.score{font-weight:700;font-variant-numeric:tabular-nums}
+.score b{font-size:1.15rem}
+.prog{flex:1;min-width:120px;height:8px;background:var(--tint);border-radius:4px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--line)}
+.prog i{display:block;height:100%;width:0;background:var(--ok);transition:width .25s}
+.tb-note{font-size:.85rem;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.tb-row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+.chip{font:inherit;font-size:.88rem;padding:.3rem .75rem;border:1.5px solid var(--line);border-radius:999px;background:transparent;color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper);font-weight:600}
+.tb-row .sp{flex:1}
+.toggle{font-size:.88rem;display:inline-flex;align-items:center;gap:.4rem;cursor:pointer}
+.toggle input{width:1.05rem;height:1.05rem;accent-color:var(--ink)}
+.lnk{font:inherit;font-size:.88rem;background:none;border:0;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:.3rem .2rem}
+:is(.chip,.lnk,.btn,select,input,textarea):focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+/* questions */
+.q{display:grid;grid-template-columns:3.4rem 1fr;column-gap:.6rem;padding:2rem 2.5rem 2.2rem;border-top:2px solid var(--ink)}
+.q:first-of-type{border-top:0}
+.qn{font-weight:800;font-size:1.6rem;line-height:1.2}
+.qintro{margin:0;font-weight:500}
+.qintro ul{margin:.4rem 0 0;padding-left:1.3rem}
+.src{margin:.35rem 0 0;font-size:.82rem;color:var(--ink-soft)}
+.part{display:grid;grid-template-columns:3.3rem 1fr;margin-top:1.4rem}
+.plabel{font-weight:700}
+.prow{display:flex;gap:1rem;justify-content:space-between;align-items:flex-start}
+.ptext{flex:1}
+.ptext ul{margin:.3rem 0 0;padding-left:1.3rem}
+.marks{color:var(--mark);font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.mono{font-family:var(--mono);letter-spacing:.04em}
+.answer-area{margin-top:.7rem;display:grid;gap:.55rem}
+.frow{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+.frow.stack{align-items:stretch;flex-direction:column;gap:.25rem}
+.flabel{min-width:2.2rem;font-weight:600}
+.frow.stack .flabel{min-width:0}
+.unit{color:var(--ink-soft)}
+.txt,.area,.blank{font:inherit;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:6px;padding:.4rem .6rem}
+.txt.w-s{width:9rem}.txt.w-m{width:14rem}.txt.w-l{width:min(100%,26rem)}
+.txt{font-family:var(--mono)}
+.txt.w-l{font-family:inherit}
+.area{width:100%;resize:vertical;line-height:1.45}
+.work{margin-top:.2rem}
+.work .area{font-size:.94rem;background:transparent;border-style:dashed}
+.work label{display:block;font-size:.84rem;color:var(--ink-soft);margin-bottom:.15rem}
+.blank{padding:.15rem .3rem;margin:0 .15rem;font-family:var(--mono)}
+.cloze{line-height:2.2;margin:0}
+
+/* bit boxes */
+.bits{display:inline-flex;gap:.3rem}
+.bit{display:flex;flex-direction:column;align-items:center;gap:.1rem}
+.bit:nth-child(4n):not(:last-child){margin-right:.55rem}
+.bit input{width:2.35rem;height:2.75rem;text-align:center;font:600 1.3rem var(--mono);color:var(--ink);background:var(--paper);border:1.5px solid var(--ink-soft);border-radius:4px;padding:0}
+.bit .pv{display:none;font:.7rem var(--mono);color:var(--ink-soft)}
+body.hints .bit .pv{display:block}
+.ok{border-color:var(--ok) !important;background:var(--ok-bg) !important}
+.bad{border-color:var(--bad) !important;background:var(--bad-bg) !important}
+.bits.ok,.bits.bad{background:none !important;border:0 !important}
+.bits.ok input{border-color:var(--ok);background:var(--ok-bg)}
+.bits.bad input{border-color:var(--bad);background:var(--bad-bg)}
+
+/* multiple choice */
+.mcq{display:grid;gap:.35rem}
+.opt{display:flex;align-items:center;gap:.65rem;padding:.4rem .7rem;border:1.5px solid var(--line);border-radius:6px;cursor:pointer}
+.opt input{width:1.05rem;height:1.05rem;accent-color:var(--ink)}
+.opt .k{font-weight:700;min-width:1.1rem}
+.opt:has(input:checked){border-color:var(--ink)}
+
+/* actions and feedback */
+.actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem}
+.btn{font:inherit;font-weight:600;font-size:.92rem;padding:.42rem .95rem;border-radius:6px;border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn:hover{filter:brightness(1.15)}
+.feedback{margin:.55rem 0 0;font-weight:600;font-size:.94rem;min-height:0}
+.feedback.good{color:var(--ok)}.feedback.miss{color:var(--bad)}.feedback.warn{color:var(--ink-soft)}
+.reveal{margin-top:.9rem;background:var(--tint);border-left:4px solid var(--ink);padding:.9rem 1.1rem 1rem}
+.reveal h3{margin:0 0 .4rem;font-size:.98rem}
+.reveal h3+*{margin-top:0}
+.anslist{list-style:none;margin:0 0 .5rem;padding:0}
+.anslist li{margin:.2rem 0}
+.anslist .al{display:inline-block;min-width:3.4rem;margin-right:.6rem;color:var(--ink-soft)}
+.reveal p{margin:.4rem 0}
+.reveal ul,.reveal ol{margin:.3rem 0;padding-left:1.25rem}
+.fill{font-family:var(--mono);background:var(--ok-bg);padding:0 .3rem;border-radius:3px}
+.wk{margin:.7rem 0 0;padding-top:.6rem;border-top:1px dotted var(--line)}
+.wk:first-of-type{border-top:0;padding-top:0}
+.wk p{margin:.25rem 0}
+table.pv{border-collapse:collapse;font:.88rem var(--mono);margin:.3rem 0}
+table.pv td{border:1px solid var(--line);padding:.12rem .55rem;text-align:center;min-width:2.1rem}
+table.pv tr:first-child td{color:var(--ink-soft);background:var(--paper)}
+table.pv tr:last-child td{font-weight:700}
+pre.add,pre.shift{font:1rem/1.35 var(--mono);margin:.3rem 0;padding:.5rem .8rem;background:var(--paper);border:1px solid var(--line);border-radius:4px;overflow-x:auto}
+pre.add .cy{color:var(--mark)}
+.selfmark{margin-top:.8rem;padding-top:.6rem;border-top:1px solid var(--line);display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;font-size:.94rem}
+.selfmark select{font:inherit;padding:.15rem .3rem;border:1.5px solid var(--ink-soft);border-radius:5px;background:var(--paper);color:var(--ink)}
+.foot{padding:1.4rem 2.5rem 2rem;border-top:2px solid var(--ink);font-size:.85rem;color:var(--ink-soft)}
+.empty{padding:2rem 2.5rem;color:var(--ink-soft)}
+
+@media (max-width:640px){
+  .cover,.toolbar,.foot,.empty{padding-left:1.1rem;padding-right:1.1rem}
+  .info{grid-template-columns:1fr}
+  .info>div+div{padding-left:0;border-left:0;border-top:1px solid var(--line);margin-top:1rem}
+  .q{grid-template-columns:1fr;padding:1.6rem 1.1rem 1.8rem}
+  .qn{margin-bottom:.2rem}
+  .part{grid-template-columns:2.9rem 1fr}
+  .bit input{width:2.05rem;height:2.5rem}
+}
+@media print{
+  body{background:#fff}.sheet{box-shadow:none}.toolbar,.actions,.reveal,.feedback{display:none !important}
+  .q{break-inside:avoid-page}
+}
+</style>
+</head>
+<body>
+<div class="sheet">
+  <header class="cover">
+    <p class="board">Cambridge IGCSE™</p>
+    <h1>COMPUTER SCIENCE 0478/11
+      <span class="paperline">Paper 1 (2023 TO 2025 ALL DATA REPRESENTATION) Computer Systems</span>
+    </h1>
+    <p class="meta"><span>Topic 1: Data Representation</span><span id="totalLine"></span></p>
+    <div class="info">
+      <div>
+        <h2>Instructions</h2>
+        <ul>
+          <li>Answer <b>all</b> questions.</li>
+          <li>Type your answer under each question. For 8-bit answers, type one bit (0 or 1) into each box.</li>
+          <li>Press <b>Check</b> to mark answers that have one correct result.</li>
+          <li>Press <b>Show answer</b> to see the answer and how it is worked out, then mark yourself.</li>
+          <li>Do not use a calculator.</li>
+        </ul>
+      </div>
+      <div>
+        <h2>Information</h2>
+        <ul>
+          <li>The number of marks for each part is shown in brackets [ ].</li>
+          <li>Every question is a Data Representation question taken from a past paper. The source is shown under each question number.</li>
+          <li>The answers were prepared for practice. They are not the official Cambridge mark scheme.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="papers">Papers used: May/June 2023, Oct/Nov 2023, May/June 2024, Oct/Nov 2024, Feb/March 2025 (Paper 12) and Oct/Nov 2025.</p>
+  </header>
+
+  <nav class="toolbar" aria-label="Paper controls">
+    <div class="tb-top">
+      <span class="score">Score <b id="score">0</b> / <b id="totalMarks">0</b></span>
+      <div class="prog" role="progressbar" aria-label="Parts marked" aria-valuemin="0" aria-valuemax="100" id="progWrap"><i id="prog"></i></div>
+      <span class="tb-note" id="markedNote"></span>
+    </div>
+    <div class="tb-row" id="filters" role="group" aria-label="Filter by syllabus topic">
+      <button class="chip" data-tag="all" aria-pressed="true">All questions</button>
+      <button class="chip" data-tag="num" aria-pressed="false">1.1 Number systems</button>
+      <button class="chip" data-tag="media" aria-pressed="false">1.2 Text, sound and images</button>
+      <button class="chip" data-tag="storage" aria-pressed="false">1.3 Storage and compression</button>
+    </div>
+    <div class="tb-row">
+      <label class="toggle"><input type="checkbox" id="hints"> Show place values under bit boxes</label>
+      <span class="sp"></span>
+      <button class="lnk" id="showAll">Show all answers</button>
+      <button class="lnk" id="hideAll">Hide all answers</button>
+      <button class="lnk" id="resetAll">Start again</button>
+    </div>
+  </nav>
+
+  <main id="paper"></main>
+  <p class="empty" id="empty" hidden>No questions match this filter.</p>
+  <footer class="foot">End of paper. Check every answer against the official mark scheme when you can.</footer>
+</div>
+<noscript><p style="padding:1rem">This paper needs JavaScript to run. Please turn it on in your browser.</p></noscript>
+
+<script>
+/* ---------- Question data ---------- */
+const CHOICES_M25 = ['A','B','C','D','E','F','G','H','W','X','Y','Z','0','1','2','4','8','10','16','127','128','255','256'];
+const DATA = [
+{ id:'q1', num:1, src:'May/June 2023, Paper 11, Question 1', tags:['num'],
+  intro:'Binary is a number system used by computers.',
+  parts:[
+  { id:'q1a', label:'(a)', marks:1, type:'mcq',
+    text:'Tick (✓) <b>one</b> box to show which statement about the binary number system is correct.',
+    options:[['A','It is a base 1 system'],['B','It is a base 2 system'],['C','It is a base 10 system'],['D','It is a base 16 system']], correct:'B',
+    model:['Binary uses only two digits, 0 and 1, so it is a base 2 system.'] },
+  { id:'q1b', label:'(b)', marks:3, type:'fields', working:true,
+    text:'Denary numbers are converted to binary numbers to be processed by a computer.<br>Convert these <b>three</b> denary numbers to 8-bit binary numbers.',
+    fields:[ {label:'50',kind:'bits',n:8,ans:'00110010'}, {label:'102',kind:'bits',n:8,ans:'01100110'}, {label:'221',kind:'bits',n:8,ans:'11011101'} ],
+    model:[{h:'dec2bin',n:50},{h:'dec2bin',n:102},{h:'dec2bin',n:221}] },
+  { id:'q1c', label:'(c)', marks:2, type:'fields', working:true,
+    text:'Binary numbers are stored in registers.<br>Negative denary numbers can be represented as binary using two’s complement.<br>Complete the binary register for the denary number –78. You must show all your working.',
+    fields:[ {label:'Register:',kind:'bits',n:8,ans:'10110010'} ],
+    model:[{h:'twos',n:78}] },
+  { id:'q1d', label:'(d)', marks:3, type:'fields', working:true,
+    text:'Two 8-bit binary numbers are given.<br>Add the <b>two</b> 8-bit binary numbers using binary addition. Give your answer in binary. Show all your working.<pre class="add" style="margin:.5rem 0 0">  0 0 1 1 0 0 1 1\n+ 0 1 1 0 0 0 0 1</pre>',
+    fields:[ {label:'Answer:',kind:'bits',n:8,ans:'10010100'} ],
+    model:[{h:'add',a:'00110011',b:'01100001'}] },
+  { id:'q1e', label:'(e)', marks:2, type:'fields',
+    text:'Two binary numbers are added by a computer and an overflow error occurs.<br>Explain why the overflow error occurred.',
+    fields:[ {kind:'area',rows:3} ],
+    model:['<ul><li>The result of the addition is too large to be stored in the number of bits available (for example, the answer needs 9 bits but the register only holds 8).</li><li>The extra bit (the carry out of the left-hand end) cannot be stored, so it is lost and the value in the register is wrong.</li></ul>'] }
+  ]},
+
+{ id:'q2', num:2, src:'May/June 2023, Paper 11, Question 2 (a) and (b)', tags:['media','storage'],
+  intro:'A student has a sound file that is too large to be stored on their external secondary storage device. The student compresses the sound file to make the file size smaller.<br>The compression method used reduces the sample rate and the sample resolution of the sound file.',
+  parts:[
+  { id:'q2a', label:'(a)', marks:2, type:'fields',
+    text:'State what is meant by the sample rate and sample resolution.',
+    fields:[ {label:'Sample rate',kind:'area',rows:2}, {label:'Sample resolution',kind:'area',rows:2} ],
+    model:['<ul><li><b>Sample rate:</b> the number of samples (measurements of the sound wave) taken every second. It is measured in hertz (Hz).</li><li><b>Sample resolution:</b> the number of bits used to store each sample (also called bit depth).</li></ul>'] },
+  { id:'q2b', label:'(b)', marks:1, type:'fields',
+    text:'Identify which type of compression has been used to compress the sound file.',
+    fields:[ {kind:'text',w:'m',label:'',ans:['lossy','lossy compression']} ],
+    model:['Lowering the sample rate and sample resolution permanently removes some of the sound data, and the original cannot be rebuilt. That is <b>lossy</b> compression.'] }
+  ]},
+
+{ id:'q3', num:3, src:'Oct/Nov 2023, Paper 11, Question 2 (a) to (d)', tags:['num'],
+  intro:'A car park has a payment machine that allows a customer to pay for their parking.<br>The cost of parking is displayed as a denary number on a screen on the payment machine.<br>The cost of parking is stored in two 8-bit binary registers.<br>For the parking cost of $10.50:<ul><li>register 1 stores the denary value 10 as binary</li><li>register 2 stores the denary value 50 as binary.</li></ul>',
+  parts:[
+  { id:'q3a', label:'(a)', marks:2, type:'fields', working:true,
+    text:'Give the parking cost that would be displayed on the payment machine when the registers store:<ul><li>register 1: <span class="mono">00010001</span></li><li>register 2: <span class="mono">01000110</span></li></ul>',
+    fields:[ {label:'Parking cost displayed $',kind:'text',w:'s',ans:['17.70','17.7']} ],
+    model:[{h:'bin2dec',bits:'00010001'},{h:'bin2dec',bits:'01000110'},'Register 1 gives the dollars (17) and register 2 gives the cents (70), so the cost is <b>$17.70</b>.'] },
+  { id:'q3b', label:'(b)', marks:2, type:'fields', working:true,
+    text:'The parking cost of $14.98 is displayed on the payment machine.<br>Give the 8-bit binary numbers that are stored in the registers to display the parking cost.',
+    fields:[ {label:'Register 1',kind:'bits',n:8,ans:'00001110'}, {label:'Register 2',kind:'bits',n:8,ans:'01100010'} ],
+    model:['Register 1 stores the dollars (14) and register 2 stores the cents (98). Convert each number separately.',{h:'dec2bin',n:14},{h:'dec2bin',n:98}] },
+  { id:'q3c', label:'(c)', marks:4, type:'fields', working:true,
+    text:'The payment machine gives the customer a ticket when they have paid their parking cost. Each ticket has a 4-digit hexadecimal ticket number that is stored as binary.<br>The binary number <span class="mono">1010000000111101</span> is stored for a customer’s ticket number.<br>Give the hexadecimal ticket number that would be displayed on this customer’s ticket.',
+    fields:[ {label:'Hexadecimal ticket number',kind:'text',w:'s',ans:['A03D']} ],
+    model:[{h:'bin2hex',bits:'1010000000111101'}] },
+  { id:'q3d', label:'(d)', marks:2, type:'fields',
+    text:'Explain why data input into the payment machine needs to be converted to binary.',
+    fields:[ {kind:'area',rows:3} ],
+    model:['<ul><li>Computers (the processor) can only process and store data as binary, so all input must be converted first.</li><li>The circuits are built from transistors and logic gates that have only two states, on and off, which are represented as 1 and 0.</li></ul>'] }
+  ]},
+
+{ id:'q4', num:4, src:'Oct/Nov 2023, Paper 11, Question 5', tags:['media','storage'],
+  intro:'A musician is recording herself playing the music for a song on the piano.',
+  parts:[
+  { id:'q4a', label:'(a)', marks:5, type:'fields',
+    text:'Explain how the analogue sound is recorded and converted to digital.',
+    fields:[ {kind:'area',rows:7} ],
+    model:['Any five points, for example:','<ul><li>A microphone picks up the sound wave and turns it into an electrical signal.</li><li>An analogue-to-digital converter (ADC) measures the height (amplitude) of the wave at regular intervals. Each measurement is a sample.</li><li>The number of samples taken each second is the sample rate.</li><li>Each sample is rounded to the nearest value that the available bits can store. The number of bits per sample is the sample resolution.</li><li>Each sample value is stored as a binary number.</li><li>The binary numbers are stored in order to make the digital sound file.</li></ul>'] },
+  { id:'q4b', label:'(b)', marks:2, type:'fields',
+    text:'State <b>two</b> ways that the accuracy of the recording could be increased.',
+    fields:[ {label:'1',kind:'line'}, {label:'2',kind:'line'} ],
+    model:['<ul><li>Increase the sample rate (take more samples per second).</li><li>Increase the sample resolution (use more bits for each sample).</li></ul>'] },
+  { id:'q4c', label:'(c)', marks:3, type:'fields',
+    text:'The musician compresses the sound file using lossless compression instead of lossy compression.<br>Explain why the musician would choose to use lossless compression instead of lossy compression.',
+    fields:[ {kind:'area',rows:4} ],
+    model:['Any three points, for example:','<ul><li>Lossless compression does not permanently remove any data.</li><li>The original file can be rebuilt exactly when it is decompressed.</li><li>So the quality and accuracy of the recording are kept.</li><li>Lossy compression would permanently remove some sound data and lower the quality.</li></ul>'] },
+  { id:'q4d', label:'(d)', marks:4, type:'fields',
+    text:'The musician types the words for the song into a document.<br>Two character sets that can be used when converting text to digital are the American standard code for information interchange (ASCII) and Unicode.<br>Explain the differences between the ASCII character set and the Unicode character set.',
+    fields:[ {kind:'area',rows:6} ],
+    model:['Any four points, for example:','<ul><li>ASCII uses 7 bits per character (128 characters). Extended ASCII uses 8 bits (256 characters).</li><li>Unicode uses more bits per character (for example 16 or 32 bits), so it has a much larger character set.</li><li>ASCII only covers the English (Latin) alphabet, digits and some symbols.</li><li>Unicode covers the characters of most world languages, plus symbols and emojis.</li><li>The first 128 Unicode codes are the same as ASCII.</li><li>Text stored in Unicode usually needs more storage space than the same text in ASCII.</li></ul>'] }
+  ]},
+
+{ id:'q5', num:5, src:'May/June 2024, Paper 11, Question 2', tags:['num'],
+  intro:'Hypertext markup language (HTML) colour codes can be represented as hexadecimal.',
+  parts:[
+  { id:'q5a', label:'(a)', marks:1, type:'mcq',
+    text:'Tick (✓) <b>one</b> box to show which statement about the hexadecimal number system is <b>incorrect</b>.',
+    options:[['A','It uses the values 0 to 9 and A to F.'],['B','It can be used as a shorter representation of binary.'],['C','It is a base 10 system.'],['D','It can be used to represent error codes.']], correct:'C',
+    model:['Hexadecimal is a base <b>16</b> system, so statement C is the incorrect one. Denary is the base 10 system.'] },
+  { id:'q5b', label:'(b)', marks:3, type:'fields', working:true,
+    text:'Denary numbers can be converted to hexadecimal.<br>Convert the <b>three</b> denary numbers to hexadecimal.',
+    fields:[ {label:'20',kind:'text',w:'s',ans:['14']}, {label:'32',kind:'text',w:'s',ans:['20']}, {label:'165',kind:'text',w:'s',ans:['A5']} ],
+    model:[{h:'dec2hex',n:20},{h:'dec2hex',n:32},{h:'dec2hex',n:165}] }
+  ]},
+
+{ id:'q6', num:6, src:'May/June 2024, Paper 11, Question 3', tags:['num','storage'],
+  intro:'The binary number <span class="mono">10100011</span> is stored in random access memory (RAM).<br>A logical left shift of <b>three</b> places is performed on the binary number.',
+  parts:[
+  { id:'q6a', label:'(a)', marks:1, type:'fields',
+    text:'Give the 8-bit binary number that will be stored after the shift has taken place.',
+    fields:[ {label:'Answer:',kind:'bits',n:8,ans:'00011000'} ],
+    model:[{h:'shift',bits:'10100011',dir:'left',n:3}] },
+  { id:'q6b', label:'(b)', marks:1, type:'mcq',
+    text:'Tick (✓) <b>one</b> box to show which statement about a logical left shift of <b>two</b> places is correct.',
+    options:[['A','It would divide the binary number by 2.'],['B','It would multiply the binary number by 2.'],['C','It would divide the binary number by 4.'],['D','It would multiply the binary number by 4.']], correct:'D',
+    model:['Each place a number is shifted left multiplies it by 2. Two places is 2 × 2 = 4, so the number is multiplied by 4 (as long as no 1s are shifted out of the left-hand end).'] },
+  { id:'q6c', label:'(c)', marks:2, type:'fields', working:true,
+    text:'<span class="mono">10100011</span> can be stored as a two’s complement integer.<br>Convert the two’s complement integer <span class="mono">10100011</span> to denary. Show all your working.',
+    fields:[ {label:'Denary:',kind:'text',w:'s',ans:['-93']} ],
+    model:[{h:'bin2dec',bits:'10100011',twos:true}] },
+  { id:'q6d', label:'(d)', marks:1, type:'fields',
+    text:'The binary number is measured as a byte because it has 8 bits.<br>State how many bytes there are in a kibibyte (KiB).',
+    fields:[ {kind:'text',w:'s',label:'',unit:'bytes',ans:['1024']} ],
+    model:['1 KiB = 2<sup>10</sup> = <b>1024</b> bytes. (A kilobyte, KB, is 1000 bytes, but a kibibyte is based on powers of 2.)'] }
+  ]},
+
+{ id:'q7', num:7, src:'Oct/Nov 2024, Paper 11, Question 1', tags:['storage'],
+  intro:'The size of a file can be measured using different units.',
+  parts:[
+  { id:'q7a', label:'(a)', marks:1, type:'mcq',
+    text:'Tick (✓) <b>one</b> box to show which of these is <b>not</b> a unit of measurement for a file.',
+    options:[['A','bit'],['B','bot'],['C','nibble'],['D','byte']], correct:'B',
+    model:['A bit, a nibble (4 bits) and a byte (8 bits) are all units. “Bot” is not a unit of measurement.'] },
+  { id:'q7b1', label:'(b)(i)', marks:2, type:'fields', unordered:true,
+    text:'The size of a file can be reduced by compressing it.<br>Give <b>two</b> types of compression that can be used to reduce the size of a file.',
+    fields:[ {label:'1',kind:'text',w:'m',ans:['lossy','lossy compression','lossless','lossless compression']}, {label:'2',kind:'text',w:'m',ans:['lossless','lossless compression','lossy','lossy compression']} ],
+    expected:['Lossy','Lossless'],
+    model:['<b>Lossy</b> compression permanently removes some data. <b>Lossless</b> compression keeps all the data so the original can be rebuilt exactly.'] },
+  { id:'q7b2', label:'(b)(ii)', marks:3, type:'fields',
+    text:'Give <b>three</b> benefits of reducing the size of a file for storage and transmission.',
+    fields:[ {label:'1',kind:'area',rows:2}, {label:'2',kind:'area',rows:2}, {label:'3',kind:'area',rows:2} ],
+    model:['Any three from:','<ul><li>Less storage space is needed, so more files can be stored.</li><li>The file is transmitted faster (quicker to upload and download).</li><li>Less bandwidth is used on the network.</li><li>It costs less to store and to send (for example, less data used).</li><li>Files are more likely to fit within limits such as email attachment size.</li></ul>'] }
+  ]},
+
+{ id:'q8', num:8, src:'Oct/Nov 2024, Paper 11, Question 3', tags:['num','media'],
+  intro:'A user enters text into a computer system, using a keyboard.<br>An American standard code for information interchange (ASCII) character set is used to convert the text to binary.',
+  parts:[
+  { id:'q8a', label:'(a)', marks:1, type:'fields',
+    text:'Identify <b>one</b> other character set that could be used to convert the text to binary.',
+    fields:[ {kind:'text',w:'m',label:'',ans:['unicode','utf-8','utf8','utf-16','utf16','utf-32','utf32']} ],
+    model:['<b>Unicode</b> (for example UTF-8, UTF-16 or UTF-32).'] },
+  { id:'q8b1', label:'(b)(i)', marks:2, type:'fields', working:true,
+    text:'The character ‘A’ is represented by the denary ASCII number 65.<br>The character ‘m’ is represented by the denary ASCII number 109.<br>Convert the two denary ASCII numbers to binary.',
+    fields:[ {label:'65',kind:'bits',n:8,ans:'01000001'}, {label:'109',kind:'bits',n:8,ans:'01101101'} ],
+    model:[{h:'dec2bin',n:65},{h:'dec2bin',n:109}] },
+  { id:'q8b2', label:'(b)(ii)', marks:2, type:'fields', working:true,
+    text:'Convert the two denary ASCII numbers, 65 and 109, to hexadecimal.',
+    fields:[ {label:'65',kind:'text',w:'s',ans:['41']}, {label:'109',kind:'text',w:'s',ans:['6D']} ],
+    model:[{h:'dec2hex',n:65},{h:'dec2hex',n:109}] },
+  { id:'q8c1', label:'(c)(i)', marks:1, type:'fields', working:true,
+    text:'The character ‘y’ is represented by the binary ASCII number <span class="mono">01111001</span>.<br>Convert the binary ASCII number to denary.',
+    fields:[ {label:'Denary:',kind:'text',w:'s',ans:['121']} ],
+    model:[{h:'bin2dec',bits:'01111001'}] },
+  { id:'q8c2', label:'(c)(ii)', marks:1, type:'fields', working:true,
+    text:'Convert the binary ASCII number <span class="mono">01111001</span> to hexadecimal.',
+    fields:[ {label:'Hexadecimal:',kind:'text',w:'s',ans:['79']} ],
+    model:[{h:'bin2hex',bits:'01111001'}] },
+  { id:'q8c3', label:'(c)(iii)', marks:1, type:'fields', working:true,
+    text:'A logical right shift of two places is performed on the binary ASCII number <span class="mono">01111001</span>.<br>Give the binary number after the logical right shift of two places is performed.',
+    fields:[ {label:'Answer:',kind:'bits',n:8,ans:'00011110'} ],
+    model:[{h:'shift',bits:'01111001',dir:'right',n:2}] },
+  { id:'q8d', label:'(d)', marks:3, type:'fields', working:true,
+    text:'The character ‘T’ is represented by the binary ASCII number <span class="mono">01010100</span>.<br>The character ‘t’ is represented by the binary ASCII number <span class="mono">01110100</span>.<br>Add the two binary numbers using binary addition. Give your answer in binary. Show all your working.',
+    fields:[ {label:'Answer:',kind:'bits',n:8,ans:'11001000'} ],
+    model:[{h:'add',a:'01010100',b:'01110100'}] }
+  ]},
+
+{ id:'q9', num:9, src:'Oct/Nov 2024, Paper 11, Question 6 (c)', tags:['num'],
+  intro:'A computer programmer uses assembly language to create a computer program for an embedded system in a washing machine.',
+  parts:[
+  { id:'q9c', label:'(c)', marks:1, type:'fields',
+    text:'The washing machine needs to display error codes on a small screen if there is a problem with the washing machine.<br>The error codes are stored as binary. The binary numbers are too long to be displayed on the washing machine.<br>State how the error codes could be reduced in length to be displayed on the screen.',
+    fields:[ {kind:'area',rows:2} ],
+    model:['Convert the binary error codes to <b>hexadecimal</b>. Every group of 4 bits becomes 1 hex digit, so the code is four times shorter (for example <span class="mono">11010110</span> becomes <span class="mono">D6</span>).'] }
+  ]},
+
+{ id:'q10', num:10, src:'Feb/March 2025, Paper 12, Question 1', tags:['num'],
+  intro:'',
+  parts:[
+  { id:'q10a', label:'(a)', marks:7, type:'blanks',
+    text:'Complete the sentences about number systems.<br>Use the items from the list. Some of the items in the list will <b>not</b> be used. You should only use an item once.<div class="mono" style="margin:.5rem 0;line-height:1.7">A &nbsp;B &nbsp;C &nbsp;D &nbsp;E &nbsp;F &nbsp;G &nbsp;H &nbsp;W &nbsp;X &nbsp;Y &nbsp;Z &nbsp;0 &nbsp;1 &nbsp;2 &nbsp;4 &nbsp;8 &nbsp;10 &nbsp;16 &nbsp;127 &nbsp;128 &nbsp;255 &nbsp;256</div>',
+    template:'The binary number system is base [[0]]. The smallest denary number that can be represented as an 8-bit binary number is [[1]]. The largest denary number that can be represented as an 8-bit binary number is [[2]].<br>The hexadecimal number system is base [[3]]. Each hexadecimal digit is equivalent to [[4]] bits. The numbers 1 to 9 are used and the number 10 is represented by [[5]]. The hexadecimal number system continues up to the number 15, which is represented by [[6]].',
+    choices:CHOICES_M25, answers:['2','0','255','16','4','A','F'],
+    model:['<ul><li>Binary has two digits (0 and 1), so it is base 2.</li><li>The 8-bit values run from <span class="mono">00000000</span> = 0 to <span class="mono">11111111</span> = 255.</li><li>Hexadecimal has 16 digits, so it is base 16. One hex digit is 4 bits.</li><li>Hex uses 0 to 9, then A = 10, B = 11, C = 12, D = 13, E = 14 and F = 15.</li></ul>'] },
+  { id:'q10b', label:'(b)', marks:3, type:'fields', working:true,
+    text:'Two 8-bit binary numbers are given.<br>Add the two 8-bit binary numbers using binary addition. Give your answer in binary. Show all your working.<pre class="add" style="margin:.5rem 0 0">  1 0 0 1 1 0 1 1\n+ 0 0 0 1 0 0 1 1</pre>',
+    fields:[ {label:'Answer:',kind:'bits',n:8,ans:'10101110'} ],
+    model:[{h:'add',a:'10011011',b:'00010011'}] },
+  { id:'q10c', label:'(c)', marks:1, type:'mcq',
+    text:'Binary addition can result in overflow.<br>Tick (✓) <b>one</b> box to show the correct definition of overflow in binary addition.',
+    options:[['A','The answer has created a negative number that cannot be represented in binary addition.'],['B','The answer is the result of a logical shift that cannot be performed in binary addition.'],['C','The answer is too large to represent in the number of bits available.'],['D','The answer is too small to represent in the number of bits available.']], correct:'C',
+    model:['Overflow happens when the result of an addition needs more bits than the register has, so the answer is too large to be stored.'] }
+  ]},
+
+{ id:'q11', num:11, src:'Feb/March 2025, Paper 12, Question 2 (a) to (c)', tags:['media','storage'],
+  intro:'An artist creates an image on a computer.',
+  parts:[
+  { id:'q11a', label:'(a)', marks:1, type:'fields',
+    text:'State what is meant by the colour depth of an image.',
+    fields:[ {kind:'area',rows:2} ],
+    model:['The number of bits used to represent the colour of each pixel.'] },
+  { id:'q11b', label:'(b)', marks:2, type:'fields',
+    text:'Describe the relationship between the resolution of the image and the file size of the image.',
+    fields:[ {kind:'area',rows:3} ],
+    model:['<ul><li>The higher the resolution (the more pixels in the image), the larger the file size.</li><li>This is because there are more pixels, so there is more colour data to store. A lower resolution gives a smaller file.</li></ul>'] },
+  { id:'q11c1', label:'(c)(i)', marks:3, type:'fields',
+    text:'The artist compresses the image file before uploading it to their website. Users can download the image file from the website to print as a poster.<br>The image file is compressed using lossless compression.<br>Explain the reasons why the artist chose lossless compression instead of lossy compression to compress this image file.',
+    fields:[ {kind:'area',rows:4} ],
+    model:['Any three points, for example:','<ul><li>Lossless compression does not remove any data, so the original image can be rebuilt exactly.</li><li>The quality of the image is kept, with no loss of detail or colour.</li><li>Users want to print the image as a poster, and a large print needs high quality.</li><li>A lossy image would lose resolution or colour depth and could look blurry or pixelated when printed large.</li></ul>'] },
+  { id:'q11c2', label:'(c)(ii)', marks:3, type:'fields',
+    text:'Identify <b>one</b> lossless method of compressing an image.<br>Describe your chosen method.',
+    fields:[ {label:'Method',kind:'line'}, {label:'Description',kind:'area',rows:4} ],
+    model:['<ul><li><b>Method:</b> run-length encoding (RLE).</li><li><b>Description:</b> a run of identical, consecutive pixels is stored once, together with a count of how many times it repeats. For example, 12 red pixels in a row are stored as “12, red” instead of storing red 12 times.</li><li>No data is lost, because the original pixels can be rebuilt exactly from the counts.</li></ul>'] }
+  ]},
+
+{ id:'q12', num:12, src:'Oct/Nov 2025, Paper 11, Question 1 (a) to (f)', tags:['num'],
+  intro:'A student has an electronic calculator. The calculator has a screen that displays the result of calculations.<br>The calculator has 8-bit registers.',
+  parts:[
+  { id:'q12a', label:'(a)', marks:1, type:'fields',
+    text:'State the highest denary number that could be stored in a single 8-bit register.',
+    fields:[ {kind:'text',w:'s',label:'',ans:['255']} ],
+    model:['<span class="mono">11111111</span> = 128 + 64 + 32 + 16 + 8 + 4 + 2 + 1 = <b>255</b>. (Or 2<sup>8</sup> − 1.)'] },
+  { id:'q12b', label:'(b)', marks:2, type:'fields', working:true,
+    text:'Denary numbers are typed into the calculator. They are converted to binary numbers and stored in the 8-bit registers.<br>The student types in the denary number 23 and the denary number 168.<br>Give the 8-bit binary numbers that are stored in the registers for these two denary numbers.',
+    fields:[ {label:'23',kind:'bits',n:8,ans:'00010111'}, {label:'168',kind:'bits',n:8,ans:'10101000'} ],
+    model:[{h:'dec2bin',n:23},{h:'dec2bin',n:168}] },
+  { id:'q12c', label:'(c)', marks:1, type:'fields', working:true,
+    text:'The result of a calculation that is stored in a register is the binary number <span class="mono">00001011</span>.<br>Give the denary number that will be displayed on the screen for this binary number.',
+    fields:[ {label:'Denary:',kind:'text',w:'s',ans:['11']} ],
+    model:[{h:'bin2dec',bits:'00001011'}] },
+  { id:'q12d', label:'(d)', marks:1, type:'fields', working:true,
+    text:'Another result of a calculation that is stored in a register is the binary number <span class="mono">01000010</span>.<br>Give the denary number that will be displayed on the screen for this binary number.',
+    fields:[ {label:'Denary:',kind:'text',w:'s',ans:['66']} ],
+    model:[{h:'bin2dec',bits:'01000010'}] },
+  { id:'q12e', label:'(e)', marks:3, type:'fields', working:true,
+    text:'Two binary numbers stored in the registers are <span class="mono">01110110</span> and <span class="mono">00110000</span>.<br>Add the binary numbers using binary addition. Show all your working. Give your answer in binary.',
+    fields:[ {label:'Answer:',kind:'bits',n:8,ans:'10100110'} ],
+    model:[{h:'add',a:'01110110',b:'00110000'}] },
+  { id:'q12f', label:'(f)', marks:1, type:'fields',
+    text:'The result of a calculation could be a negative denary number.<br>State how the calculator could represent a negative denary number as a binary number.',
+    fields:[ {kind:'area',rows:2} ],
+    model:['Using <b>two’s complement</b>. The left-hand bit has a negative place value (−128 in 8 bits), so a number that starts with 1 is negative.'] }
+  ]},
+
+{ id:'q13', num:13, src:'Oct/Nov 2025, Paper 11, Question 2 (a)', tags:['media','storage'],
+  intro:'An employee of a company sells houses. He sends images of the houses to his company.',
+  parts:[
+  { id:'q13a', label:'(a)', marks:2, type:'fields',
+    text:'The employee compresses the image files using lossy compression before sending them.<br>Lossy compression reduces the size of the image files.<br>Give <b>two</b> other reductions that lossy compression makes to the images.',
+    fields:[ {label:'1',kind:'line'}, {label:'2',kind:'line'} ],
+    model:['Any two from:','<ul><li>It reduces the resolution (fewer pixels).</li><li>It reduces the colour depth (fewer bits per pixel, so fewer colours).</li><li>It permanently removes data, so the quality or detail of the image is reduced.</li></ul>'] }
+  ]},
+
+{ id:'q14', num:14, src:'Oct/Nov 2025, Paper 11, Question 3 (a) and (b)', tags:['media','storage'],
+  intro:'A student has a portable device. He uses an on-screen keyboard to write messages to his friend.',
+  parts:[
+  { id:'q14a', label:'(a)', marks:3, type:'fields',
+    text:'Explain how the text the student writes is converted to binary to be processed.',
+    fields:[ {kind:'area',rows:5} ],
+    model:['Any three points, for example:','<ul><li>Every character has its own unique code (number) in a character set such as ASCII or Unicode.</li><li>When a character is typed, the computer looks up its code in the character set.</li><li>That code is converted to binary.</li><li>The binary is stored in memory and processed by the CPU.</li></ul>'] },
+  { id:'q14b1', label:'(b)(i)', marks:1, type:'fields', working:true,
+    text:'The device has 4 gibibytes (GiB) of random access memory (RAM).<br>State the amount of RAM the device has in mebibytes (MiB).',
+    fields:[ {kind:'text',w:'s',label:'',unit:'MiB',ans:['4096']} ],
+    model:['1 GiB = 1024 MiB, so 4 GiB = 4 × 1024 = <b>4096 MiB</b>.'] },
+  { id:'q14b2', label:'(b)(ii)', marks:1, type:'fields', working:true,
+    text:'State the amount of RAM the device has in tebibytes (TiB). Your answer can be given rounded to 3 decimal places.',
+    fields:[ {kind:'text',w:'s',label:'',unit:'TiB',ans:['0.004','0.0039','0.00390625','0.00391']} ],
+    model:['1 TiB = 1024 GiB, so 4 GiB = 4 ÷ 1024 = 0.00390625 TiB, which is <b>0.004 TiB</b> to 3 decimal places.'] }
+  ]}
+];
+</script>
+
+<script>
+/* ---------- Helpers that write the worked answers ---------- */
+(function(){
+'use strict';
+const HEX='0123456789ABCDEF';
+const g4=s=>s.replace(/(.{4})(?=.)/g,'$1 ');
+const MINUS='\u2212';
+function pvTable(w,b){
+  const top=w.map(x=>'<td>'+(x<0?MINUS+Math.abs(x):x)+'</td>').join('');
+  const bot=b.map(x=>'<td>'+x+'</td>').join('');
+  return '<table class="pv"><tr>'+top+'</tr><tr>'+bot+'</tr></table>';
+}
+function weights(n,twos){return [...Array(n)].map((_,i)=>twos&&i===0?-(2**(n-1)):2**(n-1-i));}
+function sumText(vals){return vals.map((x,i)=>i===0?(x<0?MINUS+Math.abs(x):String(x)):(x<0?' '+MINUS+' '+Math.abs(x):' + '+x)).join('');}
+const H={
+  dec2bin({n,bits=8}){
+    const w=weights(bits,false); let r=n; const b=w.map(x=>{if(r>=x){r-=x;return 1;}return 0;});
+    const used=w.filter((x,i)=>b[i]);
+    return '<div class="wk"><p>Convert <b>'+n+'</b> to binary using place values:</p>'+pvTable(w,b)+'<p>'+n+' = '+used.join(' + ')+' &rarr; <b class="mono">'+g4(b.join(''))+'</b></p></div>';
+  },
+  bin2dec({bits,twos}){
+    const n=bits.length, w=weights(n,twos), b=bits.split('').map(Number);
+    const used=w.filter((x,i)=>b[i]); const total=used.reduce((a,c)=>a+c,0);
+    const label=twos?'Convert <b class="mono">'+g4(bits)+'</b> from two’s complement. The left-hand place value is '+MINUS+2**(n-1)+':':'Convert <b class="mono">'+g4(bits)+'</b> to denary:';
+    const t=total<0?MINUS+Math.abs(total):String(total);
+    return '<div class="wk"><p>'+label+'</p>'+pvTable(w,b)+'<p>'+sumText(used)+' = <b>'+t+'</b></p></div>';
+  },
+  add({a,b}){
+    const n=a.length, cin=Array(n+1).fill(0), s=Array(n).fill(0);
+    for(let i=n-1;i>=0;i--){const t=+a[i]+ +b[i]+cin[i+1]; s[i]=t%2; cin[i]=t>1?1:0;}
+    const sp=x=>x.split('').join(' ');
+    const carry=cin.slice(1).map(x=>x?'<span class="cy">1</span>':'0').join(' ');
+    const sum=s.join('');
+    const da=parseInt(a,2), db=parseInt(b,2), ds=parseInt(sum,2);
+    let note='Check in denary: '+da+' + '+db+' = '+ds+'.';
+    if(cin[0]) note='The final carry out of the left-hand end means the answer is too big for 8 bits (overflow).';
+    return '<div class="wk"><p>Add column by column from the right. The red 1s are carries.</p><pre class="add">carry  '+carry+'\n       '+sp(a)+'\n     + '+sp(b)+'\n       '+'-'.repeat(2*n-1)+'\n       '+sp(sum)+'</pre><p>Answer: <b class="mono">'+sum+'</b>. '+note+'</p></div>';
+  },
+  twos({n}){
+    const pos=n.toString(2).padStart(8,'0'); const inv=pos.split('').map(c=>c==='0'?'1':'0').join('');
+    const res=(parseInt(inv,2)+1).toString(2).padStart(8,'0');
+    const w=weights(8,true), used=w.filter((x,i)=>res[i]==='1');
+    return '<div class="wk"><ol><li>Write '+n+' as an 8-bit binary number: <b class="mono">'+g4(pos)+'</b></li><li>Flip every bit (0 becomes 1, 1 becomes 0): <b class="mono">'+g4(inv)+'</b></li><li>Add 1: <b class="mono">'+g4(res)+'</b></li></ol><p>Check: '+sumText(used)+' = '+MINUS+n+'.</p></div>';
+  },
+  dec2hex({n}){
+    let x=n; const lines=[], digs=[];
+    while(x>0){const q=Math.floor(x/16), r=x%16; lines.push('<li>'+x+' &divide; 16 = '+q+' remainder '+r+(r>9?' ('+HEX[r]+')':'')+'</li>'); digs.unshift(HEX[r]); x=q;}
+    return '<div class="wk"><p>Convert <b>'+n+'</b> to hexadecimal by dividing by 16:</p><ul>'+lines.join('')+'</ul><p>Read the remainders from the bottom up: <b class="mono">'+digs.join('')+'</b></p></div>';
+  },
+  bin2hex({bits}){
+    const groups=bits.match(/.{4}/g);
+    const rows=groups.map(gp=>'<li><span class="mono">'+gp+'</span> = '+parseInt(gp,2)+' = <b class="mono">'+HEX[parseInt(gp,2)]+'</b></li>').join('');
+    return '<div class="wk"><p>Split <b class="mono">'+bits+'</b> into groups of 4 bits (nibbles) and convert each group:</p><ul>'+rows+'</ul><p>Answer: <b class="mono">'+groups.map(gp=>HEX[parseInt(gp,2)]).join('')+'</b></p></div>';
+  },
+  shift({bits,dir,n}){
+    const len=bits.length; let res,lost,expl;
+    if(dir==='left'){res=bits.slice(n)+'0'.repeat(n); lost=bits.slice(0,n); expl='Every bit moves '+n+' places to the left. The '+n+' left-hand bits (<span class="mono">'+lost+'</span>) are lost and '+n+' zeros are added on the right.';}
+    else {res='0'.repeat(n)+bits.slice(0,len-n); lost=bits.slice(len-n); expl='Every bit moves '+n+' places to the right. The '+n+' right-hand bits (<span class="mono">'+lost+'</span>) are lost and '+n+' zeros are added on the left.';}
+    return '<div class="wk"><pre class="shift">'+g4(bits)+'   logical shift '+dir+' '+n+'   '+g4(res)+'</pre><p>'+expl+'</p><p>Answer: <b class="mono">'+res+'</b></p></div>';
+  }
+};
+window.renderModel=function(items){
+  return (items||[]).map(it=>typeof it==='string'?(it.trim().charAt(0)==='<'?it:'<p>'+it+'</p>'):H[it.h](it)).join('');
+};
+})();
+</script>
+
+<script>
+/* ---------- The paper ---------- */
+(function(){
+'use strict';
+const paper=document.getElementById('paper');
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const norm=s=>String(s).trim().toLowerCase().replace(/\s+/g,'').replace(/[\u2212\u2013\u2014]/g,'-').replace(/^\$/,'');
+const g4=s=>s.replace(/(.{4})(?=.)/g,'$1 ');
+let state={}, tag='all';
+
+function resetState(){ state={}; DATA.forEach(q=>q.parts.forEach(p=>{state[p.id]={auto:null,self:null};})); }
+const isAuto=p=>p.type==='mcq'||p.type==='blanks'||(p.fields||[]).some(f=>f.ans);
+const visible=q=>tag==='all'||q.tags.includes(tag);
+
+function fieldHTML(f,i){
+  let c='';
+  if(f.kind==='bits'){
+    c='<span class="bits">'+[...Array(f.n)].map((_,k)=>'<label class="bit"><input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="Bit '+(f.n-k)+' of '+(f.label||'answer')+'"><span class="pv">'+(2**(f.n-1-k))+'</span></label>').join('')+'</span>';
+  } else if(f.kind==='text'){
+    c='<input class="txt w-'+(f.w||'s')+'" type="text" autocomplete="off" spellcheck="false" aria-label="'+(f.label||'Answer')+'">'+(f.unit?'<span class="unit">'+f.unit+'</span>':'');
+  } else if(f.kind==='line'){
+    c='<input class="txt w-l" type="text" autocomplete="off" aria-label="'+(f.label||'Answer')+'">';
+  } else {
+    c='<textarea class="area" rows="'+(f.rows||3)+'" aria-label="'+(f.label||'Answer')+'"></textarea>';
+  }
+  const stack=f.kind==='area';
+  return '<div class="frow'+(stack?' stack':'')+'" data-i="'+i+'">'+(f.label?'<span class="flabel">'+f.label+'</span>':'')+c+'</div>';
+}
+
+function answerListHTML(p){
+  if(p.type==='mcq'){ const t=p.options.find(o=>o[0]===p.correct)[1]; return '<h3>Answer</h3><p><b>'+p.correct+'</b> &nbsp;'+t+'</p>'; }
+  if(p.type==='blanks'){ return '<h3>Answer</h3><p class="cloze">'+p.template.replace(/\[\[(\d+)\]\]/g,(m,i)=>'<span class="fill">'+p.answers[+i]+'</span>')+'</p>'; }
+  if(isAuto(p)){
+    if(p.unordered) return '<h3>Answer</h3><p>Either order: '+p.expected.map(x=>'<b>'+x+'</b>').join(' and ')+'</p>';
+    return '<h3>Answer</h3><ul class="anslist">'+p.fields.map(f=>'<li>'+(f.label&&p.fields.length>1?'<span class="al">'+f.label+'</span>':'')+'<b class="mono">'+(f.kind==='bits'?g4(f.ans):f.ans[0])+'</b>'+(f.unit?' '+f.unit:'')+'</li>').join('')+'</ul>';
+  }
+  return '<h3>Model answer</h3>';
+}
+
+function partHTML(p){
+  let inputs='';
+  if(p.type==='mcq'){
+    inputs='<div class="mcq" role="radiogroup" aria-label="Choose one option">'+p.options.map(o=>'<label class="opt"><input type="radio" name="'+p.id+'" value="'+o[0]+'"><span class="k">'+o[0]+'</span><span>'+o[1]+'</span></label>').join('')+'</div>';
+  } else if(p.type==='blanks'){
+    inputs='<p class="cloze">'+p.template.replace(/\[\[(\d+)\]\]/g,(m,i)=>'<select class="blank" data-i="'+i+'" aria-label="Blank '+(+i+1)+'"><option value="">choose</option>'+p.choices.map(c=>'<option>'+c+'</option>').join('')+'</select>')+'</p>';
+  } else {
+    inputs=p.fields.map(fieldHTML).join('');
+  }
+  const work=p.working?'<div class="work"><label for="w-'+p.id+'">Working space (optional)</label><textarea class="area" id="w-'+p.id+'" rows="3"></textarea></div>':'';
+  const auto=isAuto(p);
+  const marks=[...Array(p.marks+1)].map((_,i)=>'<option value="'+i+'">'+i+'</option>').join('');
+  return '<section class="part" id="'+p.id+'" data-id="'+p.id+'"><div class="plabel">'+p.label+'</div><div>'+
+    '<div class="prow"><div class="ptext">'+p.text+'</div><span class="marks">['+p.marks+']</span></div>'+
+    '<div class="answer-area">'+inputs+'</div>'+work+
+    '<div class="actions">'+(auto?'<button class="btn" data-act="check">Check</button>':'')+'<button class="btn ghost" data-act="reveal" aria-expanded="false">Show answer</button></div>'+
+    '<p class="feedback" role="status" aria-live="polite"></p>'+
+    '<div class="reveal" hidden>'+answerListHTML(p)+renderModel(p.model)+
+    '<div class="selfmark"><label for="sm-'+p.id+'">Your mark</label><select id="sm-'+p.id+'" data-act="self"><option value="">not marked</option>'+marks+'</select><span>out of '+p.marks+'</span></div></div>'+
+    '</div></section>';
+}
+
+function build(){
+  paper.innerHTML=DATA.map(q=>'<article class="q" id="'+q.id+'" data-tags="'+q.tags.join(' ')+'"><div class="qn">'+q.num+'</div><div>'+
+    (q.intro?'<p class="qintro">'+q.intro+'</p>':'')+'<p class="src">Source: '+q.src+'</p>'+q.parts.map(partHTML).join('')+'</div></article>').join('');
+  applyFilter();
+}
+
+/* ----- input behaviour for bit boxes ----- */
+paper.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.closest('.bit')){
+    const v=t.value.replace(/[^01]/g,'').slice(-1); t.value=v;
+    if(v){const n=t.closest('.bit').nextElementSibling; if(n) n.querySelector('input').focus();}
+  }
+  clearMarks(t.closest('.part'));
+});
+paper.addEventListener('keydown',e=>{
+  const t=e.target; if(!t.closest||!t.closest('.bit')) return;
+  const bit=t.closest('.bit');
+  if(e.key==='Backspace'&&!t.value){const p=bit.previousElementSibling; if(p){p.querySelector('input').focus();p.querySelector('input').value='';} e.preventDefault();}
+  if(e.key==='ArrowLeft'){const p=bit.previousElementSibling; if(p){p.querySelector('input').focus();e.preventDefault();}}
+  if(e.key==='ArrowRight'){const n=bit.nextElementSibling; if(n){n.querySelector('input').focus();e.preventDefault();}}
+});
+paper.addEventListener('paste',e=>{
+  const t=e.target; if(!t.closest||!t.closest('.bit')) return;
+  const txt=(e.clipboardData||window.clipboardData).getData('text').replace(/[^01]/g,'');
+  if(!txt) return; e.preventDefault();
+  const boxes=$$('input',t.closest('.bits')); let i=boxes.indexOf(t);
+  for(const ch of txt){ if(i>=boxes.length) break; boxes[i++].value=ch; }
+  (boxes[Math.min(i,boxes.length-1)]).focus(); clearMarks(t.closest('.part'));
+});
+paper.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.matches('[data-act="self"]')){ const st=state[t.closest('.part').dataset.id]; st.self=t.value===''?null:+t.value; updateScore(); return; }
+  clearMarks(t.closest('.part'));
+});
+
+function clearMarks(el){ if(!el) return; $$('.ok,.bad',el).forEach(n=>n.classList.remove('ok','bad')); }
+function say(el,msg,cls){ const f=$('.feedback',el); f.textContent=msg; f.className='feedback '+(cls||''); }
+
+function fieldValue(row,f){
+  if(f.kind==='bits') return $$('input',row).map(i=>i.value||'_').join('');
+  return ($('input,textarea',row)||{value:''}).value;
+}
+const fieldOK=(f,v)=>f.kind==='bits'?v===f.ans:f.ans.map(norm).includes(norm(v));
+
+function check(p,el){
+  const st=state[p.id]; let correct=0,total=0;
+  clearMarks(el);
+  if(p.type==='mcq'){
+    const sel=$('input[type=radio]:checked',el); if(!sel){say(el,'Choose an option first.','warn');return;}
+    total=1; correct=sel.value===p.correct?1:0; sel.closest('.opt').classList.add(correct?'ok':'bad');
+  } else if(p.type==='blanks'){
+    const sels=$$('select.blank',el); if(sels.every(s=>!s.value)){say(el,'Choose your answers first.','warn');return;}
+    sels.forEach(s=>{const ok=s.value===p.answers[+s.dataset.i]; total++; if(ok) correct++; s.classList.add(ok?'ok':'bad');});
+  } else {
+    const rows=$$('.frow',el); const vals=rows.map((r,i)=>fieldValue(r,p.fields[i]));
+    if(vals.every(v=>/^[_\s]*$/.test(v))){say(el,'Type an answer first.','warn');return;}
+    total=rows.length; let res;
+    if(p.unordered){
+      const used=new Set(); res=vals.map(v=>{const nv=norm(v); const idx=p.expected.findIndex((x,i)=>!used.has(i)&&norm(x)===nv.replace(/compression$/,'')); if(idx>=0){used.add(idx);return true;} return false;});
+    } else res=vals.map((v,i)=>fieldOK(p.fields[i],v));
+    res.forEach((ok,i)=>{ if(ok) correct++; const row=rows[i]; const target=$('.bits',row)||$('input,textarea',row); target.classList.add(ok?'ok':'bad'); });
+  }
+  st.auto=Math.round(p.marks*correct/total); st.self=null;
+  const sm=$('#sm-'+p.id); if(sm) sm.value='';
+  if(correct===total) say(el,'Correct. '+p.marks+' of '+p.marks+' marks.','good');
+  else say(el,correct+' of '+total+' correct ('+st.auto+' of '+p.marks+' marks). Try again, or press Show answer.','miss');
+  updateScore();
+}
+
+function setReveal(el,show){
+  const r=$('.reveal',el), b=$('[data-act="reveal"]',el);
+  r.hidden=!show; b.textContent=show?'Hide answer':'Show answer'; b.setAttribute('aria-expanded',show?'true':'false');
+}
+
+paper.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]'); if(!b||b.tagName==='SELECT') return;
+  const el=b.closest('.part'); const p=findPart(el.dataset.id);
+  if(b.dataset.act==='check') check(p,el);
+  if(b.dataset.act==='reveal') setReveal(el,$('.reveal',el).hidden);
+});
+function findPart(id){ for(const q of DATA){ const p=q.parts.find(x=>x.id===id); if(p) return p; } }
+
+/* ----- toolbar ----- */
+function applyFilter(){
+  $$('.q').forEach(el=>{ const q=DATA.find(x=>x.id===el.id); el.hidden=!visible(q); });
+  $('#empty').hidden=DATA.some(visible);
+  $$('#filters .chip').forEach(c=>c.setAttribute('aria-pressed',c.dataset.tag===tag?'true':'false'));
+  updateScore();
+}
+function updateScore(){
+  let sc=0,tot=0,marked=0,np=0;
+  DATA.forEach(q=>{ if(!visible(q)) return; q.parts.forEach(p=>{ np++; tot+=p.marks; const s=state[p.id]; const v=s.self!==null?s.self:s.auto; if(v!==null){sc+=v;marked++;} }); });
+  $('#score').textContent=sc; $('#totalMarks').textContent=tot;
+  $('#markedNote').textContent=marked+' of '+np+' parts marked';
+  const pct=np?Math.round(100*marked/np):0; $('#prog').style.width=pct+'%'; $('#progWrap').setAttribute('aria-valuenow',pct);
+}
+$('#filters').addEventListener('click',e=>{ const c=e.target.closest('.chip'); if(!c) return; tag=c.dataset.tag; applyFilter(); window.scrollTo({top:0,behavior:'auto'}); });
+$('#hints').addEventListener('change',e=>document.body.classList.toggle('hints',e.target.checked));
+$('#showAll').addEventListener('click',()=>$$('.q:not([hidden]) .part').forEach(el=>setReveal(el,true)));
+$('#hideAll').addEventListener('click',()=>$$('.part').forEach(el=>setReveal(el,false)));
+$('#resetAll').addEventListener('click',()=>{ if(confirm('Clear all your answers and marks?')){ resetState(); build(); window.scrollTo({top:0,behavior:'auto'}); } });
+
+/* ----- start ----- */
+resetState(); build();
+const all=DATA.reduce((a,q)=>a+q.parts.reduce((b,p)=>b+p.marks,0),0);
+$('#totalLine').textContent='Total marks: '+all+' across '+DATA.length+' questions';
+})();
+</script>
+</body>
+</html>
