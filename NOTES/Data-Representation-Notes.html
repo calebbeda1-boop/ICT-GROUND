@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IGCSE Computer Science 0478: Data Representation (Study Notes)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#F4F6F9; --surface:#FFFFFF; --ink:#17212B; --muted:#56646F; --line:#D8DEE6;
+  --primary:#2B45C9; --primary-ink:#FFFFFF; --primary-soft:#E7EBFC;
+  --hi:#FFE14D; --hi-soft:#FFF5B8;
+  --ok:#146C43; --ok-soft:#DCF2E6; --bad:#A6261D; --bad-soft:#FBE4E1;
+  --code-bg:#EAEEF5;
+  --f-body:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --f-head:'Bricolage Grotesque','Atkinson Hyperlegible',system-ui,sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#10151C; --surface:#18202A; --ink:#E6ECF2; --muted:#9AA7B5; --line:#2B3644;
+    --primary:#8EA2FF; --primary-ink:#0E1330; --primary-soft:#1F2952;
+    --hi:#E8CF3E; --hi-soft:#3A3413;
+    --ok:#5FD39A; --ok-soft:#133525; --bad:#FF8F86; --bad-soft:#3B1A18;
+    --code-bg:#212B38;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10151C; --surface:#18202A; --ink:#E6ECF2; --muted:#9AA7B5; --line:#2B3644;
+  --primary:#8EA2FF; --primary-ink:#0E1330; --primary-soft:#1F2952;
+  --hi:#E8CF3E; --hi-soft:#3A3413;
+  --ok:#5FD39A; --ok-soft:#133525; --bad:#FF8F86; --bad-soft:#3B1A18;
+  --code-bg:#212B38;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 16px);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1.0625rem/1.65 var(--f-body);-webkit-text-size-adjust:100%}
+:focus-visible{outline:3px solid var(--primary);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+a{color:var(--primary)}
+code,.mono{font-family:var(--f-mono);font-weight:500}
+code{background:var(--code-bg);padding:.08em .35em;border-radius:4px;font-size:.92em}
+h1,h2,h3,h4{font-family:var(--f-head);line-height:1.15;margin:0}
+
+/* hero */
+.hero{max-width:1180px;margin:0 auto;padding:36px 20px 8px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:36px;align-items:center}
+.hero h1{font-weight:800;font-size:clamp(2.3rem,5.4vw,3.9rem);letter-spacing:-.02em}
+.hero p{max-width:34rem;color:var(--muted);margin:.9rem 0 0}
+.hero .badges{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.1rem}
+.badge{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:.25rem .8rem;font-size:.9rem}
+.reg-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 16px 16px}
+.reg{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.reg .cell{text-align:center}
+.reg .pv{display:block;font:500 .72rem var(--f-mono);color:var(--muted);margin-bottom:4px}
+.reg button{width:100%;aspect-ratio:1/1.15;min-height:44px;border:2px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:700 1.5rem var(--f-mono);cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.reg button[aria-pressed="true"]{background:var(--primary);border-color:var(--primary);color:var(--primary-ink)}
+.reg-out{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.reg-out div{background:var(--bg);border-radius:8px;padding:.5rem .7rem}
+.reg-out small{display:block;color:var(--muted);font-size:.8rem}
+.reg-out b{font:700 1.5rem var(--f-mono)}
+.reg-sum{margin:.7rem 0 0;font:500 .9rem var(--f-mono);color:var(--muted);word-break:break-word}
+.reg-tools{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.8rem}
+.btn{font:700 .9rem var(--f-body);border:2px solid var(--primary);background:transparent;color:var(--primary);border-radius:8px;padding:.4rem .8rem;cursor:pointer;min-height:40px}
+.btn:hover{background:var(--primary-soft)}
+.btn.solid{background:var(--primary);color:var(--primary-ink)}
+.cap{font-size:.85rem;color:var(--muted);margin:.7rem 0 0}
+
+/* layout */
+.wrap{max-width:1180px;margin:0 auto;padding:24px 20px 80px;display:grid;grid-template-columns:250px minmax(0,1fr);gap:44px}
+main{max-width:760px;min-width:0}
+.toc{position:sticky;top:16px;align-self:start;max-height:calc(100vh - 32px);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:.4rem .9rem .8rem;font-size:.95rem}
+.toc>summary{cursor:pointer;font:700 1.05rem var(--f-head);padding:.5rem 0}
+.toc h5{margin:.9rem 0 .2rem;font:700 .95rem var(--f-head);color:var(--muted)}
+.toc ol{list-style:none;margin:0;padding:0}
+.toc a{display:block;padding:.18rem 0;text-decoration:none;color:var(--ink)}
+.toc a:hover{color:var(--primary);text-decoration:underline}
+.toc .tools{margin-top:.8rem}
+@media (max-width:999px){
+  .hero{grid-template-columns:1fr;gap:22px;padding-top:24px}
+  .wrap{display:block;padding-top:8px}
+  .toc{position:static;max-height:none;margin-bottom:28px}
+}
+
+/* content */
+.topic{margin-top:56px}
+.topic:first-child{margin-top:0}
+.topic>h2{font-weight:800;font-size:clamp(1.7rem,3.6vw,2.3rem);letter-spacing:-.01em;padding-bottom:.5rem;border-bottom:4px solid var(--hi)}
+.topic-lead{color:var(--muted);margin:.8rem 0 0}
+.part{margin-top:44px}
+.part>h3{font-size:1.5rem;font-weight:700}
+.obj{display:inline-block;margin:.5rem 0 .2rem;padding:.1rem .6rem;border-radius:999px;background:var(--primary-soft);color:var(--primary);font-size:.85rem;font-weight:700}
+.part h4.sub{font-size:1.1rem;margin:1.5rem 0 .3rem}
+p{margin:.8rem 0}
+ul,ol{padding-left:1.4rem}
+li{margin:.3rem 0}
+.callout{margin:1.2rem 0;padding:.75rem 1.05rem;border-radius:8px;border-left:5px solid}
+.callout>strong:first-child{display:block;font-family:var(--f-head);margin-bottom:.1rem}
+.callout p:first-of-type{margin-top:.2rem}
+.callout>:last-child{margin-bottom:0}
+.rule{background:var(--hi-soft);border-color:var(--hi)}
+.tip{background:var(--primary-soft);border-color:var(--primary)}
+.warn{background:var(--bad-soft);border-color:var(--bad)}
+.extra{background:var(--surface);border:1px dashed var(--muted);border-left:5px solid var(--muted)}
+.scroll{overflow-x:auto;margin:1rem 0}
+table.t{border-collapse:collapse;width:100%;font-size:.96rem;background:var(--surface)}
+table.t th{background:var(--primary);color:var(--primary-ink);text-align:left;padding:.5rem .7rem;font-weight:700}
+table.t td{border:1px solid var(--line);padding:.45rem .7rem;vertical-align:top}
+table.bits{border-collapse:collapse;margin:.6rem auto;font-family:var(--f-mono)}
+table.bits th,table.bits td{border:1px solid var(--primary);padding:.35rem .5rem;text-align:center;min-width:2.6rem}
+table.bits th{background:var(--primary-soft);color:var(--primary);font-size:.78rem}
+table.bits td.pv{background:var(--code-bg);color:var(--muted);font-size:.8rem}
+table.bits td.on{font-weight:700;background:var(--hi-soft)}
+.eg{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.8rem 1.1rem;margin:1.1rem 0}
+.eg-t{font:700 1rem var(--f-head);margin-bottom:.3rem}
+pre.calc{margin:.5rem 0;padding:.7rem .9rem;background:var(--code-bg);border-radius:8px;font:500 .93rem/1.55 var(--f-mono);overflow-x:auto;white-space:pre}
+.ladder{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;margin:1rem 0;font:500 .88rem var(--f-mono)}
+.ladder span.box{background:var(--surface);border:2px solid var(--primary);border-radius:8px;padding:.3rem .6rem;font-weight:700}
+.ladder span.arr{color:var(--muted)}
+
+/* check yourself */
+.check{margin:1.8rem 0 0;border:2px solid var(--primary);border-radius:12px;overflow:hidden;background:var(--surface)}
+.check>h4{margin:0;padding:.55rem 1rem;background:var(--primary);color:var(--primary-ink);font-size:1.05rem}
+.check ol{margin:0;padding:.7rem 1rem .8rem 2.3rem}
+.check li{margin:.8rem 0}
+.check summary{cursor:pointer;color:var(--primary);font-weight:700;margin-top:.25rem;width:fit-content}
+.ans{margin-top:.35rem;padding:.5rem .8rem;background:var(--ok-soft);border-left:4px solid var(--ok);border-radius:0 6px 6px 0}
+.ans p{margin:.3rem 0}
+
+/* interactive tools */
+.tool{background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:1rem 1.1rem;margin:1.3rem 0}
+.tool>h4{font-size:1.1rem;margin-bottom:.2rem}
+.tool label{display:block;font-weight:700;font-size:.9rem;margin:.6rem 0 .2rem}
+.tool input[type=text],.tool input[type=number]{font:600 1rem var(--f-mono);padding:.4rem .6rem;border:2px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%;max-width:16rem}
+.tool input[type=range]{width:100%;max-width:22rem;accent-color:var(--primary)}
+.cv-row{display:flex;flex-wrap:wrap;gap:.6rem;align-items:baseline;margin:.3rem 0}
+.cv-row span{color:var(--muted);font-size:.9rem;min-width:11rem}
+.cv-row code{font-size:1.02rem;font-weight:700}
+.cv-msg{color:var(--bad);font-weight:700;margin:.3rem 0}
+svg.snd{width:100%;height:auto;background:var(--bg);border-radius:8px;border:1px solid var(--line)}
+.w-axis{stroke:var(--line);stroke-width:1}
+.w-orig{fill:none;stroke:var(--muted);stroke-width:1.6;stroke-dasharray:5 4}
+.w-stem{stroke:var(--primary);stroke-width:2}
+.w-dot{fill:var(--primary)}
+.pxwrap{display:flex;flex-wrap:wrap;gap:1.4rem;align-items:flex-start}
+.pxgrid{display:grid;grid-template-columns:repeat(8,32px);gap:2px;background:var(--line);padding:2px;border-radius:6px}
+.pxgrid button{width:32px;height:32px;border:0;background:var(--surface);cursor:pointer;padding:0}
+.pxgrid button[aria-pressed="true"]{background:var(--ink)}
+.pxrows{font:500 .95rem var(--f-mono);padding-top:2px}
+.pxrows div{height:32px;line-height:32px;margin-bottom:2px}
+.pxrows div span{color:var(--muted);margin-left:.7rem}
+
+/* exam questions */
+.exq{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1rem 1.2rem;margin:1.3rem 0}
+.exq>h3{font-size:1.15rem;display:flex;flex-wrap:wrap;gap:.5rem;align-items:baseline}
+.exq .tot{margin-left:auto;font-family:var(--f-mono);font-size:.95rem}
+.exq .tp{font:400 .9rem var(--f-body);color:var(--muted)}
+.exq ol.parts{list-style:none;padding:0;margin:.6rem 0}
+.exq ol.parts>li{display:flex;gap:.7rem;justify-content:space-between;margin:.55rem 0}
+.exq ol.parts>li>.l{font-weight:700;min-width:1.6rem}
+.exq ol.parts>li>.txt{flex:1}
+.exq .mk{font-family:var(--f-mono);font-weight:700;white-space:nowrap}
+.exq details.ms>summary{cursor:pointer;color:var(--primary);font-weight:700;width:fit-content}
+.ms-body{margin-top:.4rem;padding:.6rem .9rem;background:var(--ok-soft);border-left:4px solid var(--ok);border-radius:0 8px 8px 0}
+.ms-body p{margin:.35rem 0}
+.timebox{display:flex;gap:1rem;flex-wrap:wrap}
+.timebox .badge{font-weight:700}
+footer{max-width:1180px;margin:0 auto;padding:0 20px 40px;color:var(--muted);font-size:.9rem}
+@media print{
+  .toc,.reg-tools,.btn,.tool{display:none!important}
+  body{background:#fff;color:#000}
+  .wrap{display:block}
+}
+/* ══ Footer credit — glowing, on every screen ══ */
+.footer-credit{
+  position:fixed; left:0; right:0; bottom:0;
+  text-align:center; padding:9px 10px;
+  font-size:.78rem; font-weight:900; letter-spacing:1.2px;
+  background:rgba(15,15,15,.92);
+  color:#ff9500;
+  text-shadow:0 0 4px #ff9500,0 0 10px #ff6a00,0 0 18px #ff4500;
+  z-index:9000;
+  animation:footer-glow 1.6s ease-in-out infinite alternate;
+}
+@keyframes footer-glow{
+  from{ text-shadow:0 0 4px #ff9500,0 0 10px #ff6a00; }
+  to{ text-shadow:0 0 12px #ffb347,0 0 22px #ff6a00,0 0 32px #ff4500; }
+}
+@media print{ .footer-credit{ display:none !important; } }
+</style>
+</head>
+<body>
+<header class="hero">
+  <div>
+    <h1>Data Representation</h1>
+    <p>Complete study notes for Cambridge IGCSE Computer Science (0478), syllabus 2026–2028. Every section has worked examples and five self-check questions, and the topic ends with IGCSE-style exam questions.</p>
+    <div class="badges">
+      <span class="badge">1.1 Number systems</span>
+      <span class="badge">1.2 Text, sound and images</span>
+      <span class="badge">1.3 Data storage and compression</span>
+    </div>
+  </div>
+  <div class="reg-card">
+    <div class="reg" id="reg" role="group" aria-label="8-bit register"></div>
+    <div class="reg-out">
+      <div><small>Denary</small><b id="reg-d">75</b></div>
+      <div><small>Hexadecimal</small><b id="reg-h">4B</b></div>
+    </div>
+    <p class="reg-sum" id="reg-sum"></p>
+    <div class="reg-tools">
+      <button class="btn" type="button" data-set="00000000">All 0</button>
+      <button class="btn" type="button" data-set="11111111">All 1 (255)</button>
+      <button class="btn" type="button" data-set="01001011">Reset to 75</button>
+    </div>
+    <p class="cap">Click a bit to flip it between 0 and 1. The denary value is the sum of the place values that have a 1.</p>
+  </div>
+</header>
+<div class="wrap">
+<nav aria-label="Contents">
+<details class="toc" id="toc">
+  <summary>Contents</summary>
+  <h5>1.1 Number systems</h5><ol><li><a href="#n1">1. Why computers use binary</a></li><li><a href="#n2">2. Binary place values</a></li><li><a href="#n3">3. Denary to binary</a></li><li><a href="#n4">4. Hexadecimal</a></li><li><a href="#n5">5. Converting between hex, binary and denary</a></li><li><a href="#n6">6. Two’s complement (negative numbers)</a></li><li><a href="#n7">7. Adding binary numbers and overflow</a></li><li><a href="#n8">8. Logical shifts</a></li></ol>
+<h5>1.2 Text, sound and images</h5><ol><li><a href="#t1">1. Text: character sets, ASCII and Unicode</a></li><li><a href="#t2">2. Sound</a></li><li><a href="#t3">3. Images</a></li></ol>
+<h5>1.3 Data storage and compression</h5><ol><li><a href="#u1">1. Measuring data storage</a></li><li><a href="#u2">2. Calculating image and sound file sizes</a></li><li><a href="#u3">3. Compression</a></li></ol><h5>End of topic</h5><ol><li><a href="#summary">Summary to memorise</a></li><li><a href="#exam">IGCSE-style questions</a></li></ol>
+  <div class="tools"><button class="btn" type="button" id="toggle-all">Show all answers</button></div>
+</details>
+</nav>
+<main>
+<section class="topic" id="intro">
+  <h2>How to use these notes</h2>
+  <ol><li>Read one section at a time. Work through every example on paper before you look at the steps.</li><li>Every section ends with a <b>Check yourself</b> box of five questions. Answer them in your notebook first, then check the answers.</li><li>When you finish the whole topic, do the <b>IGCSE-style questions</b> at the end without looking at your notes. Time yourself: allow about one minute per mark.</li><li>If you lost many marks on a section, revise it and redo its questions.</li></ol>
+<div class="scroll"><table class="t"><tr><th>Syllabus section</th><th>What you will learn</th></tr><tr><td><b>1.1</b> Number systems</td><td>Binary, denary and hexadecimal; converting between them; adding binary numbers and overflow; logical shifts; two’s complement</td></tr><tr><td><b>1.2</b> Text, sound and images</td><td>Character sets (ASCII, Unicode); sample rate and sample resolution; image resolution and colour depth</td></tr><tr><td><b>1.3</b> Data storage and compression</td><td>Storage units (KiB, MiB, GiB…); calculating image and sound file sizes; the purpose of compression</td></tr></table></div>
+<div class="callout tip"><strong>Cambridge vocabulary</strong><p>The exam uses the word <b>denary</b> (not “decimal”), and the units <b>kibibyte, mebibyte, gibibyte</b> (KiB, MiB, GiB), which use <b>1024</b>, not 1000. Use these words in your answers.</p></div>
+</section>
+<section class="topic" id="t11"><h2>1.1 Number systems</h2><p class="topic-lead">How computers represent numbers: binary, denary and hexadecimal, plus basic arithmetic in an 8-bit register.</p>
+<section class="part" id="n1"><h3>1. Why computers use binary</h3><span class="obj">Syllabus objective 1</span><p>Think of a light switch: it has only two positions, on or off. A computer is built from millions of tiny electronic switches. Each switch has only two states: <b>voltage present</b> or <b>no voltage</b>. We write these two states as <b>1</b> (on) and <b>0</b> (off).</p>
+<p>A circuit that only has to tell two states apart is cheap to build, very fast, and hard to confuse. This is why computers use <b>binary</b> (base 2): the need comes from the hardware itself.</p>
+<div class="scroll"><table class="t"><tr><th>Term</th><th>Meaning</th><th>Number of bits</th></tr><tr><td><b>Bit</b></td><td>binary digit: a 0 or a 1</td><td>1</td></tr><tr><td><b>Nibble</b></td><td>a group of four bits</td><td>4</td></tr><tr><td><b>Byte</b></td><td>a group of eight bits</td><td>8</td></tr></table></div>
+<div class="callout rule"><strong>Remember</strong><p>All data (numbers, text, images, sound, even program instructions) must be converted to binary before a computer can process it. Data is <b>processed using logic gates</b> and <b>stored in registers</b>.</p></div>
+<h4 class="sub">How different kinds of data become binary</h4>
+<div class="scroll"><table class="t"><tr><th>What you see</th><th>What is stored</th><th>Example</th></tr><tr><td>The number 13</td><td>The binary value of the number</td><td><code>00001101</code></td></tr><tr><td>The letter K</td><td>Its code in a character set (ASCII 75)</td><td><code>01001011</code></td></tr><tr><td>The colour of a pixel</td><td>Binary colour values</td><td>bits for each pixel</td></tr><tr><td>Sound</td><td>Samples of the sound wave as binary numbers</td><td>a number for each sample</td></tr><tr><td>Program instructions</td><td>Machine code</td><td>a pattern of bits</td></tr></table></div>
+<div class="callout tip"><strong>Exam tip</strong><p>If a question asks why data is converted to binary, the mark is for the idea that the computer’s circuits only have two states (on/off), so all data must be in binary. “Because computers are digital” on its own is not enough.</p></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>Why do computers use binary instead of denary?<details><summary>Answer</summary><div class="ans">Their circuits have only two states (voltage / no voltage, on / off). So all data must be converted into 0s and 1s to be processed.</div></details></li><li>What is a bit? How many bits are in a nibble and in a byte?<details><summary>Answer</summary><div class="ans">A bit is a binary digit (0 or 1). A nibble is 4 bits. A byte is 8 bits.</div></details></li><li>Name two parts of a computer that deal with binary data: one that processes it and one that stores it.<details><summary>Answer</summary><div class="ans">Logic gates process data. Registers store data.</div></details></li><li>How are text, images and sound stored in a computer?<details><summary>Answer</summary><div class="ans">All are converted to binary: characters become character-set codes, images become pixels with colour codes, and sound becomes samples written as binary numbers.</div></details></li><li>True or false: “The processor works directly in hexadecimal.”<details><summary>Answer</summary><div class="ans">False. The processor works in binary. Hexadecimal is only a shorter way for humans to write binary.</div></details></li></ol></div></section>
+<section class="part" id="n2"><h3>2. Binary place values</h3><span class="obj">Syllabus objective 2(a)</span><p>Denary is <b>base 10</b>: ten digits (0 to 9), and each column is worth ten times the one to its right (1, 10, 100, 1000). Binary is <b>base 2</b>: two digits (0 and 1), and each column is worth <b>twice</b> the one to its right. Hexadecimal is <b>base 16</b>: sixteen digits (0 to 9 and A to F).</p>
+<div class="scroll"><table class="bits"><tr><th>Position</th><th>7</th><th>6</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>0</th></tr><tr><td class="pv">Place value</td><td class="pv">128</td><td class="pv">64</td><td class="pv">32</td><td class="pv">16</td><td class="pv">8</td><td class="pv">4</td><td class="pv">2</td><td class="pv">1</td></tr><tr><td class="pv">Bit</td><td class="on">1</td><td>0</td><td class="on">1</td><td>0</td><td class="on">1</td><td>0</td><td class="on">1</td><td>0</td></tr></table></div>
+<p>To find the denary value, add the place values wherever there is a 1. Here: 128 + 32 + 8 + 2 = <b>170</b>.</p>
+<p>The syllabus allows numbers of up to <b>16 bits</b>. The place values in the left half are 32768, 16384, 8192, 4096, 2048, 1024, 512 and 256, followed by 128 down to 1.</p>
+<div class="callout rule"><strong>Remember</strong><p>With <b>n</b> bits you can represent <b>2^{n}</b> different values, and the largest unsigned value is <b>2^{n} − 1</b>.</p><ul><li>4 bits: 16 values (0 to 15)</li><li>8 bits: 256 values (0 to 255)</li><li>16 bits: 65,536 values (0 to 65,535)</li></ul></div>
+<div class="eg"><div class="eg-t">Example 1: binary to denary</div><pre class="calc">10110101
+128 + 0 + 32 + 16 + 0 + 4 + 0 + 1 = 181</pre></div>
+<div class="eg"><div class="eg-t">Example 2: a 16-bit number</div><pre class="calc">0000 0010 1000 0101
+512 + 128 + 4 + 1 = 645</pre></div>
+<div class="tool" id="tool-conv">
+    <h4>Converter to try</h4>
+    <p class="cap" style="margin-top:0">Use it to check your practice answers. You will not have a tool like this in the exam.</p>
+    <label for="cv-d">Enter a denary number (e.g. 75 or −25)</label>
+    <input type="text" id="cv-d" inputmode="numeric" autocomplete="off" placeholder="75">
+    <div id="cv-d-out"></div>
+    <label for="cv-b">Or enter a binary number (up to 16 bits)</label>
+    <input type="text" id="cv-b" inputmode="numeric" autocomplete="off" placeholder="11110110">
+    <div id="cv-b-out"></div>
+  </div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>Give the base of denary, binary and hexadecimal.<details><summary>Answer</summary><div class="ans">Denary is base 10, binary is base 2, hexadecimal is base 16.</div></details></li><li>Write the place values of an 8-bit number from left to right.<details><summary>Answer</summary><div class="ans">128, 64, 32, 16, 8, 4, 2, 1.</div></details></li><li>Convert <code>01101001</code> to denary.<details><summary>Answer</summary><div class="ans">64 + 32 + 8 + 1 = <b>105</b>.</div></details></li><li>Convert <code>11111111</code> to denary. How many different values can an 8-bit register represent?<details><summary>Answer</summary><div class="ans">255. It can represent 2<sup>8</sup> = 256 values (0 to 255).</div></details></li><li>What is the largest value a 16-bit unsigned binary number can store?<details><summary>Answer</summary><div class="ans">2<sup>16</sup> − 1 = <b>65,535</b>.</div></details></li></ol></div></section>
+<section class="part" id="n3"><h3>3. Denary to binary</h3><span class="obj">Syllabus objective 2(b)(i)</span><p>There are two reliable methods. Choose the one you understand best and use it every time.</p>
+<h4 class="sub">Method 1: subtracting place values</h4>
+<ol><li>Write the place values: 128, 64, 32, 16, 8, 4, 2, 1.</li><li>Starting from the left: if the place value is less than or equal to the number you have left, write 1 and subtract it. Otherwise write 0.</li><li>Continue until nothing is left.</li></ol>
+<div class="eg"><div class="eg-t">Example: 200 to binary</div><pre class="calc">128 ≤ 200  →  1   (200 − 128 = 72)
+ 64 ≤  72  →  1   (72 − 64 = 8)
+ 32 &gt;   8  →  0
+ 16 &gt;   8  →  0
+  8 ≤   8  →  1   (8 − 8 = 0)
+  4, 2, 1  →  0 0 0
+
+Answer: 11001000     (128 + 64 + 8 = 200)</pre></div>
+<div class="eg"><div class="eg-t">Example: 156 to binary</div><pre class="calc">128 → 1 (left 28)   64 → 0   32 → 0
+ 16 → 1 (left 12)    8 → 1 (left 4)
+  4 → 1 (left 0)     2 → 0    1 → 0
+
+Answer: 10011100</pre></div>
+<h4 class="sub">Method 2: repeated division by 2</h4>
+<p>Divide by 2, write down the remainder (0 or 1), and keep dividing the answer until you reach 0. Then read the remainders <b>from the bottom up</b>.</p>
+<div class="eg"><div class="eg-t">Example: 37 to binary</div><pre class="calc">37 ÷ 2 = 18  remainder 1
+18 ÷ 2 =  9  remainder 0
+ 9 ÷ 2 =  4  remainder 1
+ 4 ÷ 2 =  2  remainder 0
+ 2 ÷ 2 =  1  remainder 0
+ 1 ÷ 2 =  0  remainder 1
+
+Read from the bottom up: 100101
+Pad to 8 bits:           00100101   (32 + 4 + 1 = 37)</pre></div>
+<div class="callout warn"><strong>Common mistakes</strong><p>1) Reading the remainders from the top down (the answer comes out reversed). 2) Forgetting to pad with zeros on the left to make 8 bits when the question asks for 8-bit. 3) Skipping a place value.</p></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>Convert denary 45 to 8-bit binary.<details><summary>Answer</summary><div class="ans">45 = 32 + 8 + 4 + 1, so <code>00101101</code>.</div></details></li><li>Convert denary 100 to 8-bit binary.<details><summary>Answer</summary><div class="ans">100 = 64 + 32 + 4, so <code>01100100</code>.</div></details></li><li>What is the 8-bit binary for denary 255?<details><summary>Answer</summary><div class="ans"><code>11111111</code>.</div></details></li><li>Convert denary 180 to 8-bit binary.<details><summary>Answer</summary><div class="ans">180 = 128 + 32 + 16 + 4, so <code>10110100</code>.</div></details></li><li>What is the minimum number of bits needed to store denary 300?<details><summary>Answer</summary><div class="ans"><b>9 bits</b>. Eight bits only reach 255; nine bits reach 511.</div></details></li></ol></div></section>
+<section class="part" id="n4"><h3>4. Hexadecimal</h3><span class="obj">Syllabus objectives 2(a) and 3</span><p>Hexadecimal is <b>base 16</b>. Its digits are 0 to 9, then the letters A to F, which stand for 10 to 15.</p>
+<div class="scroll"><table class="t"><tr><th>Denary</th><th>Hex</th><th>Binary</th><th>Denary</th><th>Hex</th><th>Binary</th></tr><tr><td>0</td><td>0</td><td><code>0000</code></td><td>8</td><td>8</td><td><code>1000</code></td></tr><tr><td>1</td><td>1</td><td><code>0001</code></td><td>9</td><td>9</td><td><code>1001</code></td></tr><tr><td>2</td><td>2</td><td><code>0010</code></td><td>10</td><td>A</td><td><code>1010</code></td></tr><tr><td>3</td><td>3</td><td><code>0011</code></td><td>11</td><td>B</td><td><code>1011</code></td></tr><tr><td>4</td><td>4</td><td><code>0100</code></td><td>12</td><td>C</td><td><code>1100</code></td></tr><tr><td>5</td><td>5</td><td><code>0101</code></td><td>13</td><td>D</td><td><code>1101</code></td></tr><tr><td>6</td><td>6</td><td><code>0110</code></td><td>14</td><td>E</td><td><code>1110</code></td></tr><tr><td>7</td><td>7</td><td><code>0111</code></td><td>15</td><td>F</td><td><code>1111</code></td></tr></table></div>
+<div class="callout rule"><strong>Remember</strong><p><b>One</b> hex digit = <b>4 bits</b> (one nibble). <b>Two</b> hex digits = 8 bits (one byte). This is why converting between hex and binary is so easy.</p></div>
+<h4 class="sub">Why hexadecimal is used</h4>
+<ul><li>It is <b>shorter</b> than binary: one byte is 2 hex digits instead of 8 bits.</li><li>It is <b>easier for humans</b> to read, remember and copy, and there are fewer mistakes.</li><li>The computer itself still uses binary. Hex is for people.</li></ul>
+<h4 class="sub">Where hexadecimal is used</h4>
+<div class="scroll"><table class="t"><tr><th>Area</th><th>Example</th></tr><tr><td>Colours in HTML/CSS</td><td><code>#FF0000</code> is red (FF for red, 00 for green, 00 for blue)</td></tr><tr><td>MAC addresses</td><td><code>00:1A:2B:3C:4D:5E</code></td></tr><tr><td>Memory addresses and memory dumps</td><td>Used by programmers to read memory and find errors (debugging)</td></tr><tr><td>Error codes</td><td>System error numbers are often shown in hex</td></tr><tr><td>IPv6 addresses</td><td><code>2001:0db8:85a3::8a2e</code></td></tr><tr><td>Character codes</td><td>ASCII and Unicode codes are often written in hex</td></tr></table></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>List all the digits used in hexadecimal.<details><summary>Answer</summary><div class="ans">0 to 9 and A to F (A = 10, B = 11, C = 12, D = 13, E = 14, F = 15).</div></details></li><li>How many bits does one hex digit represent? How many do two hex digits represent?<details><summary>Answer</summary><div class="ans">One hex digit = 4 bits. Two hex digits = 8 bits (one byte).</div></details></li><li>Give two reasons why people prefer hexadecimal to binary.<details><summary>Answer</summary><div class="ans">It is shorter (fewer digits); it is easier to read, remember and copy without mistakes.</div></details></li><li>Name three places where hexadecimal is used.<details><summary>Answer</summary><div class="ans">HTML/CSS colour codes, MAC addresses, memory addresses / memory dumps, error codes, IPv6 (any three).</div></details></li><li>What is hex <code>B</code> in denary, and what is it as 4-bit binary?<details><summary>Answer</summary><div class="ans">Denary 11; binary <code>1011</code>.</div></details></li></ol></div></section>
+<section class="part" id="n5"><h3>5. Converting between hex, binary and denary</h3><span class="obj">Syllabus objectives 2(b)(ii) and 2(b)(iii)</span><h4 class="sub">Hex to binary</h4>
+<p>Replace each hex digit with its 4 bits, using the table.</p>
+<div class="eg"><div class="eg-t">Example</div><pre class="calc">3F  →  3 = 0011,  F = 1111  →  0011 1111
+A7  →  A = 1010,  7 = 0111  →  1010 0111</pre></div>
+<h4 class="sub">Binary to hex</h4>
+<p>Split the bits into groups of 4 <b>starting from the right</b>. If the last group (on the left) has fewer than 4 bits, pad it with zeros on the left. Then convert each group.</p>
+<div class="eg"><div class="eg-t">Example</div><pre class="calc">10111101  →  1011  1101  →  B D  →  BD
+1010110   →  0101  0110  →  5 6  →  56   (zero added on the left)</pre></div>
+<h4 class="sub">Hex to denary</h4>
+<p>Multiply each digit by its place value (1, 16, 256, 4096…) and add.</p>
+<div class="eg"><div class="eg-t">Examples</div><pre class="calc">3F   = 3 × 16 + 15         = 48 + 15          = 63
+B4   = 11 × 16 + 4         = 176 + 4          = 180
+1A3F = 1×4096 + 10×256 + 3×16 + 15
+     = 4096 + 2560 + 48 + 15                  = 6719</pre></div>
+<h4 class="sub">Denary to hex</h4>
+<p>Divide by 16 again and again and write down the remainders. Read them from the bottom up (remainders 10 to 15 become A to F).</p>
+<div class="eg"><div class="eg-t">Examples</div><pre class="calc">200 ÷ 16 = 12 remainder 8   →  12 = C, 8      →  C8
+255 ÷ 16 = 15 remainder 15  →  F, F           →  FF
+
+1000 ÷ 16 = 62 remainder 8
+  62 ÷ 16 =  3 remainder 14 (E)
+   3 ÷ 16 =  0 remainder 3
+Read from the bottom up: 3E8   (3×256 + 14×16 + 8 = 1000)</pre></div>
+<div class="callout tip"><strong>Alternative method</strong><p>If dividing by 16 worries you, convert the denary number to binary first, then convert the binary to hex in groups of 4. Both methods are accepted in the exam as long as you show your working.</p></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>Convert hex <code>5C</code> to binary.<details><summary>Answer</summary><div class="ans">5 = 0101, C = 1100, so <code>0101 1100</code>.</div></details></li><li>Convert binary <code>11010111</code> to hex.<details><summary>Answer</summary><div class="ans">1101 = D, 0111 = 7, so <b>D7</b>.</div></details></li><li>Convert hex <code>7F</code> to denary.<details><summary>Answer</summary><div class="ans">7 × 16 + 15 = 112 + 15 = <b>127</b>.</div></details></li><li>Convert denary 220 to hex.<details><summary>Answer</summary><div class="ans">220 ÷ 16 = 13 remainder 12, which is D and C. Answer: <b>DC</b> (13 × 16 + 12 = 220).</div></details></li><li>Convert the 7-bit binary number <code>1010110</code> to hex.<details><summary>Answer</summary><div class="ans">Pad with a zero on the left: 0101 0110, so <b>56</b>.</div></details></li></ol></div></section>
+<section class="part" id="n6"><h3>6. Two’s complement (negative numbers)</h3><span class="obj">Syllabus objective 6</span><p>Ordinary (unsigned) binary can only store positive numbers (0 to 255 in 8 bits). To store <b>negative</b> numbers we use <b>two’s complement</b>. In 8 bits, the leftmost bit (the most significant bit, MSB) has a <b>negative</b> place value.</p>
+<div class="scroll"><table class="bits"><tr><th>Position</th><th>7</th><th>6</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>0</th></tr><tr><td class="pv">Place value</td><td class="pv" style="color:var(--bad);font-weight:700">−128</td><td class="pv">64</td><td class="pv">32</td><td class="pv">16</td><td class="pv">8</td><td class="pv">4</td><td class="pv">2</td><td class="pv">1</td></tr></table></div>
+<ul><li>MSB = 0 means the number is positive. MSB = 1 means the number is negative.</li><li>The range of 8-bit two’s complement is <b>−128 to +127</b> (256 values).</li></ul>
+<div class="scroll"><table class="t"><tr><th>Denary</th><th>+127</th><th>+1</th><th>0</th><th>−1</th><th>−128</th></tr><tr><td><b>Binary</b></td><td><code>01111111</code></td><td><code>00000001</code></td><td><code>00000000</code></td><td><code>11111111</code></td><td><code>10000000</code></td></tr></table></div>
+<h4 class="sub">Two’s complement to denary (place values)</h4>
+<div class="eg"><div class="eg-t">Example: 11110110</div><pre class="calc">−128 + 64 + 32 + 16 + 0 + 4 + 2 + 0
+= −128 + 118 = −10</pre></div>
+<h4 class="sub">Negative denary to binary</h4>
+<p><b>Method A: invert the bits, then add 1</b></p>
+<ol><li>Write the positive value in 8-bit binary (ignore the minus sign).</li><li>Invert every bit (0 becomes 1, 1 becomes 0).</li><li>Add 1.</li></ol>
+<div class="eg"><div class="eg-t">Example: −25</div><pre class="calc">25 in 8 bits      = 00011001
+Invert the bits   = 11100110
+Add 1             = 11100111
+
+Check: −128 + 64 + 32 + 4 + 2 + 1 = −25 ✓</pre></div>
+<p><b>Method B: place values.</b> Start with −128, then add positive place values until you reach the number you want.</p>
+<div class="eg"><div class="eg-t">Example: −45</div><pre class="calc">Start at −128. To reach −45 you need to add 83.
+64 → left 19    16 → left 3    2 → left 1    1 → left 0
+Bits: −128(1) 64(1) 32(0) 16(1) 8(0) 4(0) 2(1) 1(1)
+
+Answer: 11010011</pre></div>
+<div class="callout tip"><strong>Shortcut</strong><p>Starting from the right, copy the bits up to and including the <b>first 1</b>, then invert all the remaining bits on the left. Example: 25 = 0001100<b>1</b>. The first 1 is the last bit, so invert the rest: 1110011<b>1</b> = 11100111.</p></div>
+<h4 class="sub">Negative binary to denary by inverting</h4>
+<p>Invert the bits, add 1, read the result as a positive number, then put a minus sign in front.</p>
+<div class="eg"><div class="eg-t">Example</div><pre class="calc">11100111 → invert 00011000 → add 1 = 00011001 = 25 → answer −25</pre></div>
+<div class="callout warn"><strong>Common mistakes</strong><p>1) Forgetting to “add 1”. 2) Not padding to 8 bits before inverting. 3) Forgetting that −128 (<code>10000000</code>) exists but +128 does not exist in 8-bit two’s complement. 4) Forgetting that positive numbers are written as ordinary binary with MSB = 0.</p></div>
+<p class="cap">The step “add 1” is simple binary addition. You will study binary addition in detail in section 7.</p>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>What is the range of 8-bit two’s complement?<details><summary>Answer</summary><div class="ans">−128 to +127.</div></details></li><li>What is the place value of the MSB in 8-bit two’s complement?<details><summary>Answer</summary><div class="ans">−128.</div></details></li><li>Write +50 in 8-bit two’s complement.<details><summary>Answer</summary><div class="ans">50 = 32 + 16 + 2, so <code>00110010</code>.</div></details></li><li>Write −12 in 8-bit two’s complement.<details><summary>Answer</summary><div class="ans">12 = 00001100; invert to 11110011; add 1 = <code>11110100</code>. Check: −128 + 64 + 32 + 16 + 4 = −12.</div></details></li><li>What is the value of <code>11111111</code> in two’s complement?<details><summary>Answer</summary><div class="ans">−128 + 127 = <b>−1</b>.</div></details></li></ol></div></section>
+<section class="part" id="n7"><h3>7. Adding binary numbers and overflow</h3><span class="obj">Syllabus objectives 4(a) and 4(b)</span><p>There are only four rules for adding binary:</p>
+<div class="scroll"><table class="t"><tr><th>Addition</th><th>Answer</th><th>Carry</th></tr><tr><td><code>0 + 0</code></td><td><code>0</code></td><td>0</td></tr><tr><td><code>0 + 1</code></td><td><code>1</code></td><td>0</td></tr><tr><td><code>1 + 1</code></td><td><code>0</code></td><td>1 (because 1 + 1 = 10)</td></tr><tr><td><code>1 + 1 + 1</code> (with a carry)</td><td><code>1</code></td><td>1 (because 1 + 1 + 1 = 11)</td></tr></table></div>
+<p>Add from <b>right to left</b>, and carry into the next column.</p>
+<div class="eg"><div class="eg-t">Example 1: 53 + 78</div><pre class="calc">carry:   1 1 1 1 1 0 0 0
+         0 0 1 1 0 1 0 1   (53)
+       + 0 1 0 0 1 1 1 0   (78)
+       -------------------
+         1 0 0 0 0 0 1 1   (131)</pre><p>Check: 128 + 2 + 1 = 131 ✓</p></div>
+<h4 class="sub">Overflow</h4>
+<p>An 8-bit register can hold values up to <b>255</b> only. If the answer needs 9 bits, the ninth bit has nowhere to go. This is an <b>overflow error</b>: the value produced is outside the limit that the register can store.</p>
+<div class="eg"><div class="eg-t">Example 2: 200 + 100 (overflow)</div><pre class="calc">         1 1 0 0 1 0 0 0   (200)
+       + 0 1 1 0 0 1 0 0   (100)
+       -------------------
+       1 0 0 1 0 1 1 0 0   ← 9 bits (true answer = 300)
+       ^
+       carry out of the register
+
+The register keeps: 0 0 1 0 1 1 0 0 = 44   (wrong answer)</pre></div>
+<div class="callout rule"><strong>Remember</strong><p>Overflow happens when the result is <b>greater than 255</b> in an 8-bit register (or greater than 65,535 in a 16-bit register). A computer or device has a predefined limit on the values it can store, and a value outside that limit causes an overflow error.</p></div>
+<div class="callout tip"><strong>Exam tip</strong><p>Show the carries in your working. Then write one sentence: “The answer needs 9 bits but the register only has 8 bits, so there is an overflow.”</p></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>What is 1 + 1 in binary?<details><summary>Answer</summary><div class="ans">10: write 0 and carry 1.</div></details></li><li>Add <code>00011011</code> + <code>00010101</code>.<details><summary>Answer</summary><div class="ans"><code>00110000</code> (27 + 21 = 48).</div></details></li><li>Add <code>10000001</code> + <code>10000001</code> in an 8-bit register. What happens?<details><summary>Answer</summary><div class="ans">129 + 129 = 258, which is more than 255. The register keeps <code>00000010</code> and there is a carry out of the ninth bit: <b>overflow</b>.</div></details></li><li>What is an overflow error and when does it happen in an 8-bit register?<details><summary>Answer</summary><div class="ans">It happens when the result is bigger than the limit of the register (more than 255), so it does not fit in 8 bits.</div></details></li><li>An 8-bit register holds 200 and you add 60. What happens and why?<details><summary>Answer</summary><div class="ans">200 + 60 = 260 &gt; 255, so there is an overflow: the answer needs 9 bits.</div></details></li></ol></div></section>
+<section class="part" id="n8"><h3>8. Logical shifts</h3><span class="obj">Syllabus objective 5</span><p>A logical shift moves all the bits in a register in one direction. Bits shifted out of the end of the register are <b>lost</b>, and <b>zeros</b> are shifted in at the opposite end.</p>
+<ul><li><b>Left shift:</b> bits move left. Zeros enter on the right. The MSB is lost. Each shift <b>multiplies by 2</b>.</li><li><b>Right shift:</b> bits move right. Zeros enter on the left. The LSB is lost. Each shift <b>divides by 2</b>.</li><li><b>Multiple shifts:</b> a shift of n places multiplies or divides by 2<sup>n</sup>.</li></ul>
+<div class="eg"><div class="eg-t">Example 1: left shift</div><pre class="calc">00001101  (13)
+Left shift 1  →  00011010  (26)    13 × 2
+Left shift 2  →  00110100  (52)    13 × 4</pre></div>
+<div class="eg"><div class="eg-t">Example 2: right shift</div><pre class="calc">00110100  (52)
+Right shift 2 →  00001101  (13)    52 ÷ 4</pre></div>
+<div class="eg"><div class="eg-t">Example 3: when bits are lost</div><pre class="calc">11010000  (208)
+Left shift 1  →  10100000  (160)   the MSB 1 was lost, so the answer is NOT 416
+Left shift 2  →  01000000  (64)
+
+00001101  (13)
+Right shift 1 →  00000110  (6)     the LSB 1 was lost, 13 ÷ 2 = 6 (remainder lost)</pre></div>
+<div class="callout rule"><strong>Remember</strong><p>Multiplying with a left shift only works if <b>no 1 is lost</b> from the left end. Dividing with a right shift loses the remainder (the LSB is lost), so the answer is a whole number only.</p></div>
+<div class="callout tip"><strong>Exam tip</strong><p>A question may say “logical left shift of 3 places”. Either shift one place at a time (three times), or move all bits at once and make sure you fill the empty places with zeros. The result must still have 8 bits.</p></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>Perform a logical left shift of 1 place on <code>00000111</code>.<details><summary>Answer</summary><div class="ans"><code>00001110</code> (7 becomes 14).</div></details></li><li>Perform a logical right shift of 2 places on <code>01101000</code>.<details><summary>Answer</summary><div class="ans"><code>00011010</code> (104 ÷ 4 = 26).</div></details></li><li>What does a left shift of 3 places do to the value (if no 1 is lost)?<details><summary>Answer</summary><div class="ans">It multiplies by 2<sup>3</sup> = 8.</div></details></li><li>Perform a left shift of 1 place on <code>10010000</code>. What is lost?<details><summary>Answer</summary><div class="ans"><code>00100000</code>. The MSB (a 1) is lost, so 144 did not become 288; it became 32.</div></details></li><li>Perform a right shift of 1 place on <code>00000101</code> (5). What is the answer and why is it not 2.5?<details><summary>Answer</summary><div class="ans"><code>00000010</code> (2). The LSB (a 1) is lost, and a register can only hold whole numbers.</div></details></li></ol></div></section>
+</section>
+<section class="topic" id="t12"><h2>1.2 Text, sound and images</h2><p class="topic-lead">How text, sound and images are turned into binary, and what happens when you change the quality.</p>
+<section class="part" id="t1"><h3>1. Text: character sets, ASCII and Unicode</h3><span class="obj">Syllabus objective 1</span><p>A computer does not store a letter as a picture of “A”. It stores the <b>code number</b> of that character in binary. The list of all the characters a system can use, with the code for each one, is called a <b>character set</b>.</p>
+<h4 class="sub">ASCII</h4>
+<ul><li>American Standard Code for Information Interchange.</li><li>Original ASCII uses <b>7 bits</b> (128 characters). Extended ASCII uses <b>8 bits</b> (256 characters).</li><li>It includes English letters (upper and lower case), the digits 0 to 9, punctuation and control codes.</li></ul>
+<div class="scroll"><table class="t"><tr><th>Character</th><th>Space</th><th>0</th><th>9</th><th>A</th><th>Z</th><th>a</th><th>z</th></tr><tr><td><b>ASCII (denary)</b></td><td>32</td><td>48</td><td>57</td><td>65</td><td>90</td><td>97</td><td>122</td></tr></table></div>
+<div class="callout rule"><strong>Remember</strong><p>Characters follow an order. If A = 65 then B = 66, C = 67 and so on. A lower-case letter is <b>32 more</b> than its capital: a = 97. The digit character <code>5</code> has the code 53, not 5.</p></div>
+<div class="eg"><div class="eg-t">Example: the word “Hi”</div><pre class="calc">H = 72  = 01001000
+i = 105 = 01101001
+
+"Hi" = 01001000 01101001   (16 bits = 2 bytes using 8 bits per character)</pre></div>
+<h4 class="sub">Unicode</h4>
+<ul><li>ASCII has only 128 or 256 characters. That is not enough for Arabic, Chinese, Hindi and many symbols.</li><li><b>Unicode</b> allows a much greater range of characters and symbols: the languages of the world and even <b>emojis</b>.</li><li>Unicode uses <b>more bits per character</b> than ASCII (often 16 or 32), so a Unicode text file is larger.</li></ul>
+<div class="scroll"><table class="t"><tr><th></th><th>ASCII</th><th>Unicode</th></tr><tr><td>Bits per character</td><td>7 or 8</td><td>More (e.g. 16 or 32)</td></tr><tr><td>Number of characters</td><td>128 or 256</td><td>Many thousands (many languages, symbols, emojis)</td></tr><tr><td>File size</td><td>Smaller</td><td>Larger</td></tr></table></div>
+<div class="eg"><div class="eg-t">Size of a piece of text</div><pre class="calc">"HELLO" has 5 characters
+At 8 bits per character:  5 × 8  = 40 bits = 5 bytes
+At 16 bits per character: 5 × 16 = 80 bits = 10 bytes</pre></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>What is a character set?<details><summary>Answer</summary><div class="ans">A list of characters and symbols where each one has a unique binary code.</div></details></li><li>Give two differences between ASCII and Unicode.<details><summary>Answer</summary><div class="ans">ASCII uses 7 or 8 bits and has 128 or 256 characters; Unicode uses more bits and can represent many languages, symbols and emojis.</div></details></li><li>The ASCII code for “A” is 65. Give the code for “C” in denary and in 8-bit binary.<details><summary>Answer</summary><div class="ans">67; <code>01000011</code> (64 + 2 + 1).</div></details></li><li>Why is a Unicode text file usually larger than an ASCII file with the same text?<details><summary>Answer</summary><div class="ans">Unicode uses more bits for each character.</div></details></li><li>A text file has 200 characters and each uses 8 bits. What is the file size in bytes?<details><summary>Answer</summary><div class="ans">200 × 8 = 1600 bits ÷ 8 = <b>200 bytes</b>.</div></details></li></ol></div></section>
+<section class="part" id="t2"><h3>2. Sound</h3><span class="obj">Syllabus objective 2</span><p>Sound is a continuous (analogue) wave. A computer needs binary numbers, so the wave is measured many times at regular intervals. Each measurement is called a <b>sample</b>.</p>
+<ol><li>The sound wave is <b>sampled</b> at regular intervals of time.</li><li>Each sample records the height (amplitude) of the wave at that moment as a number.</li><li>That number is written in binary and stored.</li></ol>
+<div class="callout rule"><strong>Two key terms</strong><p><b>Sample rate</b> is the number of samples taken per <b>second</b>, measured in hertz (Hz). Example: a CD uses 44,100 Hz.</p><p><b>Sample resolution</b> (bit depth) is the number of <b>bits per sample</b>. Example: 16 bits. With <i>n</i> bits you can represent 2<sup>n</sup> amplitude levels.</p></div>
+<div class="scroll"><table class="t"><tr><th>If you increase…</th><th>Accuracy of the recording</th><th>File size</th></tr><tr><td>Sample rate</td><td>Increases (the wave is followed more closely)</td><td>Increases</td></tr><tr><td>Sample resolution</td><td>Increases (more amplitude levels)</td><td>Increases</td></tr></table></div>
+<p>If you decrease them, the opposite happens: lower quality and a smaller file.</p>
+<div class="tool" id="tool-snd">
+    <h4>Try it: sample rate and sample resolution</h4>
+    <p class="cap" style="margin-top:0">The dashed line is the real sound wave. The blue lines are the samples that get stored. Move the sliders and watch the quality change.</p>
+    <svg class="snd" id="snd-svg" viewBox="0 0 640 220" role="img" aria-label="A sound wave being sampled"></svg>
+    <label for="snd-n">Sample rate: <b id="snd-nv">12</b> samples</label>
+    <input type="range" id="snd-n" min="4" max="40" value="12">
+    <label for="snd-b">Sample resolution: <b id="snd-bv">2</b> bits</label>
+    <input type="range" id="snd-b" min="1" max="4" value="2">
+    <p id="snd-out" style="margin-bottom:0"></p>
+  </div>
+<div class="callout tip"><strong>Exam tip</strong><p>For an “effect” question give two things: <b>quality/accuracy</b> and <b>file size</b>. When sample rate or sample resolution increases, both increase.</p></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>What is sample rate and what is it measured in?<details><summary>Answer</summary><div class="ans">The number of samples taken per second; measured in hertz (Hz).</div></details></li><li>What is sample resolution?<details><summary>Answer</summary><div class="ans">The number of bits used for each sample.</div></details></li><li>What happens to quality and file size if you increase the sample rate?<details><summary>Answer</summary><div class="ans">Both the quality/accuracy and the file size increase.</div></details></li><li>How many amplitude levels can a 4-bit sample resolution represent?<details><summary>Answer</summary><div class="ans">2<sup>4</sup> = <b>16</b>.</div></details></li><li>Describe briefly how sound is converted to binary.<details><summary>Answer</summary><div class="ans">The sound wave is sampled at regular intervals; the amplitude of each sample is measured as a number; each number is written in binary and stored.</div></details></li></ol></div></section>
+<section class="part" id="t3"><h3>3. Images</h3><span class="obj">Syllabus objective 3</span><p>A digital image is a grid of tiny dots called <b>pixels</b>. Each pixel has a binary code that describes its colour.</p>
+<div class="callout rule"><strong>Two key terms</strong><p><b>Resolution</b> is the number of pixels in the image (width × height). Example: 1920 × 1080 = 2,073,600 pixels.</p><p><b>Colour depth</b> is the number of bits used for <b>each pixel</b>. With <i>n</i> bits you get 2<sup>n</sup> colours.</p></div>
+<div class="scroll"><table class="t"><tr><th>Colour depth (bits per pixel)</th><th>1</th><th>2</th><th>4</th><th>8</th><th>16</th><th>24</th></tr><tr><td><b>Number of colours</b></td><td>2</td><td>4</td><td>16</td><td>256</td><td>65,536</td><td>16,777,216</td></tr></table></div>
+<p>When resolution or colour depth increases, <b>both the image quality and the file size increase</b>. When they decrease, the image has lower quality and the file is smaller.</p>
+<div class="tool" id="tool-px">
+    <h4>Try it: a 1-bit image of 8 × 8 pixels</h4>
+    <p class="cap" style="margin-top:0">Click a square to switch it between white (0) and black (1). Each row is one byte, which you can also write in hex.</p>
+    <div class="pxwrap">
+      <div class="pxgrid" id="px-grid" role="group" aria-label="8 by 8 pixel grid"></div>
+      <div class="pxrows" id="px-rows"></div>
+    </div>
+    <div class="reg-tools">
+      <button class="btn" type="button" id="px-smile">Smiley face</button>
+      <button class="btn" type="button" id="px-clear">Clear all</button>
+    </div>
+    <p class="cap" id="px-size"></p>
+  </div>
+<div class="eg"><div class="eg-t">Why colour images are large</div><pre class="calc">A 1-bit (black and white) picture, 64 pixels  →  64 bits  = 8 bytes
+A 24-bit picture, 64 pixels                 →  1536 bits = 192 bytes
+The colour depth went up 24 times, so the file size went up 24 times.</pre></div>
+<div class="callout warn"><strong>Common mistakes</strong><p>Mixing up resolution and colour depth. Resolution is the <b>number of pixels</b>; colour depth is the <b>number of bits per pixel</b>. Write full definitions in your answer.</p></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>What is a pixel?<details><summary>Answer</summary><div class="ans">The smallest element of a picture; each pixel has a binary code for its colour.</div></details></li><li>State the difference between resolution and colour depth.<details><summary>Answer</summary><div class="ans">Resolution is the number of pixels in the image; colour depth is the number of bits used to represent the colour of each pixel.</div></details></li><li>How many colours can a colour depth of 3 bits give?<details><summary>Answer</summary><div class="ans">2<sup>3</sup> = <b>8</b>.</div></details></li><li>An image needs 256 colours. How many bits per pixel are needed?<details><summary>Answer</summary><div class="ans">2<sup>8</sup> = 256, so <b>8 bits</b>.</div></details></li><li>Give two effects of increasing the resolution and colour depth of an image.<details><summary>Answer</summary><div class="ans">The image has better quality/more detail, and the file size increases.</div></details></li></ol></div></section>
+</section>
+<section class="topic" id="t13"><h2>1.3 Data storage and compression</h2><p class="topic-lead">Measuring storage, calculating image and sound file sizes, and why files are compressed.</p>
+<section class="part" id="u1"><h3>1. Measuring data storage</h3><span class="obj">Syllabus objective 1</span><div class="scroll"><table class="t"><tr><th>Unit</th><th>Symbol</th><th>Amount of the previous unit</th></tr><tr><td>bit</td><td>b</td><td>0 or 1</td></tr><tr><td>nibble</td><td>—</td><td>4 bits</td></tr><tr><td>byte</td><td>B</td><td>8 bits</td></tr><tr><td>kibibyte</td><td>KiB</td><td>1024 bytes</td></tr><tr><td>mebibyte</td><td>MiB</td><td>1024 KiB</td></tr><tr><td>gibibyte</td><td>GiB</td><td>1024 MiB</td></tr><tr><td>tebibyte</td><td>TiB</td><td>1024 GiB</td></tr><tr><td>pebibyte</td><td>PiB</td><td>1024 TiB</td></tr><tr><td>exbibyte</td><td>EiB</td><td>1024 PiB</td></tr></table></div>
+<div class="ladder" aria-label="Ladder of units"><span class="box">bits</span><span class="arr">÷ 8 →</span><span class="box">bytes</span><span class="arr">÷ 1024 →</span><span class="box">KiB</span><span class="arr">÷ 1024 →</span><span class="box">MiB</span><span class="arr">÷ 1024 →</span><span class="box">GiB</span><span class="arr">÷ 1024 →</span><span class="box">TiB</span></div>
+<p>Going right (to a bigger unit) you divide. Going left (to a smaller unit) you multiply. For example, × 8 from bytes to bits, and × 1024 from MiB to KiB.</p>
+<div class="callout rule"><strong>Remember</strong><p>Computers use base 2, and 2<sup>10</sup> = <b>1024</b>. In Cambridge exams all calculations must use <b>1024</b>, not 1000. Give the answer in the <b>unit that the question asks for</b>.</p></div>
+<div class="eg"><div class="eg-t">Conversion examples</div><pre class="calc">3 MiB to KiB           :  3 × 1024      = 3072 KiB
+2048 KiB to MiB        :  2048 ÷ 1024   = 2 MiB
+5 GiB to MiB           :  5 × 1024      = 5120 MiB
+6 bytes to bits        :  6 × 8         = 48 bits
+12000 bits to bytes    :  12000 ÷ 8     = 1500 bytes</pre></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>How many bits are in a byte? How many bytes are 24 bits?<details><summary>Answer</summary><div class="ans">8 bits. 24 ÷ 8 = <b>3 bytes</b>.</div></details></li><li>How many bytes are in 1 KiB?<details><summary>Answer</summary><div class="ans">1024 bytes.</div></details></li><li>Convert 5 MiB to KiB.<details><summary>Answer</summary><div class="ans">5 × 1024 = <b>5120 KiB</b>.</div></details></li><li>Convert 4096 KiB to MiB.<details><summary>Answer</summary><div class="ans">4096 ÷ 1024 = <b>4 MiB</b>.</div></details></li><li>Why does the exam use 1024 instead of 1000?<details><summary>Answer</summary><div class="ans">Computers use binary (base 2), and 2<sup>10</sup> = 1024. The units KiB, MiB and GiB are built on this.</div></details></li></ol></div></section>
+<section class="part" id="u2"><h3>2. Calculating image and sound file sizes</h3><span class="obj">Syllabus objective 2</span><div class="callout rule"><strong>Two formulae to memorise</strong><p><b>Image:</b> file size (bits) = <b>width × height × colour depth</b></p><p><b>Sound:</b> file size (bits) = <b>sample rate × sample resolution × length (seconds)</b></p><p>Then divide by 8 to get bytes, and by 1024 at each step to get KiB, MiB, until you reach the unit the question asks for.</p></div>
+<h4 class="sub">Example 1: an image</h4>
+<div class="eg"><div class="eg-t">An image is 256 × 128 pixels with a colour depth of 8 bits. What is the file size in KiB?</div><pre class="calc">Pixels = 256 × 128        = 32,768
+Bits   = 32,768 × 8       = 262,144 bits
+Bytes  = 262,144 ÷ 8      = 32,768 bytes
+KiB    = 32,768 ÷ 1024    = 32 KiB</pre></div>
+<h4 class="sub">Example 2: a larger image</h4>
+<div class="eg"><div class="eg-t">An image is 800 × 600 pixels with a colour depth of 24 bits. What is the file size in KiB and in MiB?</div><pre class="calc">Pixels = 800 × 600           = 480,000
+Bits   = 480,000 × 24        = 11,520,000 bits
+Bytes  = 11,520,000 ÷ 8      = 1,440,000 bytes
+KiB    = 1,440,000 ÷ 1024    = 1406.25 KiB
+MiB    = 1406.25 ÷ 1024      ≈ 1.37 MiB</pre></div>
+<h4 class="sub">Example 3: sound</h4>
+<div class="eg"><div class="eg-t">A sound lasts 10 seconds, with a sample rate of 8000 Hz and a sample resolution of 8 bits. What is the file size in KiB?</div><pre class="calc">Bits  = 8000 × 8 × 10      = 640,000 bits
+Bytes = 640,000 ÷ 8         = 80,000 bytes
+KiB   = 80,000 ÷ 1024       = 78.125 KiB</pre></div>
+<div class="eg"><div class="eg-t">A song lasts 3 minutes (180 seconds), 44,100 Hz, 16 bits. What is the file size in MiB?</div><pre class="calc">Bits  = 44,100 × 16 × 180   = 127,008,000 bits
+Bytes = 127,008,000 ÷ 8     = 15,876,000 bytes
+KiB   = 15,876,000 ÷ 1024   = 15,503.9 KiB
+MiB   = 15,503.9 ÷ 1024     ≈ 15.14 MiB</pre></div>
+<div class="callout tip"><strong>Exam tip: four steps</strong><ol><li>Write the formula.</li><li>Substitute the numbers and calculate the answer in bits.</li><li>Convert to the unit asked for (÷ 8, then ÷ 1024).</li><li>Write the answer with its unit (e.g. “32 KiB”).</li></ol></div>
+<div class="callout warn"><strong>Common mistakes</strong><p>1) Using 1000 instead of 1024. 2) Forgetting to divide by 8 (leaving the answer in bits). 3) Confusing colour depth (bits per pixel) with the number of colours. If the question gives the number of colours (e.g. 256), first find the bits: 256 = 2<sup>8</sup>, so 8 bits. 4) Leaving out the unit in the answer.</p></div>
+<div class="callout tip"><strong>“What happens if…” questions</strong><p>If the colour depth doubles (e.g. 8 to 16 bits) and the resolution stays the same, the file size <b>doubles</b>. If the sample rate is halved, the file size is <b>halved</b>. The file size is found by multiplying, so each factor changes the size in proportion.</p></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>Write the formula for the file size of an image (in bits).<details><summary>Answer</summary><div class="ans">width × height × colour depth.</div></details></li><li>An image is 64 × 64 pixels with a colour depth of 8 bits. What is the file size in bytes?<details><summary>Answer</summary><div class="ans">64 × 64 = 4096 pixels × 8 = 32,768 bits ÷ 8 = <b>4096 bytes</b> (4 KiB).</div></details></li><li>A sound lasts 20 seconds with a sample rate of 4000 Hz and a resolution of 8 bits. What is the file size in bytes?<details><summary>Answer</summary><div class="ans">4000 × 8 × 20 = 640,000 bits ÷ 8 = <b>80,000 bytes</b>.</div></details></li><li>An image is 100 × 50 pixels with a colour depth of 2 bits. What is the file size in bits and in bytes?<details><summary>Answer</summary><div class="ans">100 × 50 = 5000 pixels × 2 = <b>10,000 bits</b>; ÷ 8 = <b>1250 bytes</b>.</div></details></li><li>The colour depth of an image is increased from 8 to 16 bits and the resolution stays the same. What happens to the file size?<details><summary>Answer</summary><div class="ans">It doubles.</div></details></li></ol></div></section>
+<section class="part" id="u3"><h3>3. Compression</h3><span class="obj">Syllabus objective 3</span><p><b>Compression</b> means reducing the size of a file. Image, sound and video files are very large without compression.</p>
+<div class="callout rule"><strong>Why compression is needed</strong><ul><li>Less <b>storage space</b> is needed (more files fit on one phone or disk).</li><li>Less <b>bandwidth</b> is needed when sending or receiving the file.</li><li>A <b>shorter time</b> to transmit, download and upload the file.</li></ul></div>
+<div class="eg"><div class="eg-t">Real-life example</div><p>When you send a photo or video on a messaging app, the file is compressed so that it uses less mobile data and arrives faster. Video that is streamed online is also compressed so that it does not keep buffering.</p></div>
+<div class="callout extra"><strong>Extra: lossless and lossy compression</strong><p>The syllabus extract for 1.3 covers the purpose of compression. Cambridge 0478 questions often also ask about the two types, so know them briefly. Check with your teacher whether they are in the syllabus for your exam year.</p><ul><li><b>Lossless:</b> the original file can be rebuilt exactly; no data is lost. Examples: ZIP, PNG, and <b>run length encoding (RLE)</b>.</li><li><b>Lossy:</b> some data is permanently removed and cannot be recovered. The file is much smaller but the quality is reduced. Examples: JPEG, MP3, MP4.</li></ul><p><b>RLE</b> stores repeats as a count followed by the item:</p><pre class="calc">AAAABBBCCD   →   4A3B2C1D      (10 characters become 8)</pre></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>What is compression and why is it used?<details><summary>Answer</summary><div class="ans">It reduces the size of a file. It is used so that less storage, less bandwidth and less transmission time are needed.</div></details></li><li>Give three benefits of compressing a file before sending it.<details><summary>Answer</summary><div class="ans">Less storage space; less bandwidth; a shorter time to send or download.</div></details></li><li>Why is video compressed before it is sent over the internet?<details><summary>Answer</summary><div class="ans">Video contains a lot of data. Compressed video uses less bandwidth, arrives faster and reduces buffering.</div></details></li><li>(Extra) State the main difference between lossy and lossless compression.<details><summary>Answer</summary><div class="ans">Lossless can restore the original file exactly; lossy permanently removes data, giving a smaller file but lower quality.</div></details></li><li>(Extra) Compress <code>AAAABBBCC</code> using RLE.<details><summary>Answer</summary><div class="ans"><code>4A3B2C</code>.</div></details></li></ol></div></section>
+</section>
+<section class="topic" id="summary">
+  <h2>Summary to memorise</h2>
+  <p class="topic-lead">The key rules and formulae of the whole topic. Learn them before the exam.</p>
+  <div class="scroll"><table class="t"><tr><th>Topic</th><th>Rule</th></tr><tr><td>Values with n bits</td><td>2<sup>n</sup> values; largest unsigned number = 2<sup>n</sup> − 1 (8 bits: 255; 16 bits: 65,535)</td></tr><tr><td>8-bit place values</td><td>128, 64, 32, 16, 8, 4, 2, 1</td></tr><tr><td>Hexadecimal</td><td>1 digit = 4 bits; 2 digits = 1 byte. Hex is for humans; the processor uses binary</td></tr><tr><td>Uses of hex</td><td>HTML/CSS colours, MAC addresses, memory dumps/addresses, error codes, IPv6</td></tr><tr><td>Overflow (8-bit)</td><td>Result &gt; 255: it needs 9 bits but the register only has 8</td></tr><tr><td>Left shift</td><td>Multiply by 2 for each shift; MSB is lost; zeros enter on the right</td></tr><tr><td>Right shift</td><td>Divide by 2 for each shift; LSB is lost; zeros enter on the left</td></tr><tr><td>8-bit two’s complement</td><td>MSB = −128; range −128 to +127. Negative: positive binary → invert the bits → add 1</td></tr><tr><td>ASCII and Unicode</td><td>ASCII 7 or 8 bits (128 or 256 characters); Unicode uses more bits: all languages and emojis</td></tr><tr><td>Sound</td><td>Sample rate (samples per second, Hz) and sample resolution (bits per sample); both up → quality and file size up</td></tr><tr><td>Images</td><td>Resolution (number of pixels), colour depth (bits per pixel; colours = 2<sup>n</sup>); both up → quality and file size up</td></tr><tr><td>Units</td><td>1 byte = 8 bits; each step KiB → MiB → GiB → TiB → PiB → EiB is <b>1024</b></td></tr><tr><td>Image file size</td><td>width × height × colour depth (bits), then ÷ 8 for bytes</td></tr><tr><td>Sound file size</td><td>sample rate × sample resolution × seconds (bits), then ÷ 8 for bytes</td></tr><tr><td>Compression</td><td>Reduces file size: less storage, less bandwidth, shorter transmission time</td></tr></table></div>
+  <div class="callout warn"><strong>Mistakes that lose marks most often</strong><ol><li>Not padding with zeros to 8 bits when the question asks for 8-bit.</li><li>Reading remainders from top to bottom when dividing.</li><li>Forgetting “add 1” in two’s complement.</li><li>Using 1000 instead of 1024, or forgetting to divide by 8.</li><li>Leaving out the unit (KiB, bytes…) in the final answer.</li><li>Giving only quality and forgetting file size in “effect” questions.</li><li>Not showing working in questions worth several marks.</li></ol></div>
+</section>
+<section class="topic" id="exam">
+  <h2>IGCSE-style questions</h2>
+  <p class="topic-lead">10 questions, <b>57 marks</b> in total, in the style of Paper 1. They were written for practice and are not real past-paper questions.</p>
+  <div class="timebox"><span class="badge">Suggested time: about 70 minutes</span><span class="badge">46 marks or more: you are in good shape</span><span class="badge">34 to 45 marks: revise the sections where you lost marks</span><span class="badge">Below 34: study the topic again</span></div>
+  <p>Do these without looking at your notes. Write your working on paper, then open the mark scheme and mark yourself.</p>
+  <article class="exq"><h3>Question 1 <span class="tp">Number systems</span><span class="tot">[5]</span></h3>
+<ol class="parts"><li><span class="l">(a)</span><span class="txt">State why computers use binary to represent data.</span><span class="mk">[2]</span></li><li><span class="l">(b)</span><span class="txt">Convert the denary number 173 into 8-bit binary.</span><span class="mk">[1]</span></li><li><span class="l">(c)</span><span class="txt">Convert the binary number <code>01101011</code> into hexadecimal.</span><span class="mk">[2]</span></li></ol>
+<details class="ms"><summary>Mark scheme</summary><div class="ms-body"><p><b>(a)</b> Computers are made of circuits/switches that have only two states (on/off, voltage/no voltage) [1]; so all data must be converted to binary to be processed [1].</p><p><b>(b)</b> <code>10101101</code> [1] (128 + 32 + 8 + 4 + 1).</p><p><b>(c)</b> 0110 = 6 [1], 1011 = B [1]. Answer: <b>6B</b>.</p></div></details></article>
+<article class="exq"><h3>Question 2 <span class="tp">Hexadecimal</span><span class="tot">[6]</span></h3>
+<ol class="parts"><li><span class="l">(a)</span><span class="txt">Convert the hexadecimal number 9C into denary.</span><span class="mk">[2]</span></li><li><span class="l">(b)</span><span class="txt">Give two uses of hexadecimal in computer science.</span><span class="mk">[2]</span></li><li><span class="l">(c)</span><span class="txt">Explain why people use hexadecimal instead of binary.</span><span class="mk">[2]</span></li></ol>
+<details class="ms"><summary>Mark scheme</summary><div class="ms-body"><p><b>(a)</b> 9 × 16 = 144 [1]; 144 + 12 = <b>156</b> [1].</p><p><b>(b)</b> Any two [1 each]: colour codes in HTML/CSS; MAC addresses; memory addresses / memory dump; error codes; IPv6 addresses.</p><p><b>(c)</b> It is shorter / needs fewer digits than binary [1]; it is easier to read, remember or copy without making mistakes [1].</p></div></details></article>
+<article class="exq"><h3>Question 3 <span class="tp">Binary addition and overflow</span><span class="tot">[7]</span></h3>
+<ol class="parts"><li><span class="l">(a)</span><span class="txt">Add the two 8-bit binary numbers <code>01101110</code> and <code>01011011</code>. Show your working.</span><span class="mk">[2]</span></li><li><span class="l">(b)</span><span class="txt">Add <code>11100110</code> and <code>00110011</code> in an 8-bit register. State what happens.</span><span class="mk">[3]</span></li><li><span class="l">(c)</span><span class="txt">Explain why an overflow error occurs.</span><span class="mk">[2]</span></li></ol>
+<details class="ms"><summary>Mark scheme</summary><div class="ms-body"><p><b>(a)</b> <code>11001001</code> [1] with correct carries shown [1]. (110 + 91 = 201)</p><p><b>(b)</b> The sum needs 9 bits: <code>1 00011001</code> (230 + 51 = 281) [1]; the register keeps <code>00011001</code> and the extra carry bit is lost [1]; an overflow error occurs [1].</p><p><b>(c)</b> The result is greater than the largest value the register can store (255 for 8 bits) [1]; so there is an extra bit that cannot fit in the register [1].</p></div></details></article>
+<article class="exq"><h3>Question 4 <span class="tp">Logical shifts</span><span class="tot">[5]</span></h3>
+<ol class="parts"><li><span class="l">(a)</span><span class="txt">Perform a logical left shift of 2 places on <code>00010110</code>.</span><span class="mk">[1]</span></li><li><span class="l">(b)</span><span class="txt">State the effect of the shift in (a) on the value of the number.</span><span class="mk">[1]</span></li><li><span class="l">(c)</span><span class="txt">Perform a logical right shift of 3 places on <code>10110100</code>.</span><span class="mk">[1]</span></li><li><span class="l">(d)</span><span class="txt">A logical left shift of 1 place on <code>11000000</code> does not double its value. Explain why.</span><span class="mk">[2]</span></li></ol>
+<details class="ms"><summary>Mark scheme</summary><div class="ms-body"><p><b>(a)</b> <code>01011000</code> [1].</p><p><b>(b)</b> The value is multiplied by 4 [1] (22 becomes 88).</p><p><b>(c)</b> <code>00010110</code> [1] (180 ÷ 8; the bits 100 are lost).</p><p><b>(d)</b> The most significant bit (a 1) is shifted out and lost [1]; the result <code>10000000</code> is 128, not 384, because 384 is too large for 8 bits [1].</p></div></details></article>
+<article class="exq"><h3>Question 5 <span class="tp">Two’s complement</span><span class="tot">[5]</span></h3>
+<ol class="parts"><li><span class="l">(a)</span><span class="txt">Represent −37 as an 8-bit two’s complement binary number. Show your working.</span><span class="mk">[2]</span></li><li><span class="l">(b)</span><span class="txt">Give the denary value of the 8-bit two’s complement number <code>10011100</code>.</span><span class="mk">[2]</span></li><li><span class="l">(c)</span><span class="txt">State the range of denary values that can be stored as an 8-bit two’s complement number.</span><span class="mk">[1]</span></li></ol>
+<details class="ms"><summary>Mark scheme</summary><div class="ms-body"><p><b>(a)</b> 37 = <code>00100101</code>; invert = <code>11011010</code>; add 1 = <code>11011011</code>. Working [1], answer [1].</p><p><b>(b)</b> −128 + 16 + 8 + 4 [1] = <b>−100</b> [1].</p><p><b>(c)</b> −128 to +127 [1].</p></div></details></article>
+<article class="exq"><h3>Question 6 <span class="tp">Text</span><span class="tot">[5]</span></h3>
+<ol class="parts"><li><span class="l">(a)</span><span class="txt">Describe two differences between ASCII and Unicode.</span><span class="mk">[2]</span></li><li><span class="l">(b)</span><span class="txt">The ASCII code for the character “A” is 65. Give the ASCII code for “D” in denary and in 8-bit binary.</span><span class="mk">[2]</span></li><li><span class="l">(c)</span><span class="txt">A text file saved using Unicode is larger than the same text saved using ASCII. Explain why.</span><span class="mk">[1]</span></li></ol>
+<details class="ms"><summary>Mark scheme</summary><div class="ms-body"><p><b>(a)</b> Any two [1 each]: ASCII uses 7 (or 8) bits per character, Unicode uses more bits (e.g. 16 or 32); ASCII has 128 (or 256) characters, Unicode has many more; Unicode can represent many languages, symbols and emojis, ASCII cannot.</p><p><b>(b)</b> 68 [1]; <code>01000100</code> [1].</p><p><b>(c)</b> Unicode uses more bits per character than ASCII [1].</p></div></details></article>
+<article class="exq"><h3>Question 7 <span class="tp">Sound</span><span class="tot">[7]</span></h3>
+<ol class="parts"><li><span class="l">(a)</span><span class="txt">Define the terms <i>sample rate</i> and <i>sample resolution</i>.</span><span class="mk">[2]</span></li><li><span class="l">(b)</span><span class="txt">A sound is re-recorded using a higher sample rate. Describe two effects of this change.</span><span class="mk">[2]</span></li><li><span class="l">(c)</span><span class="txt">Describe how a sound wave is converted into binary so that it can be stored.</span><span class="mk">[3]</span></li></ol>
+<details class="ms"><summary>Mark scheme</summary><div class="ms-body"><p><b>(a)</b> Sample rate: the number of samples taken per second [1]. Sample resolution: the number of bits used for each sample [1].</p><p><b>(b)</b> The recording is more accurate / better quality [1]; the file size is larger [1].</p><p><b>(c)</b> The sound wave is sampled at regular intervals [1]; the amplitude (height) of the wave is measured at each sample [1]; each measurement is converted to a binary number and stored [1].</p></div></details></article>
+<article class="exq"><h3>Question 8 <span class="tp">Images</span><span class="tot">[7]</span></h3>
+<ol class="parts"><li><span class="l">(a)</span><span class="txt">An image is 200 pixels wide and 100 pixels high. It uses 16 different colours. Calculate the file size in bytes. Show your working.</span><span class="mk">[4]</span></li><li><span class="l">(b)</span><span class="txt">Give the file size from (a) in kibibytes (KiB), to 2 decimal places.</span><span class="mk">[1]</span></li><li><span class="l">(c)</span><span class="txt">Describe two effects of increasing the colour depth of an image.</span><span class="mk">[2]</span></li></ol>
+<details class="ms"><summary>Mark scheme</summary><div class="ms-body"><p><b>(a)</b> 16 colours needs 4 bits per pixel [1]; 200 × 100 = 20,000 pixels [1]; 20,000 × 4 = 80,000 bits [1]; 80,000 ÷ 8 = <b>10,000 bytes</b> [1].</p><p><b>(b)</b> 10,000 ÷ 1024 = <b>9.77 KiB</b> [1].</p><p><b>(c)</b> The image quality improves / more colours are available [1]; the file size increases [1].</p></div></details></article>
+<article class="exq"><h3>Question 9 <span class="tp">Sound file size and storage units</span><span class="tot">[6]</span></h3>
+<ol class="parts"><li><span class="l">(a)</span><span class="txt">A sound file has a sample rate of 8000 Hz, a sample resolution of 16 bits and lasts for 30 seconds. Calculate the file size in kibibytes (KiB). Show your working.</span><span class="mk">[4]</span></li><li><span class="l">(b)(i)</span><span class="txt">How many mebibytes (MiB) are there in 3 gibibytes (GiB)?</span><span class="mk">[1]</span></li><li><span class="l">(ii)</span><span class="txt">How many bits are there in 6 bytes?</span><span class="mk">[1]</span></li></ol>
+<details class="ms"><summary>Mark scheme</summary><div class="ms-body"><p><b>(a)</b> 8000 × 16 × 30 [1] = 3,840,000 bits [1]; ÷ 8 = 480,000 bytes [1]; ÷ 1024 = <b>468.75 KiB</b> [1].</p><p><b>(b)(i)</b> 3 × 1024 = <b>3072 MiB</b> [1]. <b>(ii)</b> 6 × 8 = <b>48 bits</b> [1].</p></div></details></article>
+<article class="exq"><h3>Question 10 <span class="tp">Compression</span><span class="tot">[4]</span></h3>
+<ol class="parts"><li><span class="l">(a)</span><span class="txt">Give two benefits of compressing a large file before sending it by email.</span><span class="mk">[2]</span></li><li><span class="l">(b)</span><span class="txt">(Extra) State one difference between lossy and lossless compression.</span><span class="mk">[2]</span></li></ol>
+<details class="ms"><summary>Mark scheme</summary><div class="ms-body"><p><b>(a)</b> Any two [1 each]: less bandwidth needed; shorter transmission/upload/download time; less storage space needed.</p><p><b>(b)</b> Lossless: the original file can be rebuilt exactly, no data is lost [1]. Lossy: some data is permanently removed so the file is smaller but the quality is reduced [1].</p></div></details></article>
+  <div class="callout tip"><strong>When you finish</strong><p>Add up your marks out of 57. Write down the sections where you made mistakes (for example two’s complement or file size), then revise them using the “Check yourself” questions. After that, practise with official Cambridge 0478 Paper 1 past papers.</p></div>
+</section>
+</main>
+</div>
+<footer><p>These notes follow the Cambridge IGCSE Computer Science 0478 syllabus (2026, 2027 and 2028), Topic 1: Data representation. The examples and questions were written for practice.</p></footer>
+<div class="footer-credit no-print">⚡ DESIGNED BY MR. BEDA (COMPUTER SCIENCE TEACHER) ⚡</div>
+<script>
+(function(){
+'use strict';
+var $=function(s){return document.querySelector(s)};
+var pad=function(s,n){while(s.length<n)s='0'+s;return s};
+
+/* ---- hero register ---- */
+var vals=[128,64,32,16,8,4,2,1];
+var bits=[0,1,0,0,1,0,1,1];
+var reg=$('#reg');
+vals.forEach(function(v,i){
+  var c=document.createElement('div');c.className='cell';
+  c.innerHTML='<span class="pv">'+v+'</span>';
+  var b=document.createElement('button');b.type='button';
+  b.setAttribute('aria-label','Bit with place value '+v);
+  b.addEventListener('click',function(){bits[i]=bits[i]?0:1;drawReg();});
+  c.appendChild(b);reg.appendChild(c);
+});
+function drawReg(){
+  var bs=reg.querySelectorAll('button'),n=0,parts=[],i;
+  for(i=0;i<8;i++){
+    bs[i].textContent=bits[i];
+    bs[i].setAttribute('aria-pressed',bits[i]?'true':'false');
+    if(bits[i]){n+=vals[i];parts.push(vals[i]);}
+  }
+  $('#reg-d').textContent=n;
+  $('#reg-h').textContent=pad(n.toString(16).toUpperCase(),2);
+  $('#reg-sum').textContent=(parts.length?parts.join(' + '):'0')+' = '+n;
+}
+document.querySelectorAll('[data-set]').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var s=btn.getAttribute('data-set');
+    for(var i=0;i<8;i++)bits[i]=+s.charAt(i);
+    drawReg();
+  });
+});
+drawReg();
+
+/* ---- converter ---- */
+function row(k,v){return '<div class="cv-row"><span>'+k+'</span><code>'+v+'</code></div>';}
+var dIn=$('#cv-d'),bIn=$('#cv-b'),dOut=$('#cv-d-out'),bOut=$('#cv-b-out');
+function fromDen(){
+  var raw=dIn.value.replace(/\u2212/g,'-').replace(/\s+/g,'');
+  if(raw===''){dOut.innerHTML='';return;}
+  if(!/^-?\d+$/.test(raw)){dOut.innerHTML='<p class="cv-msg">Enter a whole number only, e.g. 75 or \u221225.</p>';return;}
+  var n=parseInt(raw,10),h='';
+  if(n>=0&&n<=255){
+    h+=row('Binary (8-bit)',pad(n.toString(2),8));
+    h+=row('Hex',pad(n.toString(16).toUpperCase(),2));
+  }else if(n>255){
+    h+='<p class="cv-msg">'+n+' is greater than 255: it does not fit in an 8-bit register (overflow).</p>';
+  }
+  if(n<0&&n>=-128){
+    h+=row('Two\u2019s complement (8-bit)',pad((n&255).toString(2),8));
+  }else if(n<-128){
+    h+='<p class="cv-msg">'+n+' is below \u2212128: it does not fit in 8-bit two\u2019s complement.</p>';
+  }else if(n>=0&&n<=127){
+    h+=row('Two\u2019s complement (8-bit)',pad(n.toString(2),8));
+  }
+  dOut.innerHTML=h;
+}
+function fromBin(){
+  var raw=bIn.value.replace(/\s+/g,'');
+  if(raw===''){bOut.innerHTML='';return;}
+  if(!/^[01]{1,16}$/.test(raw)){bOut.innerHTML='<p class="cv-msg">Use 0 and 1 only, up to 16 bits.</p>';return;}
+  var n=parseInt(raw,2),h='';
+  h+=row('Denary (unsigned binary)',n);
+  h+=row('Hex',pad(n.toString(16).toUpperCase(),Math.ceil(raw.length/4)));
+  if(raw.length===8){h+=row('Two\u2019s complement (8-bit)',n>=128?n-256:n);}
+  bOut.innerHTML=h;
+}
+dIn.addEventListener('input',fromDen);
+bIn.addEventListener('input',fromBin);
+
+/* ---- sound sampling demo ---- */
+var svg=$('#snd-svg'),sn=$('#snd-n'),sb=$('#snd-b');
+function wave(t){return 0.68*Math.sin(4*Math.PI*t)+0.27*Math.sin(10*Math.PI*t+1);}
+function drawSnd(){
+  var W=640,H=220,P=18,mid=H/2,R=H/2-P;
+  var N=+sn.value,B=+sb.value,L=Math.pow(2,B),i,t,x,y,q,lvl,path='',s='';
+  s+='<line class="w-axis" x1="'+P+'" y1="'+mid+'" x2="'+(W-P)+'" y2="'+mid+'"/>';
+  for(i=0;i<=240;i++){
+    t=i/240;x=P+t*(W-2*P);y=mid-(wave(t)/0.98)*R;
+    path+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1);
+  }
+  s+='<path class="w-orig" d="'+path+'"/>';
+  for(i=0;i<N;i++){
+    t=i/N;x=P+t*(W-2*P);
+    lvl=Math.round((wave(t)/0.98+1)/2*(L-1));
+    q=(lvl/(L-1))*2-1;
+    y=mid-q*R;
+    s+='<line class="w-stem" x1="'+x.toFixed(1)+'" y1="'+mid+'" x2="'+x.toFixed(1)+'" y2="'+y.toFixed(1)+'"/>';
+    s+='<circle class="w-dot" cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="3.5"/>';
+  }
+  svg.innerHTML=s;
+  $('#snd-nv').textContent=N;$('#snd-bv').textContent=B;
+  $('#snd-out').innerHTML='Amplitude levels: 2<sup>'+B+'</sup> = <b>'+L+'</b>. Data stored: '+N+' \u00d7 '+B+' = <b>'+(N*B)+' bits</b>.';
+}
+sn.addEventListener('input',drawSnd);
+sb.addEventListener('input',drawSnd);
+drawSnd();
+
+/* ---- pixel grid ---- */
+var smile=['00111100','01000010','10100101','10000001','10100101','10011001','01000010','00111100'];
+var rows=smile.slice();
+var grid=$('#px-grid'),rowsEl=$('#px-rows'),cells=[];
+function setBit(s,c,v){return s.slice(0,c)+v+s.slice(c+1);}
+for(var r=0;r<8;r++){
+  for(var c=0;c<8;c++){
+    (function(r,c){
+      var b=document.createElement('button');b.type='button';
+      b.setAttribute('aria-label','Row '+(r+1)+', column '+(c+1));
+      b.addEventListener('click',function(){
+        rows[r]=setBit(rows[r],c,rows[r].charAt(c)==='1'?'0':'1');
+        drawPx();
+      });
+      grid.appendChild(b);cells.push(b);
+    })(r,c);
+  }
+}
+function drawPx(){
+  var r,c;
+  for(r=0;r<8;r++)for(c=0;c<8;c++){
+    cells[r*8+c].setAttribute('aria-pressed',rows[r].charAt(c)==='1'?'true':'false');
+  }
+  rowsEl.innerHTML=rows.map(function(s){
+    return '<div>'+s+'<span>hex '+pad(parseInt(s,2).toString(16).toUpperCase(),2)+'</span></div>';
+  }).join('');
+  $('#px-size').textContent='64 pixels \u00d7 1 bit per pixel = 64 bits = 8 bytes.';
+}
+$('#px-smile').addEventListener('click',function(){rows=smile.slice();drawPx();});
+$('#px-clear').addEventListener('click',function(){rows=['00000000','00000000','00000000','00000000','00000000','00000000','00000000','00000000'];drawPx();});
+drawPx();
+
+/* ---- answers toggle, toc, print ---- */
+var allOpen=false;
+var tog=$('#toggle-all');
+function setAll(v){document.querySelectorAll('.check details, details.ms').forEach(function(d){d.open=v;});}
+tog.addEventListener('click',function(){
+  allOpen=!allOpen;setAll(allOpen);
+  tog.textContent=allOpen?'Hide all answers':'Show all answers';
+});
+window.addEventListener('beforeprint',function(){setAll(true);});
+if(window.matchMedia('(min-width:1000px)').matches){$('#toc').open=true;}
+})();
+</script>
+</body>
+</html>
