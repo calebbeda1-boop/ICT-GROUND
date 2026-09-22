@@ -670,26 +670,23 @@ grid.innerHTML = EXAMS.map(e => `
 `).join('');
 </script>
 
-<script src="assets/orbital/tooplate-2167-orbital-script.js"></script>
-    <script>
-    // Zuia right-click
-    document.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-    });
+<script>
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
 
-    // Zuia kucopy maandishi
-    document.addEventListener('copy', function(e) {
-        e.preventDefault();
-    });
+    var target = e.target;
+    var tagName = target.tagName.toLowerCase();
 
-    // Zuia baadhi ya shortcuts (F12, Ctrl+Shift+I, Ctrl+U)
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'F12' || 
-            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
-            (e.ctrlKey && e.key === 'U')) {
-            e.preventDefault();
-        }
-    });
-    </script>
+    if (tagName === 'a' || target.closest('a')) {
+        alert('⚠️Alert: This link is protected');
+    } else if (['h1','h2','h3','h4','h5','h6'].includes(tagName)) {
+        alert('⚠️Alert: Right click on headline is disabled');
+    } else if (['p','span','li','td','th','div'].includes(tagName) && target.innerText && target.innerText.trim().length > 0) {
+        alert('⚠️Alert: Right click on text is disabled');
+    } else {
+        alert('⚠️Alert: Right click on empty spaces is disabled');
+    }
+});
+</script>
 </body>
 </html>
