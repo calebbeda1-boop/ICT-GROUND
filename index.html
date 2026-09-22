@@ -670,69 +670,6 @@ grid.innerHTML = EXAMS.map(e => `
 `).join('');
 </script>
 
-<script>
-// 1. Zuia kabisa keyboard shortcuts zote muhimu
-document.onkeydown = function(e) {
-    e = e || window.event;
 
-    // Ctrl + combo yoyote (U, S, C, A, P, F)
-    if (e.ctrlKey && ['U','S','C','A','P','F','H'].includes(e.key.toUpperCase())) {
-        e.preventDefault();
-        return false;
-    }
-    // Ctrl+Shift+ combo (I, J, C, K)
-    if (e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase())) {
-        e.preventDefault();
-        return false;
-    }
-    // F12
-    if (e.key === 'F12' || e.keyCode === 123) {
-        e.preventDefault();
-        return false;
-    }
-};
-
-// 2. Gundua kama DevTools imefunguliwa (kwa kupima ukubwa wa window)
-function detectDevTools() {
-    var threshold = 160;
-    if (window.outerWidth - window.innerWidth > threshold ||
-        window.outerHeight - window.innerHeight > threshold) {
-        document.body.innerHTML = '<h1 style="text-align:center;margin-top:50px;">⚠️ Developer Tools Detected. Access Denied.</h1>';
-    }
-}
-setInterval(detectDevTools, 1000);
-
-// 3. Njia nyingine ya kugundua DevTools (debugger trick - inapunguza speed ya inspect)
-setInterval(function() {
-    var start = new Date();
-    debugger;
-    var end = new Date();
-    if (end - start > 100) {
-        document.body.innerHTML = '<h1 style="text-align:center;margin-top:50px;">⚠️ Developer Tools Detected. Access Denied.</h1>';
-    }
-}, 1000);
-
-// 4. Zuia kufungua page kwenye iframe (clickjacking protection - pia inasumbua baadhi ya "view source" extensions)
-if (window.top !== window.self) {
-    window.top.location = window.self.location;
-}
-
-// 5. Zuia right click, copy, drag (kama tulivyoweka awali)
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.addEventListener('copy', e => e.preventDefault());
-document.addEventListener('dragstart', e => e.preventDefault());
-</script>
-
-<style>
-body {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-@media print {
-    body { display: none !important; }
-}
-</style>
 </body>
 </html>
