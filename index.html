@@ -38,7 +38,7 @@
     --nav-bg:rgba(10,12,20,.5);
     --card-bg:rgba(255,255,255,.03);
     --space-visual-opacity:1;
-    --toggle-icon:"DARK MODE";
+    --toggle-icon:"🌙";
   }
   html[data-theme="light"]{
     --bg:#f5f6fa;
@@ -54,7 +54,7 @@
     --nav-bg:rgba(255,255,255,.85);
     --card-bg:#ffffff;
     --space-visual-opacity:.12;
-    --toggle-icon:"LIGHT MODE";
+    --toggle-icon:"☀️";
   }
   html[data-theme="light"] body{ background:var(--bg); color:var(--text-primary); }
   html[data-theme="light"] .aura,
@@ -403,8 +403,7 @@
 const TOPICS = [
   { id:1, label:'DATA REPRESENTATION', img:'image-01.png', locked:false,
     subtopics:[
-      { t:'ALL NOTES',       url:'NOTES/Data-Representation-Notes.html' },
-       { t:'Number Systems',       url:'/exams/data-representation-number-systems.html' },
+      { t:'Number Systems',       url:'/exams/data-representation-number-systems.html' },
       { t:'Text, Sound & Images', url:'/exams/data-representation-text-sound-images.html' },
       { t:'Compression',          url:'/exams/data-representation-compression.html' }
     ]
@@ -670,6 +669,7 @@ grid.innerHTML = EXAMS.map(e => `
 `).join('');
 </script>
 
+<script src="assets/orbital/tooplate-2167-orbital-script.js"></script>
 
 </body>
 </html>
