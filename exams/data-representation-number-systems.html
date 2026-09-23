@@ -1525,5 +1525,83 @@ function dismissOverlay(){
 })();
 </script>
 <div class="footer-credit no-print">⚡ DESIGNED BY MR. BEDA (COMPUTER SCIENCE MASTER) ⚡</div>
+   </script>
+
+<script src="assets/orbital/tooplate-2167-orbital-script.js"></script>
+<script>
+// Zuia right-click kabisa
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+});
+
+// Zuia kucopy, kucut, kupaste
+document.addEventListener('copy', function(e) { e.preventDefault(); });
+document.addEventListener('cut', function(e) { e.preventDefault(); });
+document.addEventListener('paste', function(e) { e.preventDefault(); });
+
+// Zuia kudrag content (kama picha)
+document.addEventListener('dragstart', function(e) { e.preventDefault(); });
+
+// Zuia keyboard shortcuts mbalimbali
+document.addEventListener('keydown', function(e) {
+    // F12 - Developer Tools
+    if (e.key === 'F12') { e.preventDefault(); return false; }
+
+    // Ctrl+Shift+I / Ctrl+Shift+J / Ctrl+Shift+C - Developer Tools
+    if (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase())) {
+        e.preventDefault(); return false;
+    }
+
+    // Ctrl+U - View Source
+    if (e.ctrlKey && e.key.toUpperCase() === 'U') {
+        e.preventDefault(); return false;
+    }
+
+    // Ctrl+S - Save Page
+    if (e.ctrlKey && e.key.toUpperCase() === 'S') {
+        e.preventDefault(); return false;
+    }
+
+    // Ctrl+P - Print
+    if (e.ctrlKey && e.key.toUpperCase() === 'P') {
+        e.preventDefault(); return false;
+    }
+
+    // Ctrl+A - Select All
+    if (e.ctrlKey && e.key.toUpperCase() === 'A') {
+        e.preventDefault(); return false;
+    }
+
+    // Ctrl+C - Copy
+    if (e.ctrlKey && e.key.toUpperCase() === 'C') {
+        e.preventDefault(); return false;
+    }
+});
+
+// Jaribu kuzuia print (haizuii 100%)
+window.addEventListener('beforeprint', function(e) {
+    document.body.style.display = 'none';
+});
+window.addEventListener('afterprint', function(e) {
+    document.body.style.display = 'block';
+});
+</script>
+
+<style>
+/* Zuia kuchagua maandishi kwa mouse */
+body {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Zuia print kwa CSS pia */
+@media print {
+    body {
+        display: none !important;
+    }
+}
+</style>
 </body>
 </html>
