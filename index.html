@@ -258,7 +258,18 @@
   @keyframes modalUpSheet{ from{opacity:0; transform:translateY(40px);} to{opacity:1; transform:translateY(0);} }
 </style>
 </head>
-
+<script>
+(function(){
+  try{
+    if(sessionStorage.getItem('ictground-counted')) return;
+    var isNew = !localStorage.getItem('ictground-visitor');
+    fetch('/api/visit',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({newVisitor:isNew}),keepalive:true})
+    .then(function(r){ if(r.ok){ sessionStorage.setItem('ictground-counted','1'); localStorage.setItem('ictground-visitor','1'); } })
+    .catch(function(){});
+  }catch(e){}
+})();
+</script>
 <body class="visuals-on">
 
 <div class="aura"></div>
