@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IGCSE Computer Science 0478: Data Transmission (Study Notes)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#F4F6F9; --surface:#FFFFFF; --ink:#17212B; --muted:#56646F; --line:#D8DEE6;
+  --primary:#2B45C9; --primary-ink:#FFFFFF; --primary-soft:#E7EBFC;
+  --hi:#FFE14D; --hi-soft:#FFF5B8;
+  --ok:#146C43; --ok-soft:#DCF2E6; --bad:#A6261D; --bad-soft:#FBE4E1;
+  --code-bg:#EAEEF5;
+  --f-body:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --f-head:'Bricolage Grotesque','Atkinson Hyperlegible',system-ui,sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#10151C; --surface:#18202A; --ink:#E6ECF2; --muted:#9AA7B5; --line:#2B3644;
+    --primary:#8EA2FF; --primary-ink:#0E1330; --primary-soft:#1F2952;
+    --hi:#E8CF3E; --hi-soft:#3A3413;
+    --ok:#5FD39A; --ok-soft:#133525; --bad:#FF8F86; --bad-soft:#3B1A18;
+    --code-bg:#212B38;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10151C; --surface:#18202A; --ink:#E6ECF2; --muted:#9AA7B5; --line:#2B3644;
+  --primary:#8EA2FF; --primary-ink:#0E1330; --primary-soft:#1F2952;
+  --hi:#E8CF3E; --hi-soft:#3A3413;
+  --ok:#5FD39A; --ok-soft:#133525; --bad:#FF8F86; --bad-soft:#3B1A18;
+  --code-bg:#212B38;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 16px);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1.0625rem/1.65 var(--f-body);-webkit-text-size-adjust:100%}
+:focus-visible{outline:3px solid var(--primary);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+a{color:var(--primary)}
+code,.mono{font-family:var(--f-mono);font-weight:500}
+code{background:var(--code-bg);padding:.08em .35em;border-radius:4px;font-size:.92em}
+h1,h2,h3,h4{font-family:var(--f-head);line-height:1.15;margin:0}
+
+/* hero */
+.hero{max-width:1180px;margin:0 auto;padding:36px 20px 8px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:36px;align-items:center}
+.hero h1{font-weight:800;font-size:clamp(2.3rem,5.4vw,3.9rem);letter-spacing:-.02em}
+.hero p{max-width:34rem;color:var(--muted);margin:.9rem 0 0}
+.hero .badges{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.1rem}
+.badge{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:.25rem .8rem;font-size:.9rem}
+.reg-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 16px 16px}
+.reg{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.reg .cell{text-align:center}
+.reg .pv{display:block;font:500 .72rem var(--f-mono);color:var(--muted);margin-bottom:4px}
+.reg button{width:100%;aspect-ratio:1/1.15;min-height:44px;border:2px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:700 1.5rem var(--f-mono);cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.reg button[aria-pressed="true"]{background:var(--primary);border-color:var(--primary);color:var(--primary-ink)}
+.reg-out{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.reg-out div{background:var(--bg);border-radius:8px;padding:.5rem .7rem}
+.reg-out small{display:block;color:var(--muted);font-size:.8rem}
+.reg-out b{font:700 1.5rem var(--f-mono)}
+.reg-sum{margin:.7rem 0 0;font:500 .9rem var(--f-mono);color:var(--muted);word-break:break-word}
+.reg-tools{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.8rem}
+.btn{font:700 .9rem var(--f-body);border:2px solid var(--primary);background:transparent;color:var(--primary);border-radius:8px;padding:.4rem .8rem;cursor:pointer;min-height:40px}
+.btn:hover{background:var(--primary-soft)}
+.btn.solid{background:var(--primary);color:var(--primary-ink)}
+.cap{font-size:.85rem;color:var(--muted);margin:.7rem 0 0}
+
+/* layout */
+.wrap{max-width:1180px;margin:0 auto;padding:24px 20px 80px;display:grid;grid-template-columns:250px minmax(0,1fr);gap:44px}
+main{max-width:760px;min-width:0}
+.toc{position:sticky;top:16px;align-self:start;max-height:calc(100vh - 32px);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:.4rem .9rem .8rem;font-size:.95rem}
+.toc>summary{cursor:pointer;font:700 1.05rem var(--f-head);padding:.5rem 0}
+.toc h5{margin:.9rem 0 .2rem;font:700 .95rem var(--f-head);color:var(--muted)}
+.toc ol{list-style:none;margin:0;padding:0}
+.toc a{display:block;padding:.18rem 0;text-decoration:none;color:var(--ink)}
+.toc a:hover{color:var(--primary);text-decoration:underline}
+.toc .tools{margin-top:.8rem}
+@media (max-width:999px){
+  .hero{grid-template-columns:1fr;gap:22px;padding-top:24px}
+  .wrap{display:block;padding-top:8px}
+  .toc{position:static;max-height:none;margin-bottom:28px}
+}
+
+/* content */
+.topic{margin-top:56px}
+.topic:first-child{margin-top:0}
+.topic>h2{font-weight:800;font-size:clamp(1.7rem,3.6vw,2.3rem);letter-spacing:-.01em;padding-bottom:.5rem;border-bottom:4px solid var(--hi)}
+.topic-lead{color:var(--muted);margin:.8rem 0 0}
+.part{margin-top:44px}
+.part>h3{font-size:1.5rem;font-weight:700}
+.obj{display:inline-block;margin:.5rem 0 .2rem;padding:.1rem .6rem;border-radius:999px;background:var(--primary-soft);color:var(--primary);font-size:.85rem;font-weight:700}
+.part h4.sub{font-size:1.1rem;margin:1.5rem 0 .3rem}
+p{margin:.8rem 0}
+ul,ol{padding-left:1.4rem}
+li{margin:.3rem 0}
+.callout{margin:1.2rem 0;padding:.75rem 1.05rem;border-radius:8px;border-left:5px solid}
+.callout>strong:first-child{display:block;font-family:var(--f-head);margin-bottom:.1rem}
+.callout p:first-of-type{margin-top:.2rem}
+.callout>:last-child{margin-bottom:0}
+.rule{background:var(--hi-soft);border-color:var(--hi)}
+.tip{background:var(--primary-soft);border-color:var(--primary)}
+.warn{background:var(--bad-soft);border-color:var(--bad)}
+.extra{background:var(--surface);border:1px dashed var(--muted);border-left:5px solid var(--muted)}
+.scroll{overflow-x:auto;margin:1rem 0}
+table.t{border-collapse:collapse;width:100%;font-size:.96rem;background:var(--surface)}
+table.t th{background:var(--primary);color:var(--primary-ink);text-align:left;padding:.5rem .7rem;font-weight:700}
+table.t td{border:1px solid var(--line);padding:.45rem .7rem;vertical-align:top}
+table.bits{border-collapse:collapse;margin:.6rem auto;font-family:var(--f-mono)}
+table.bits th,table.bits td{border:1px solid var(--primary);padding:.35rem .5rem;text-align:center;min-width:2.6rem}
+table.bits th{background:var(--primary-soft);color:var(--primary);font-size:.78rem}
+table.bits td.pv{background:var(--code-bg);color:var(--muted);font-size:.8rem}
+table.bits td.on{font-weight:700;background:var(--hi-soft)}
+.eg{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.8rem 1.1rem;margin:1.1rem 0}
+.eg-t{font:700 1rem var(--f-head);margin-bottom:.3rem}
+pre.calc{margin:.5rem 0;padding:.7rem .9rem;background:var(--code-bg);border-radius:8px;font:500 .93rem/1.55 var(--f-mono);overflow-x:auto;white-space:pre}
+.ladder{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;margin:1rem 0;font:500 .88rem var(--f-mono)}
+.ladder span.box{background:var(--surface);border:2px solid var(--primary);border-radius:8px;padding:.3rem .6rem;font-weight:700}
+.ladder span.arr{color:var(--muted)}
+
+/* check yourself */
+.check{margin:1.8rem 0 0;border:2px solid var(--primary);border-radius:12px;overflow:hidden;background:var(--surface)}
+.check>h4{margin:0;padding:.55rem 1rem;background:var(--primary);color:var(--primary-ink);font-size:1.05rem}
+.check ol{margin:0;padding:.7rem 1rem .8rem 2.3rem}
+.check li{margin:.8rem 0}
+.check summary{cursor:pointer;color:var(--primary);font-weight:700;margin-top:.25rem;width:fit-content}
+.ans{margin-top:.35rem;padding:.5rem .8rem;background:var(--ok-soft);border-left:4px solid var(--ok);border-radius:0 6px 6px 0}
+.ans p{margin:.3rem 0}
+
+/* interactive tools */
+.tool{background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:1rem 1.1rem;margin:1.3rem 0}
+.tool>h4{font-size:1.1rem;margin-bottom:.2rem}
+.tool label{display:block;font-weight:700;font-size:.9rem;margin:.6rem 0 .2rem}
+.tool input[type=text],.tool input[type=number]{font:600 1rem var(--f-mono);padding:.4rem .6rem;border:2px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%;max-width:16rem}
+.tool input[type=range]{width:100%;max-width:22rem;accent-color:var(--primary)}
+.cv-row{display:flex;flex-wrap:wrap;gap:.6rem;align-items:baseline;margin:.3rem 0}
+.cv-row span{color:var(--muted);font-size:.9rem;min-width:11rem}
+.cv-row code{font-size:1.02rem;font-weight:700}
+.cv-msg{color:var(--bad);font-weight:700;margin:.3rem 0}
+svg.snd{width:100%;height:auto;background:var(--bg);border-radius:8px;border:1px solid var(--line)}
+.w-axis{stroke:var(--line);stroke-width:1}
+.w-orig{fill:none;stroke:var(--muted);stroke-width:1.6;stroke-dasharray:5 4}
+.w-stem{stroke:var(--primary);stroke-width:2}
+.w-dot{fill:var(--primary)}
+.pxwrap{display:flex;flex-wrap:wrap;gap:1.4rem;align-items:flex-start}
+.pxgrid{display:grid;grid-template-columns:repeat(8,32px);gap:2px;background:var(--line);padding:2px;border-radius:6px}
+.pxgrid button{width:32px;height:32px;border:0;background:var(--surface);cursor:pointer;padding:0}
+.pxgrid button[aria-pressed="true"]{background:var(--ink)}
+.pxrows{font:500 .95rem var(--f-mono);padding-top:2px}
+.pxrows div{height:32px;line-height:32px;margin-bottom:2px}
+.pxrows div span{color:var(--muted);margin-left:.7rem}
+
+/* exam questions */
+.exq{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1rem 1.2rem;margin:1.3rem 0}
+.exq>h3{font-size:1.15rem;display:flex;flex-wrap:wrap;gap:.5rem;align-items:baseline}
+.exq .tot{margin-left:auto;font-family:var(--f-mono);font-size:.95rem}
+.exq .tp{font:400 .9rem var(--f-body);color:var(--muted)}
+.exq ol.parts{list-style:none;padding:0;margin:.6rem 0}
+.exq ol.parts>li{display:flex;gap:.7rem;justify-content:space-between;margin:.55rem 0}
+.exq ol.parts>li>.l{font-weight:700;min-width:1.6rem}
+.exq ol.parts>li>.txt{flex:1}
+.exq .mk{font-family:var(--f-mono);font-weight:700;white-space:nowrap}
+.exq details.ms>summary{cursor:pointer;color:var(--primary);font-weight:700;width:fit-content}
+.ms-body{margin-top:.4rem;padding:.6rem .9rem;background:var(--ok-soft);border-left:4px solid var(--ok);border-radius:0 8px 8px 0}
+.ms-body p{margin:.35rem 0}
+.timebox{display:flex;gap:1rem;flex-wrap:wrap}
+.timebox .badge{font-weight:700}
+footer{max-width:1180px;margin:0 auto;padding:0 20px 40px;color:var(--muted);font-size:.9rem}
+@media print{
+  .toc,.reg-tools,.btn,.tool{display:none!important}
+  body{background:#fff;color:#000}
+  .wrap{display:block}
+}
+
+.pkt{display:flex;gap:.6rem;flex-wrap:wrap;margin:.6rem 0}
+.pkt-part{flex:1;min-width:7rem;padding:1rem .6rem;border:2px solid var(--primary);border-radius:10px;background:var(--primary-soft);color:var(--primary);font:700 1rem var(--f-head);cursor:pointer}
+.pkt-part[aria-pressed="true"]{background:var(--primary);color:var(--primary-ink)}
+.pkt-info{margin-top:.8rem;min-height:3.2rem}
+.par-fail{color:var(--bad);font-weight:700}
+.par-ok{color:var(--ok);font-weight:700}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div>
+    <h1>Data Transmission</h1>
+    <p>Complete study notes for Cambridge IGCSE Computer Science (0478), syllabus 2026–2028. Every section has worked examples and five self-check questions, and the topic ends with IGCSE-style exam questions.</p>
+    <div class="badges">
+      <span class="badge">2.1 Types and methods of data transmission</span>
+      <span class="badge">2.2 Methods of error detection</span>
+      <span class="badge">2.3 Encryption</span>
+    </div>
+  </div>
+  <div class="reg-card">
+    <div class="reg" id="hero-reg" role="group" aria-label="7 data bits"></div>
+    <div class="reg-out">
+      <div><small>Parity bit (P)</small><b id="hero-p">0</b></div>
+      <div><small>1s in data</small><b id="hero-count">0</b></div>
+    </div>
+    <p class="reg-sum">Full byte (P b7…b1): <b id="hero-byte" style="font-family:var(--f-mono)"></b> — total 1s: <b id="hero-total"></b></p>
+    <div class="reg-tools">
+      <button class="btn solid" type="button" id="hero-even" aria-pressed="true">Even parity</button>
+      <button class="btn" type="button" id="hero-odd" aria-pressed="false">Odd parity</button>
+    </div>
+    <p class="cap">Click a data bit to flip it. The parity bit is set so the total number of 1s matches the chosen parity.</p>
+  </div>
+</header>
+<div class="wrap">
+<nav aria-label="Contents">
+<details class="toc" id="toc">
+  <summary>Contents</summary>
+  <h5>2.1 Types and methods of data transmission</h5><ol><li><a href="#n1">1. The structure of a data packet</a></li><li><a href="#n2">2. Packet switching</a></li><li><a href="#n3">3. Serial and parallel data transmission</a></li><li><a href="#n4">4. Simplex, half-duplex and full-duplex transmission</a></li><li><a href="#n5">5. Choosing a suitable transmission method</a></li><li><a href="#n6">6. The universal serial bus (USB) interface</a></li></ol>
+<h5>2.2 Methods of error detection</h5><ol><li><a href="#e1">1. Why errors occur, and the need for error detection</a></li><li><a href="#e2">2. Parity check</a></li><li><a href="#e3">3. Checksum</a></li><li><a href="#e4">4. Echo check</a></li><li><a href="#e5">5. Automatic repeat request (ARQ)</a></li><li><a href="#e6">6. Check digit</a></li></ol>
+<h5>2.3 Encryption</h5><ol><li><a href="#c1">1. Why data is encrypted: plaintext, key and ciphertext</a></li><li><a href="#c2">2. Symmetric encryption</a></li><li><a href="#c3">3. Asymmetric encryption</a></li></ol><h5>End of topic</h5><ol><li><a href="#summary">Summary to memorise</a></li><li><a href="#exam">IGCSE-style questions</a></li></ol>
+  <div class="tools"><button class="btn" type="button" id="toggle-all">Show all answers</button></div>
+</details>
+</nav>
+<main>
+<section class="topic" id="intro">
+  <h2>How to use these notes</h2>
+  <ol><li>Read one section at a time. Work through every example on paper before you look at the steps.</li><li>Every section ends with a <b>Check yourself</b> box of five questions. Answer them in your notebook first, then check the answers.</li><li>When you finish the whole topic, do the <b>IGCSE-style questions</b> at the end without looking at your notes. Time yourself: allow about one minute per mark.</li><li>If you lost many marks on a section, revise it and redo its questions.</li></ol>
+<div class="scroll"><table class="t"><tr><th>Syllabus section</th><th>What you will learn</th></tr><tr><td><b>2.1</b> Types and methods of data transmission</td><td>Data packets and their structure, packet switching, serial/parallel transmission, simplex/half-duplex/full-duplex, choosing a method, the USB interface</td></tr><tr><td><b>2.2</b> Methods of error detection</td><td>Why transmission errors happen, parity check (byte and block), checksum, echo check, automatic repeat request (ARQ), check digit</td></tr><tr><td><b>2.3</b> Encryption</td><td>Why data is encrypted, plaintext/ciphertext/key, symmetric encryption, asymmetric encryption</td></tr></table></div>
+<div class="callout tip"><strong>Command words matter</strong><p>Cambridge marks reward exact, named points, not general impressions. “USB is easy to use” earns nothing on its own — “the device is automatically detected and the correct driver is loaded, so no technical knowledge is needed” earns marks. Learn the named terms in the <b>Remember</b> boxes and use them in your answers.</p></div>
+</section>
+<section class="topic" id="t21"><h2>2.1 Types and methods of data transmission</h2><p class="topic-lead">Data packets and how they are structured and switched across a network, serial vs parallel, simplex/half-duplex/full-duplex, choosing a method, and the USB interface.</p>
+<section class="part" id="n1"><h3>1. The structure of a data packet</h3><span class="obj">Syllabus objectives 1(a) and 1(b)</span><p>A file can be very large. If a whole file were sent across a network as one single block, it would tie up the connection for a long time, and a single fault anywhere in it would ruin the whole transmission. Instead, before it is transmitted, a file is <b>broken down into packets</b>: small, separate units of data that are sent one at a time and reassembled at the other end.</p>
+<p>Breaking data into packets also lets many devices share the same network fairly, and if one packet is damaged or lost, only that small packet has to be sent again, not the whole file.</p>
+<h4 class="sub">The three parts of a packet</h4>
+<p>Every packet has exactly three parts, always in this order: a <b>header</b>, a <b>payload</b>, and a <b>trailer</b>.</p>
+<div class="scroll"><table class="t"><tr><th>Part</th><th>What it contains</th><th>Why it is needed</th></tr><tr><td><b>Header</b></td><td>The <b>destination address</b>, the <b>packet number</b>, and the <b>originator’s address</b></td><td>Tells the network where the packet is going, lets the packets be put back in order, and lets the receiver ask for a resend</td></tr><tr><td><b>Payload</b></td><td>The actual data being sent</td><td>This is the whole point of the packet: a small slice of the file or message</td></tr><tr><td><b>Trailer</b></td><td>A marker for the end of the packet, and the data used by an error-detection method (such as a checksum)</td><td>Lets the receiver know the packet has ended, and lets it check whether the payload arrived correctly</td></tr></table></div>
+<h4 class="sub">What is in the header, in detail</h4>
+<ul><li><b>Destination address</b> — usually an IP address. It is the address of the device the packet is being sent to; without it, the network would not know where to deliver the packet.</li><li><b>Packet number</b> — identifies this packet’s position in the file. Packets do not always arrive in the order they were sent (you will see why in Section 2), so the receiving device uses the packet number to put them back in the correct order.</li><li><b>Originator’s address</b> — the address of the device the packet was sent from. It is not essential for delivery, but it lets the receiver (or the network) trace where a packet came from, and lets it ask that device to resend a packet if one is missing or damaged.</li></ul>
+<div class="callout rule"><strong>Remember</strong><p>Packet = header + payload + trailer. The header holds exactly three things: <b>destination address, packet number, originator’s address</b>. Cambridge awards marks for these named items — “sender’s name” or “file name” will not earn the mark.</p></div>
+<div class="tool" id="tool-packet">
+    <h4>Try it: open up a packet</h4>
+    <p class="cap" style="margin-top:0">Click each part of the packet to see what it contains.</p>
+    <div class="pkt" id="pkt-diagram" role="group" aria-label="Packet structure">
+      <button type="button" class="pkt-part" data-part="header">Header</button>
+      <button type="button" class="pkt-part" data-part="payload">Payload</button>
+      <button type="button" class="pkt-part" data-part="trailer">Trailer</button>
+    </div>
+    <div id="pkt-info" class="pkt-info"></div>
+  </div>
+<div class="eg"><div class="eg-t">Example: one packet of a photo upload</div><p>A phone is uploading a photo to a cloud storage service. The photo has been split into 40 packets. Packet number 17 of that upload might contain:</p><div class="scroll"><table class="t"><tr><th>Section</th><th>Contents in this packet</th></tr><tr><td>Header</td><td>Destination address: the address of the cloud server · Packet number: 17 · Originator’s address: the address of the phone</td></tr><tr><td>Payload</td><td>The 17th slice of the photo’s image data</td></tr><tr><td>Trailer</td><td>An end-of-packet marker, plus a checksum value used to check this packet for errors</td></tr></table></div></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>Name the three sections of a data packet, in order.<details><summary>Answer</summary><div class="ans">Header, payload, trailer.</div></details></li><li>State the three items of information contained in the header.<details><summary>Answer</summary><div class="ans">The destination address, the packet number, and the originator’s address.</div></details></li><li>Which section of the packet contains the actual data being sent?<details><summary>Answer</summary><div class="ans">The payload.</div></details></li><li>Give two reasons why data is broken down into packets before it is transmitted.<details><summary>Answer</summary><div class="ans">Any two: a whole large file would take too long / be impractical to send as one block; packets let many devices share the network; if a packet is lost or damaged, only that packet needs to be resent rather than the whole file.</div></details></li><li>Why is the packet number needed if the originator’s address is already known?<details><summary>Answer</summary><div class="ans">The packet number is used to put the packets back into the correct order when they arrive, since they may not arrive in the order they were sent; the originator’s address is only used to say where a packet came from, not what order it belongs in.</div></details></li></ol></div></section>
+<section class="part" id="n2"><h3>2. Packet switching</h3><span class="obj">Syllabus objective 1(c)</span><p><b>Packet switching</b> is the process of sending packets of data across a network from one device to another. Each packet is transmitted separately, and different packets belonging to the same file can travel by completely different paths.</p>
+<h4 class="sub">How it works, step by step</h4>
+<ol><li>The data is broken down into packets, each with a header, payload and trailer.</li><li>Each packet is sent onto the network on its own. There may be several possible pathways between the sender and the receiver, and <b>each packet could take a different route</b>.</li><li>A <b>router</b> is the device that controls which pathway a packet takes. At each router the packet reaches, the router looks at the destination address in the header and passes the packet on towards the next router on a suitable path.</li><li>Because different packets can take different routes, some paths are longer or busier than others, so the <b>packets may arrive out of order</b>.</li><li>Once the <b>last packet has arrived</b>, the receiving device uses the packet numbers in the headers to <b>reorder</b> the packets and rebuild the original file.</li><li>If a packet does not arrive, or arrives damaged, the receiving device can use the originator’s address to ask for that one packet to be resent.</li></ol>
+<div class="callout rule"><strong>Remember</strong><p>The order matters in an exam answer: split into packets → routers direct each packet, possibly by a different route → packets may arrive out of order → once the last packet arrives, they are reordered using the packet numbers. Leaving out the reordering step is a common way to lose a mark.</p></div>
+<h4 class="sub">Advantages and disadvantages of packet switching</h4>
+<div class="scroll"><table class="t"><tr><th>Advantages</th><th>Disadvantages</th></tr><tr><td>Packets can avoid busy or broken routes, so the network is used efficiently and data can still get through if part of the network fails</td><td>Packets may arrive out of order, so time and processing is needed to reorder them</td></tr><tr><td>Many devices can share the same network at the same time, since no single dedicated pathway is reserved for one file</td><td>A delayed or lost packet has to be requested again, which slows down the overall transmission</td></tr><tr><td>If a packet is lost or corrupted, only that packet has to be resent, not the whole file</td><td>Each packet carries extra data (the header and trailer), which adds to the total amount of data transmitted</td></tr></table></div>
+<div class="eg"><div class="eg-t">Example: a five-packet journey</div><p>A file is split into 5 packets and sent from a laptop to a server. Because of network conditions, packets 1, 3 and 4 travel through router A, while packets 2 and 5 are sent through router B, which is less busy at that moment. Packet 3 arrives first, then 1, then 5, then 4, and packet 2 is delayed and arrives last.</p><p>Even though the packets arrived in the order 3, 1, 5, 4, 2, the server does not use them in that order. It waits until packet 2 (the last one) has arrived, then reorders all 5 packets into 1, 2, 3, 4, 5 using the packet numbers stored in each header, and rebuilds the original file.</p></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>What is packet switching?<details><summary>Answer</summary><div class="ans">The process of transmitting packets of data separately across a network, where each packet may take a different route to reach the destination.</div></details></li><li>What is the job of a router in packet switching?<details><summary>Answer</summary><div class="ans">It controls which route/pathway a packet takes across the network, directing it towards its destination address.</div></details></li><li>Why might packets arrive at their destination out of order?<details><summary>Answer</summary><div class="ans">Because different packets can be sent along different routes, and some routes take longer than others (for example, because they are busier).</div></details></li><li>How does the receiving device put the packets back into the correct order?<details><summary>Answer</summary><div class="ans">It uses the packet number stored in each packet’s header, once the last packet has arrived.</div></details></li><li>Give one advantage and one disadvantage of packet switching.<details><summary>Answer</summary><div class="ans">Any one advantage (e.g. packets can avoid busy or broken routes / only a lost packet needs resending / many devices can share the network) and any one disadvantage (e.g. packets may arrive out of order and need reordering / a lost packet must be requested again, causing delay / extra header and trailer data increases the amount transmitted).</div></details></li></ol></div></section>
+<section class="part" id="n3"><h3>3. Serial and parallel data transmission</h3><span class="obj">Syllabus objectives 2(a) and 2(b)</span><p>Serial and parallel transmission are about <b>how many wires</b> are used and <b>how many bits</b> are sent at a time.</p>
+<h4 class="sub">Serial transmission</h4>
+<p>In <b>serial transmission</b>, data is sent <b>one bit at a time</b>, one after another, down a <b>single wire</b>.</p>
+<div class="scroll"><table class="t"><tr><th>Advantages</th><th>Disadvantages</th></tr><tr><td>Bits arrive in the order they were sent, so there is very little chance the data becomes jumbled (skewed)</td><td>Slower than parallel transmission, because only one bit moves at a time</td></tr><tr><td>Only one wire is needed, so the cable is cheaper to make and to buy</td><td>Extra bits (a start bit and a stop bit) may need to be sent to mark when the transmission of each unit begins and ends</td></tr><tr><td>Only one wire carries the signal, so there is less chance of interference between wires and therefore less chance of an error</td><td></td></tr></table></div>
+<p>Because it is reliable over longer distances, serial transmission is normally used to send data between separate devices, for example between a computer and a printer, or across a network.</p>
+<h4 class="sub">Parallel transmission</h4>
+<p>In <b>parallel transmission</b>, <b>multiple bits are sent at the same time</b>, each down its own wire — for example, a whole byte can be sent in one step using eight wires.</p>
+<div class="scroll"><table class="t"><tr><th>Advantages</th><th>Disadvantages</th></tr><tr><td>Much faster than serial transmission, since many bits move at once</td><td>Bits can arrive at very slightly different times over a longer wire, so the byte can become jumbled — this is called <b>skew</b></td></tr><tr><td>Many computers move data this way internally (for example, between the processor and memory), so no conversion to serial is needed for that short journey</td><td>Multiple wires running next to each other are more likely to interfere with one another, increasing the chance of an error</td></tr><tr><td></td><td>More wires means a more expensive cable to manufacture and to buy</td></tr></table></div>
+<p>Because of skew and interference, parallel transmission is only reliable over very short distances — typically no more than about 5 metres — such as inside a computer.</p>
+<div class="callout rule"><strong>Remember</strong><p>Serial = one bit at a time, one wire, reliable over long distances. Parallel = many bits at a time, many wires, faster but only safe over short distances because of skew and interference.</p></div>
+<div class="eg"><div class="eg-t">Example: choosing between serial and parallel</div><p>A printing company connects a design computer to a large printer 3 metres away, and needs to print many leaflets quickly.</p><p>A parallel connection would be fast enough over this short distance, but it does carry a higher risk of skew and interference than a serial connection, and the cable is more expensive because of the extra wires. A serial connection would be more reliable but slower. In practice, an interface such as USB (Section 6) is often chosen here because it uses serial transmission at a high speed, giving good reliability without the cost and interference risk of a parallel cable.</p></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>How many bits are transmitted at a time in serial transmission, and how many wires does it use?<details><summary>Answer</summary><div class="ans">One bit at a time, using a single wire.</div></details></li><li>How many bits are transmitted at a time in parallel transmission?<details><summary>Answer</summary><div class="ans">Multiple bits at the same time, each down its own wire.</div></details></li><li>What is meant by “skew”?<details><summary>Answer</summary><div class="ans">When bits sent at the same time (in parallel) arrive at slightly different times, so the data becomes jumbled/out of step.</div></details></li><li>Give two advantages of serial transmission over parallel transmission.<details><summary>Answer</summary><div class="ans">Any two: less chance of the data being skewed; less chance of interference/errors; only one wire needed, so cheaper to manufacture and buy.</div></details></li><li>A company transmits data between two devices 200 metres apart. Suggest, with a reason, whether serial or parallel transmission should be used.<details><summary>Answer</summary><div class="ans">Serial, because parallel transmission is only reliable over short distances (around 5 metres) due to skew and interference, while serial transmission remains reliable over long distances.</div></details></li></ol></div></section>
+<section class="part" id="n4"><h3>4. Simplex, half-duplex and full-duplex transmission</h3><span class="obj">Syllabus objectives 2(a) and 2(b)</span><p>While serial and parallel describe <b>how many bits</b> move at once, simplex, half-duplex and full-duplex describe <b>which direction(s)</b> data can travel between two devices.</p>
+<div class="scroll"><table class="t"><tr><th>Method</th><th>Direction of data</th><th>Example</th><th>Advantage</th><th>Disadvantage</th></tr><tr><td><b>Simplex</b></td><td>One direction only</td><td>A keyboard sending key presses to a computer</td><td>Simple and cheap: only one direction of hardware is needed</td><td>The receiving device can never send anything back</td></tr><tr><td><b>Half-duplex</b></td><td>Both directions, but only one direction at a time</td><td>A pair of two-way radios (walkie-talkies)</td><td>Both devices can send, using only one shared channel/wire</td><td>Devices must take turns, so it is slower than full-duplex</td></tr><tr><td><b>Full-duplex</b></td><td>Both directions at the same time</td><td>A telephone call</td><td>Fastest form of two-way communication: no waiting for a turn</td><td>Needs more complex, more expensive hardware</td></tr></table></div>
+<p>A keyboard only ever needs to send data to the computer, not receive it, so a simplex connection is used. A telephone call needs both people to be able to speak and listen at the same time, so full-duplex is needed. Two-way radios can send in both directions, but only one person can transmit at any one moment, so half-duplex is used.</p>
+<div class="callout rule"><strong>Remember</strong><p>Ask two questions about a scenario. Does data ever need to travel back the other way? No → simplex. Yes → does it need to travel both ways at the exact same time? No, one direction at a time → half-duplex. Yes → full-duplex.</p></div>
+<p>A connection always uses one option from each pair at once: for example, a connection can be a serial simplex connection, a parallel full-duplex connection, or a serial half-duplex connection. A full answer about a scenario should name one choice from each pair, with a reason linked to the scenario for each.</p>
+<div class="eg"><div class="eg-t">Example: a business and a file server</div><p>A business manager transmits customer data to a central file server 100 metres away. The manager needs to send and receive data to and from the server at the same time, and the accuracy of the data is very important.</p><p>The 100-metre distance rules out parallel transmission (too much skew and interference), so <b>serial</b> transmission should be used. Because data must travel in both directions at the same time, <b>full-duplex</b> transmission should be used.</p></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>What is the difference between half-duplex and full-duplex transmission?<details><summary>Answer</summary><div class="ans">In half-duplex, data travels in both directions but only one direction at a time; in full-duplex, data travels in both directions at the same time.</div></details></li><li>Give an example of a device connection that would use simplex transmission.<details><summary>Answer</summary><div class="ans">Any suitable example, such as a keyboard sending key presses to a computer, or a sensor sending readings to a computer, where data only ever needs to travel one way.</div></details></li><li>State one advantage of simplex transmission.<details><summary>Answer</summary><div class="ans">It is simple and cheap, since hardware is only needed for one direction of data flow.</div></details></li><li>State one disadvantage of half-duplex transmission compared with full-duplex.<details><summary>Answer</summary><div class="ans">Devices must take turns to send data (only one direction at a time), so it is slower than full-duplex.</div></details></li><li>A weather station sensor only ever sends temperature readings to a display; the display never sends data back. Which method of direction of transmission is most suitable, and why?<details><summary>Answer</summary><div class="ans">Simplex, because data only ever needs to travel in one direction, from the sensor to the display, and the display never needs to send anything back.</div></details></li></ol></div></section>
+<section class="part" id="n5"><h3>5. Choosing a suitable transmission method</h3><span class="obj">Syllabus objective 2(b)</span><p>Every connection between two devices actually needs <b>two separate decisions</b>: how many bits travel at a time (serial or parallel), and which direction(s) data can travel (simplex, half-duplex or full-duplex). Exam questions often describe a scenario and ask you to choose and justify one or both of these.</p>
+<h4 class="sub">Three questions to ask about any scenario</h4>
+<ul><li><b>How far apart are the devices?</b> A short distance, such as inside a single device, makes parallel transmission safe. Anything longer favours serial transmission.</li><li><b>Does data ever need to travel back the other way?</b> If not, simplex is enough. If it does, some form of duplex is needed.</li><li><b>Does data need to travel both ways at the same moment?</b> If yes, full-duplex is needed. If the two directions can take turns, half-duplex is enough and is cheaper.</li></ul>
+<div class="callout rule"><strong>Remember</strong><p>Distance decides serial vs parallel. Direction decides simplex vs half-duplex vs full-duplex. A complete answer names one choice from each pair and gives a reason for each, using details from the scenario.</p></div>
+<div class="callout warn"><strong>Common mistakes</strong><p>Giving a method with no reason (“Serial” alone earns nothing without a linked justification). Choosing parallel for anything outside a single device or a very short cable. Choosing full-duplex just because data flows both ways, without checking whether it needs to happen at the same time.</p></div>
+<div class="eg"><div class="eg-t">Worked example</div><p>A ticket kiosk at a ferry terminal is connected to a ticket printer by a cable. The kiosk sends ticket data to the printer, and the printer sends status messages back to the kiosk, but never at the exact same moment.</p><p><b>Step 1 — distance:</b> the kiosk and printer are separate devices connected by a cable, so this is a longer distance than “inside one device” → <b>serial</b> transmission avoids skew and interference over this distance.</p><p><b>Step 2 — direction:</b> data needs to travel both ways (ticket data one way, status messages the other), so simplex is ruled out. Since the question says this never happens at the same moment → <b>half-duplex</b> transmission is suitable.</p><p><b>Full answer:</b> Serial, half-duplex transmission. Serial is used because the distance between the kiosk and the printer would cause skew and interference with a parallel connection. Half-duplex is used because data must travel in both directions, but never at the same time.</p></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>What two separate choices need to be made for any data transmission connection?<details><summary>Answer</summary><div class="ans">How many bits are sent at a time (serial or parallel), and which direction(s) data can travel (simplex, half-duplex or full-duplex).</div></details></li><li>Which factor mainly decides whether serial or parallel transmission should be used?<details><summary>Answer</summary><div class="ans">The distance between the two devices (parallel is only suitable over very short distances).</div></details></li><li>A sensor sends data to a controller over a long wire and never receives any data back. State a suitable method for the number of bits transmitted at a time, and a suitable direction of transmission.<details><summary>Answer</summary><div class="ans">Serial (long distance rules out parallel), simplex (data only ever travels one way).</div></details></li><li>Data moves between the processor and memory inside a computer, in both directions, at the same time. Suggest suitable methods, with reasons.<details><summary>Answer</summary><div class="ans">Parallel, because the distance is very short so skew and interference are not a problem, and it is faster; full-duplex, because data must travel in both directions at the same time.</div></details></li><li>Why does a full scenario answer need to name a method AND a reason for each of the two choices?<details><summary>Answer</summary><div class="ans">Because a method on its own could be correct by chance; the reason, linked to details in the scenario such as distance or the direction data needs to flow, is what shows understanding and earns the marks.</div></details></li></ol></div></section>
+<section class="part" id="n6"><h3>6. The universal serial bus (USB) interface</h3><span class="obj">Syllabus objective 3</span><p>The <b>universal serial bus (USB)</b> is a widely used standard interface for connecting devices, such as keyboards, mice, printers, cameras, phones and flash drives, to a computer. As its name says, USB uses <b>serial transmission</b>: data travels one bit at a time.</p>
+<h4 class="sub">How USB transmits data</h4>
+<ul><li>The device is plugged into a USB port, and the computer automatically <b>detects</b> the device.</li><li>The computer identifies the type of device and loads the correct <b>device driver</b>, so that the computer and the device can communicate. If a suitable driver is not already available, the user may be asked to install one.</li><li>Data is then transmitted <b>serially</b> between the device and the computer.</li><li>The USB cable can also supply <b>power</b> to the device, so a small device does not always need its own separate power supply.</li></ul>
+<h4 class="sub">Benefits and drawbacks of the USB interface</h4>
+<div class="scroll"><table class="t"><tr><th>Benefits</th><th>Drawbacks</th></tr><tr><td>The connector only fits one way, so it is difficult to connect a device incorrectly</td><td>A USB cable only works reliably over a limited length (commonly around 5 metres); the signal weakens over longer distances</td></tr><tr><td>The device is detected automatically and its driver is loaded automatically, so little technical knowledge is needed to use it</td><td>The transmission speed is limited by the USB standard being used; older standards (such as USB 1 or 2) are much slower than newer ones</td></tr><tr><td>USB is a universal, widely supported standard, so a USB port is included on many different kinds of device</td><td>Older USB ports and cables may not support the fastest speeds of newer devices, so the connection may run slower than the device is capable of</td></tr><tr><td>The cable can also supply power to the connected device, so some devices need no separate power source</td><td></td></tr></table></div>
+<div class="eg"><div class="eg-t">Example: a flash drive</div><p>A student plugs a flash drive into their laptop. The laptop automatically detects the flash drive and loads the correct driver, so files can immediately be copied to it. Because USB is a universal standard, the same flash drive will also work when plugged into almost any other computer, and because the transmission is serial, it remains reliable even though the cable is a few metres long.</p></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>What type of data transmission does the USB interface use?<details><summary>Answer</summary><div class="ans">Serial transmission.</div></details></li><li>Describe what happens when a USB device is first connected to a computer.<details><summary>Answer</summary><div class="ans">The computer automatically detects the device, and the correct device driver is loaded (automatically, or the user is asked to install one) so the two can communicate.</div></details></li><li>Give two benefits of using the USB interface.<details><summary>Answer</summary><div class="ans">Any two: automatic detection and automatic driver loading (little technical knowledge needed); the connector only fits one way, so it is hard to connect incorrectly; it is a universal standard supported by many devices; it can supply power to the connected device.</div></details></li><li>Give two drawbacks of using the USB interface.<details><summary>Answer</summary><div class="ans">Any two: the cable only works reliably over a limited length; transmission speed is limited by the USB standard being used; an older port or cable may not support a newer, faster device at full speed.</div></details></li><li>Why is a USB connection able to transmit data reliably even though it is serial, which is normally slower than parallel?<details><summary>Answer</summary><div class="ans">USB is a special, high-speed form of serial transmission, designed to transmit data quickly while keeping the reliability advantages of serial transmission (no skew, less interference).</div></details></li></ol></div></section>
+</section>
+<section class="topic" id="t22"><h2>2.2 Methods of error detection</h2><p class="topic-lead">Why transmission errors happen, and five ways to detect them: parity check, checksum, echo check, ARQ, and check digit.</p>
+<section class="part" id="e1"><h3>1. Why errors occur, and the need for error detection</h3><span class="obj">Syllabus objective 1</span><p>Transmitting data from one device to another is not always a perfect process. As data travels along a wire, through a cable, or over a wireless signal, <b>interference</b> (electrical noise from nearby devices and cables) can disturb it. This can cause:</p>
+<ul><li><b>Data loss</b> — a bit that was sent does not arrive; it is simply lost.</li><li><b>Data gain</b> — an extra bit appears in the received data that was never sent.</li><li><b>Data change</b> — a bit arrives with the wrong value: a 1 becomes a 0, or a 0 becomes a 1.</li></ul>
+<p>These errors matter. If a password, an address, or a payment amount is not transmitted correctly, the consequences can be serious: a person may not be able to log in, a message may go to the wrong place, or a transaction may be wrong. Because of this, systems need a reliable way to <b>check for errors after data has been transmitted</b>, so that corrupted data can be identified and, where possible, corrected by requesting it again.</p>
+<div class="callout rule"><strong>Remember</strong><p>Interference is the general cause of transmission errors, and it can lead to three effects: data loss, data gain, and data change. Error detection methods check whether the data that arrived matches the data that was sent.</p></div>
+<h4 class="sub">An overview of the error detection methods</h4>
+<p>Cambridge 0478 requires five error detection methods. Four of them check for errors that occurred <b>during transmission</b>; one of them (the check digit) checks for errors made when data is <b>entered or scanned</b>.</p>
+<div class="scroll"><table class="t"><tr><th>Method</th><th>What it checks for</th><th>When it is used</th></tr><tr><td>Parity check</td><td>Transmission errors</td><td>After transmission</td></tr><tr><td>Checksum</td><td>Transmission errors</td><td>After transmission</td></tr><tr><td>Echo check</td><td>Transmission errors</td><td>After transmission</td></tr><tr><td>Automatic repeat request (ARQ)</td><td>Transmission errors, and triggers a resend</td><td>After transmission</td></tr><tr><td>Check digit</td><td><b>Data entry</b> errors (typing or scanning)</td><td>When data is entered</td></tr></table></div>
+<div class="callout tip"><strong>Exam tip</strong><p>If a question specifically asks for a method used to check data <b>after transmission</b>, a check digit is not a valid answer, because it checks data entry, not transmission.</p></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>What is the general cause of errors in data transmission?<details><summary>Answer</summary><div class="ans">Interference (electrical noise) affecting the wire, cable or wireless signal used to transmit the data.</div></details></li><li>Name the three effects interference can have on transmitted data.<details><summary>Answer</summary><div class="ans">Data loss, data gain, and data change.</div></details></li><li>Why is it important to check for errors after data has been transmitted?<details><summary>Answer</summary><div class="ans">Because incorrect data (such as a password, address or payment amount) can cause serious problems, so systems need to detect when data has been corrupted and, if possible, have it resent.</div></details></li><li>Name the five error detection methods required for this syllabus.<details><summary>Answer</summary><div class="ans">Parity check, checksum, echo check, automatic repeat request (ARQ), and check digit.</div></details></li><li>Which of the five error detection methods checks for errors in data entry rather than data transmission?<details><summary>Answer</summary><div class="ans">The check digit.</div></details></li></ol></div></section>
+<section class="part" id="e2"><h3>2. Parity check</h3><span class="obj">Syllabus objective 2</span><p>A <b>parity check</b> detects errors by counting the number of 1s in a byte of data. Before data is transmitted, an extra bit called the <b>parity bit</b> is added to each byte. It is set so that the total number of 1s in the byte (data bits plus the parity bit) is either always odd (<b>odd parity</b>) or always even (<b>even parity</b>), whichever has been agreed before transmission.</p>
+<div class="scroll"><table class="bits"><tr><th>Position</th><th>7</th><th>6</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>0</th></tr><tr><td class="pv">Place value</td><td class="pv">P</td><td class="pv">b7</td><td class="pv">b6</td><td class="pv">b5</td><td class="pv">b4</td><td class="pv">b3</td><td class="pv">b2</td><td class="pv">b1</td></tr></table></div>
+<h4 class="sub">How a parity check works, step by step</h4>
+<ol><li>Before transmission, the sender and receiver agree whether <b>odd</b> or <b>even</b> parity will be used.</li><li>For each byte, the sender counts the number of 1s in the 7 data bits.</li><li>The sender sets the parity bit so that the total number of 1s (data bits plus parity bit) matches the agreed parity.</li><li>The full byte (7 data bits plus the parity bit) is transmitted.</li><li>After transmission, the receiver counts the number of 1s in all 8 received bits.</li><li>If the total matches the agreed parity, no error is detected. If it does not match, an error has been detected.</li></ol>
+<div class="callout rule"><strong>Remember</strong><p><b>Even parity</b>: the parity bit is set so the total number of 1s in the byte is even. <b>Odd parity</b>: the parity bit is set so the total number of 1s in the byte is odd.</p></div>
+<div class="eg"><div class="eg-t">Worked example: setting and checking a parity bit</div><p>The 7 data bits <code>1 0 1 1 0 1 0</code> are to be sent using <b>even parity</b>.</p><p><b>Step 1 — count the 1s:</b> 1, 0, 1, 1, 0, 1, 0 → there are 4 ones.</p><p><b>Step 2 — set the parity bit:</b> 4 is already even, so the parity bit is set to <b>0</b> to keep the total even.</p><pre class="calc">P  b7 b6 b5 b4 b3 b2 b1
+0  1  0  1  1  0  1  0     total 1s = 4 (even) ✓</pre><p><b>Step 3 — the receiver checks:</b> after transmission, the receiver counts the 1s in all 8 bits it received. If the total is even, no error is detected. If the total is odd, an error has occurred.</p></div>
+<div class="tool" id="tool-parity">
+    <h4>Try it: build a byte and break it</h4>
+    <p class="cap" style="margin-top:0">Click the 7 data bits to set them. The parity bit (P) is calculated for you. Then flip one bit, or two, to see what the receiver notices.</p>
+    <div class="reg" id="par-reg" role="group" aria-label="Byte with parity bit"></div>
+    <div class="reg-tools" role="radiogroup" aria-label="Parity type">
+      <button class="btn solid" type="button" id="par-even" aria-pressed="true">Even parity</button>
+      <button class="btn" type="button" id="par-odd" aria-pressed="false">Odd parity</button>
+    </div>
+    <p class="reg-sum" id="par-sum"></p>
+    <div class="reg-tools">
+      <button class="btn" type="button" id="par-flip1">Flip a random bit (transmission)</button>
+      <button class="btn" type="button" id="par-flip2">Flip two random bits</button>
+      <button class="btn" type="button" id="par-reset">Reset</button>
+    </div>
+    <p class="cap" id="par-result" style="margin-bottom:0"></p>
+  </div>
+<div class="callout warn"><strong>A limitation of the parity check</strong><p>A parity check only detects an <b>odd number of changed bits</b> (1, 3, 5…). If exactly two bits in the same byte are flipped during transmission, the total count of 1s returns to what it should be, and the error is missed completely.</p></div>
+<h4 class="sub">Parity byte and parity block check</h4>
+<p>A single parity bit can only tell you that an error occurred somewhere in one byte, not which bit. When a whole <b>block</b> of many bytes is sent together, a <b>parity block check</b> is used, which can pinpoint the exact bit that changed.</p>
+<ul><li>Each byte in the block already has its own parity bit, calculated as above. This is a check <b>along each row</b>.</li><li>After all the bytes, an extra byte called the <b>parity byte</b> is calculated and sent. Each bit of the parity byte is the parity bit for one <b>column</b>: look down that bit position through every byte in the block, and set the parity byte’s bit for that position so the column also matches the agreed parity.</li><li>This gives a check along each <b>column</b> as well as along each row.</li></ul>
+<div class="eg"><div class="eg-t">Worked example: parity block check (even parity)</div><p>A block of 4 bytes is to be transmitted using even parity.</p><pre class="calc">Byte     b7 b6 b5 b4 b3 b2 b1   1s in data   Parity bit (P)
+Byte 1   1  1  0  0  1  0  1     4            0
+Byte 2   0  1  1  0  1  0  0     3            1
+Byte 3   1  0  0  1  1  1  0     4            0
+Byte 4   0  0  1  1  0  1  1     4            0</pre><p>Each row parity bit is set so that row’s total number of 1s (including P) is even — for example, Byte 2 has 3 ones in its data bits, so P = 1 to make the row total 4.</p><p><b>Now find the parity byte</b>, one column at a time. Look down each column (including the P column) across all 4 bytes and count the 1s:</p><pre class="calc">Column        P   b7  b6  b5  b4  b3  b2  b1
+Byte 1        0   1   1   0   0   1   0   1
+Byte 2        1   0   1   1   0   1   0   0
+Byte 3        0   1   0   0   1   1   1   0
+Byte 4        0   0   0   1   1   0   1   1
+Column total  1   2   2   2   2   3   2   2
+
+Parity byte:  1   0   0   0   0   1   0   0</pre><p>Every column already has an even total except the P column (1 one) and the b3 column (3 ones), so the parity byte has a 1 in those two positions and 0 everywhere else: <b>parity byte = 1 0 0 0 0 1 0 0</b>.</p><p><b>If a single bit is corrupted during transmission</b> — say, bit b5 of Byte 3 flips from 0 to 1 — Byte 3’s own row will no longer match even parity, and the b5 column will no longer match the parity byte either. The row and the column that both fail cross at exactly the bit that changed, so the receiver can identify, and in this case correct, that one bit.</p></div>
+<div class="callout tip"><strong>Exam tip</strong><p>Describe a parity block check as two checks working together: a <b>row</b> check (each byte’s own parity bit) and a <b>column</b> check (the parity byte). A single-bit error makes exactly one row and one column fail, and where they cross is the corrupted bit.</p></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>What is a parity bit?<details><summary>Answer</summary><div class="ans">An extra bit added to a byte of data, set so that the total number of 1s in the byte matches an agreed odd or even parity.</div></details></li><li>The 7 data bits <code>1 1 0 0 1 0 0</code> are to be sent using odd parity. State the parity bit that should be added.<details><summary>Answer</summary><div class="ans">The data bits contain 3 ones, which is already odd, so the parity bit is set to <b>0</b> to keep the total odd (3).</div></details></li><li>A byte is received as <code>0 1 1 0 0 1 0 0</code> and even parity is being used. Does the receiver detect an error? Explain.<details><summary>Answer</summary><div class="ans">The received byte contains 3 ones, which is odd, not even. Since even parity was agreed, this does not match, so an error is detected.</div></details></li><li>Explain one limitation of a simple parity check.<details><summary>Answer</summary><div class="ans">It can only detect an odd number of changed bits; if exactly two bits in the same byte are flipped, the count of 1s is unchanged and the error is not detected.</div></details></li><li>In a parity block check, what does a single failing row and a single failing column together tell the receiver?<details><summary>Answer</summary><div class="ans">They identify the exact bit that has been corrupted, since the failing row and the failing column cross at that one bit position.</div></details></li></ol></div></section>
+<section class="part" id="e3"><h3>3. Checksum</h3><span class="obj">Syllabus objective 2</span><p>A <b>checksum</b> is a value calculated from a set of data using an algorithm, and is used to check whether that data has changed during transmission.</p>
+<h4 class="sub">How it works, step by step</h4>
+<ol><li>Before transmission, the sender runs the data through an agreed algorithm to calculate a checksum value.</li><li>The checksum value is transmitted <b>along with</b> the data, not instead of it.</li><li>After transmission, the receiver runs the <b>same algorithm</b> on the data it received, producing its own checksum value.</li><li>The receiver <b>compares</b> the checksum value it calculated with the one that was transmitted.</li><li>If the two values <b>match</b>, no error is detected. If they <b>do not match</b>, an error has occurred, and the data can be requested again.</li></ol>
+<div class="callout rule"><strong>Remember</strong><p>A checksum is calculated → transmitted with the data → recalculated by the receiver → compared. Because both sides use the <i>same</i> algorithm, different results can only mean the data itself was different, so it must have changed during transmission.</p></div>
+<div class="callout tip"><strong>Exam tip</strong><p>Do not say the checksum is “added to” the data as though it becomes part of it; say it is <b>transmitted along with</b> the data. Also state clearly that the receiver uses the <b>same algorithm</b> to recalculate the value — this is often a separate marking point.</p></div>
+<div class="eg"><div class="eg-t">Example</div><p>A weather station transmits five sensor readings to a control centre. Before sending, it calculates a checksum from the five values and transmits it along with them. At the control centre, the same calculation is performed on the received readings. If its checksum matches the one that was sent, the readings are accepted as correct; if not, the control centre asks for the readings to be sent again.</p></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>What is a checksum?<details><summary>Answer</summary><div class="ans">A value calculated from a set of data using an algorithm, used to check whether the data has changed during transmission.</div></details></li><li>Describe what happens to the checksum value before the data is transmitted.<details><summary>Answer</summary><div class="ans">It is calculated from the data using an algorithm, and is transmitted along with the data.</div></details></li><li>What does the receiver do with the checksum value after the data has been transmitted?<details><summary>Answer</summary><div class="ans">It recalculates a checksum value from the received data, using the same algorithm, and compares it with the checksum value that was transmitted.</div></details></li><li>Why does a mismatch between the two checksum values show that an error has occurred?<details><summary>Answer</summary><div class="ans">Because both sides use the same algorithm on the data; if the results are different, the data used to calculate them must have been different, meaning it changed during transmission.</div></details></li><li>Name one other error detection method (besides checksum) that can be used to check for errors after transmission.<details><summary>Answer</summary><div class="ans">Any one of: parity check, echo check, automatic repeat request (ARQ).</div></details></li></ol></div></section>
+<section class="part" id="e4"><h3>4. Echo check</h3><span class="obj">Syllabus objective 2</span><p>An <b>echo check</b> detects errors by comparing the data before and after it has made a round trip, rather than by calculating a value.</p>
+<h4 class="sub">How it works, step by step</h4>
+<ol><li>The sending device transmits data to the receiving device.</li><li>The receiving device transmits a <b>copy</b> of the data it received straight back to the sender.</li><li>The sending device <b>compares</b> the data it originally sent with the copy it has received back.</li><li>If the two match, no error has occurred. If they do not match, an error has occurred, and the data can be requested again.</li></ol>
+<pre class="calc">Sender  ───── data ─────────────────►  Receiver
+Sender  ◄──── copy of received data ───  Receiver
+
+Sender compares: data it sent vs copy received back
+Match → no error          Do not match → error detected</pre>
+<div class="callout rule"><strong>Remember</strong><p>Echo check = data sent → a copy sent back → sender compares original with copy. Unlike a parity check or checksum, it uses no calculated value at all, only a direct comparison.</p></div>
+<div class="callout warn"><strong>A limitation of the echo check</strong><p>If the sender and the copy do not match, the sender knows an error occurred somewhere, but not whether it happened on the journey to the receiver or on the copy’s journey back. Either direction of the round trip could be the cause.</p></div>
+<div class="eg"><div class="eg-t">Example</div><p>A student sends a file from their laptop to a school printer. The printer sends a copy of the data it received back to the laptop. The laptop compares the data it originally sent with the copy that has come back from the printer. If they match, the laptop assumes the file was received correctly; if they do not match, an error has occurred somewhere during the round trip, and the laptop sends the file again.</p></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>Describe the three steps of an echo check.<details><summary>Answer</summary><div class="ans">The sender transmits data to the receiver; the receiver sends a copy of the received data back to the sender; the sender compares the original data it sent with the copy it received back.</div></details></li><li>How does the sender know an error has occurred, using an echo check?<details><summary>Answer</summary><div class="ans">If the data it originally sent does not match the copy it receives back, an error has occurred.</div></details></li><li>Does an echo check use a calculated value, such as a checksum? Explain.<details><summary>Answer</summary><div class="ans">No. It works by directly comparing the original data with a copy sent back, with no algorithm or calculation involved.</div></details></li><li>Give one limitation of the echo check.<details><summary>Answer</summary><div class="ans">If the comparison fails, the sender cannot tell whether the error happened on the way to the receiver or on the copy’s way back — only that an error occurred somewhere.</div></details></li><li>An echo check is used between a computer and a scanner. Describe how it detects an error.<details><summary>Answer</summary><div class="ans">The computer sends data to the scanner; the scanner sends a copy of the received data back to the computer; the computer compares the data it sent with the copy received back, and if they do not match, an error has occurred.</div></details></li></ol></div></section>
+<section class="part" id="e5"><h3>5. Automatic repeat request (ARQ)</h3><span class="obj">Syllabus objective 4</span><p>An <b>automatic repeat request (ARQ)</b> is a method used to make sure that data is received without error, by combining acknowledgements with a timer, and automatically resending data when something goes wrong.</p>
+<h4 class="sub">Positive acknowledgement ARQ</h4>
+<ol><li>The sending device transmits a data packet and starts a <b>timer</b>.</li><li>The receiving device checks the packet for errors.</li><li>If the packet is error-free, the receiver sends a <b>positive acknowledgement</b> back to the sender.</li><li>When the sender receives the positive acknowledgement, it resets the timer and sends the next packet.</li><li>If the sender does not receive an acknowledgement before the timer runs out, a <b>timeout</b> occurs, and the sender resends the same packet.</li><li>This continues until a positive acknowledgement is received, or until a set maximum number of attempts has been reached.</li></ol>
+<h4 class="sub">Negative acknowledgement ARQ</h4>
+<ol><li>The sending device transmits a data packet.</li><li>The receiving device checks the packet for errors.</li><li>If the receiver detects an error, it sends a <b>negative acknowledgement</b> back to the sender, and the sender resends that packet.</li><li>If no error is detected, no acknowledgement (or only a brief confirmation) is sent, and the sender still sets a timeout so that it does not wait forever for a negative acknowledgement that will never come.</li></ol>
+<div class="callout rule"><strong>Remember</strong><p>Both versions of ARQ use a <b>timer/timeout</b> and an <b>acknowledgement</b>. The difference is what triggers the resend: with a positive acknowledgement, no message within the timeout means resend; with a negative acknowledgement, receiving that specific message means resend.</p></div>
+<div class="callout tip"><strong>Exam tip</strong><p>A question may combine ARQ with another method, such as a parity check, in one scenario (for example, “describe how this combined system checks for errors”, worth many marks). Cover both parts in order: how the transmission-level check (such as parity) is performed, then how ARQ uses acknowledgements and timeouts to trigger a resend.</p></div>
+<div class="eg"><div class="eg-t">Example: positive acknowledgement ARQ</div><p>A file is sent in five packets using positive acknowledgement ARQ. The sender transmits packet 1 and starts a timer. The receiver checks packet 1, finds no errors, and sends back a positive acknowledgement. The sender receives this before the timer runs out, so it sends packet 2 and restarts the timer. Packet 3 is lost during transmission, so no acknowledgement arrives before the timer ends: a timeout occurs, and the sender resends packet 3. This continues until all five packets have been positively acknowledged.</p></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>What two things does an ARQ system rely on to check that data has arrived correctly?<details><summary>Answer</summary><div class="ans">Acknowledgements (sent back by the receiver) and a timer/timeout.</div></details></li><li>Describe what happens in positive acknowledgement ARQ when the receiver finds no errors in a packet.<details><summary>Answer</summary><div class="ans">The receiver sends a positive acknowledgement back to the sender, which then resets its timer and sends the next packet.</div></details></li><li>What is a timeout, and what happens when one occurs?<details><summary>Answer</summary><div class="ans">A timeout is when the sender’s timer runs out before it receives an acknowledgement; when this happens, the sender resends the data packet.</div></details></li><li>In negative acknowledgement ARQ, what causes the sender to resend a packet?<details><summary>Answer</summary><div class="ans">Receiving a negative acknowledgement from the receiver, which is sent when the receiver detects an error in that packet.</div></details></li><li>A packet is transmitted correctly, but the positive acknowledgement sent back is lost. What is likely to happen, and why?<details><summary>Answer</summary><div class="ans">The sender’s timer runs out without an acknowledgement being received, so a timeout occurs and the sender resends the packet, even though the original copy actually arrived correctly (so the receiver may end up with a duplicate).</div></details></li></ol></div></section>
+<section class="part" id="e6"><h3>6. Check digit</h3><span class="obj">Syllabus objective 3</span><p>A <b>check digit</b> is a single digit calculated from the other digits in a number, and added onto the end of that number. Unlike the other four methods in this topic, a check digit does not check for errors during transmission — it checks for errors made when data is <b>entered</b>, whether typed in by hand or read automatically, for example by a barcode scanner.</p>
+<h4 class="sub">How it works, step by step</h4>
+<ol><li>A check digit is calculated from the other digits of a number (for example, a barcode number or an ISBN), using an agreed algorithm, and is stored as the final digit of that number.</li><li>When the number is entered — typed in, or scanned — the check digit is <b>recalculated</b> from the digits that were entered, using the same algorithm.</li><li>If the recalculated check digit <b>matches</b> the one stored in the number, the data entered is accepted as correct.</li><li>If it <b>does not match</b>, an error has occurred during data entry.</li></ol>
+<div class="callout rule"><strong>Remember</strong><p>Check digit = calculated → added to the number → recalculated at entry → compared. It is easy to confuse a check digit with a checksum, because the process sounds similar. The difference is <b>when the error can happen</b>: a checksum checks for errors during <b>transmission</b>; a check digit checks for errors during <b>data entry</b> (typing or scanning).</p></div>
+<h4 class="sub">Where check digits are used</h4>
+<ul><li><b>International Standard Book Numbers (ISBN)</b> — every published book has a unique ISBN, and its final digit is a check digit calculated from the digits before it, to catch a mistyped or mis-scanned ISBN.</li><li><b>Barcodes</b> — a barcode printed on a product includes a check digit as part of its number. When a checkout scanner reads the barcode, the check digit is recalculated to confirm the barcode was scanned correctly.</li></ul>
+<div class="callout tip"><strong>Exam tip</strong><p>Cambridge does not ask you to actually calculate a real check digit — only to describe the process (calculated, added, recalculated on entry, compared) and to give examples of where check digits are used, such as ISBNs and barcodes.</p></div>
+<div class="eg"><div class="eg-t">Example</div><p>A supermarket checkout scans a product’s barcode. The check digit stored in the barcode was originally calculated from the other digits of the barcode number. When the scanner reads the barcode, it recalculates the check digit from the digits it has just scanned, using the same method. If the recalculated check digit matches the one printed in the barcode, the scan is accepted; if it does not match — perhaps because the barcode was smudged or misread — the till rejects the scan and asks for the product to be scanned again.</p></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>What is a check digit?<details><summary>Answer</summary><div class="ans">A single digit calculated from the other digits in a number and added to the end of it, used to detect errors made when the number is entered.</div></details></li><li>Does a check digit detect errors in transmission or in data entry?<details><summary>Answer</summary><div class="ans">Data entry (typing in a number, or scanning it) — not transmission.</div></details></li><li>Describe what happens when a number with a check digit is entered or scanned.<details><summary>Answer</summary><div class="ans">The check digit is recalculated from the digits that were entered, using the same algorithm that produced the original check digit, and the two are compared.</div></details></li><li>Give two examples of where a check digit is used.<details><summary>Answer</summary><div class="ans">International Standard Book Numbers (ISBNs) and barcodes.</div></details></li><li>Explain the key difference between a check digit and a checksum.<details><summary>Answer</summary><div class="ans">Both are calculated values that are recalculated and compared, but a checksum checks for errors that occur during transmission of data, while a check digit checks for errors made when data is entered (typed or scanned) rather than during transmission.</div></details></li></ol></div></section>
+</section>
+<section class="topic" id="t23"><h2>2.3 Encryption</h2><p class="topic-lead">Why data is encrypted, the plaintext/key/ciphertext model, and symmetric versus asymmetric encryption.</p>
+<section class="part" id="c1"><h3>1. Why data is encrypted: plaintext, key and ciphertext</h3><span class="obj">Syllabus objective 1</span><p>Data that travels across a network passes through cables, routers and wireless signals that are not owned or controlled by the sender or receiver. Anyone with the right equipment along that path could copy the data as it goes past. <b>Encryption</b> is used to protect data from being understood if this happens.</p>
+<div class="callout rule"><strong>What encryption does and does not do</strong><p>Encryption does <b>not</b> stop data being intercepted — an eavesdropper can still capture it. What encryption does is make any intercepted data <b>meaningless</b>: without the correct key, it cannot be understood or used.</p></div>
+<h4 class="sub">Plaintext, key and ciphertext</h4>
+<ul><li><b>Plaintext</b> — the original, readable data, before it has been encrypted.</li><li><b>Key</b> — a value used, together with an encryption algorithm, to scramble the plaintext. A matching key is needed to unscramble it again.</li><li><b>Ciphertext</b> — the scrambled, meaningless data produced by encryption. This is the form of the data that is actually transmitted.</li></ul>
+<pre class="calc">Plaintext ── encrypted using a key ──► Ciphertext ── transmitted ──► Ciphertext
+                                                                        │
+                                                        decrypted using a key
+                                                                        ▼
+                                                                    Plaintext</pre>
+<div class="callout tip"><strong>Exam tip</strong><p>The single most common way to lose marks on this topic is writing that encryption “stops data being intercepted” or “stops hackers accessing the data”. The correct wording is that the data can still be intercepted, but it is <b>meaningless / cannot be understood</b> without the key.</p></div>
+<div class="eg"><div class="eg-t">Example</div><p>A person logs into a banking app. Their password (the plaintext) is encrypted using a key, producing ciphertext, which is transmitted to the bank’s server. If this ciphertext were intercepted while it travelled across the network, it would appear as meaningless scrambled data to whoever intercepted it, because they do not have the correct key to decrypt it. At the server, the same or a matching key is used to decrypt the ciphertext back into the original plaintext password.</p></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>What is the purpose of encrypting data before it is transmitted?<details><summary>Answer</summary><div class="ans">So that if the data is intercepted during transmission, it cannot be understood (it is meaningless) without the correct key.</div></details></li><li>Does encryption prevent data from being intercepted? Explain.<details><summary>Answer</summary><div class="ans">No. Data can still be intercepted; encryption only makes the intercepted data meaningless to anyone without the correct key.</div></details></li><li>Define the terms plaintext and ciphertext.<details><summary>Answer</summary><div class="ans">Plaintext is the original, readable data before encryption. Ciphertext is the scrambled, meaningless data produced by encrypting the plaintext.</div></details></li><li>What is a key used for in encryption?<details><summary>Answer</summary><div class="ans">It is used, together with an algorithm, to scramble plaintext into ciphertext, and a matching key is used to unscramble the ciphertext back into plaintext.</div></details></li><li>A message is encrypted before being sent over the internet. Using the terms plaintext, key and ciphertext, describe what happens to it.<details><summary>Answer</summary><div class="ans">The plaintext message is encrypted using a key, producing ciphertext; the ciphertext is transmitted; the receiver uses a key to decrypt the ciphertext back into the original plaintext.</div></details></li></ol></div></section>
+<section class="part" id="c2"><h3>2. Symmetric encryption</h3><span class="obj">Syllabus objective 2</span><p>In <b>symmetric encryption</b>, the <b>same key</b> is used to both encrypt and decrypt the data.</p>
+<h4 class="sub">How it works, step by step</h4>
+<ol><li>The sender and the receiver both hold an identical copy of a secret key.</li><li>The sender encrypts the plaintext using the key, producing ciphertext.</li><li>The ciphertext is transmitted across the network.</li><li>The receiver decrypts the ciphertext using the <b>same</b> key, recovering the original plaintext.</li></ol>
+<h4 class="sub">The key exchange problem</h4>
+<p>Before any of this can happen, both sides must somehow already hold the same secret key. If that key itself has to be sent across the network and it is intercepted on the way, whoever intercepts it can then decrypt everything encrypted with it. This weakness is called the <b>key exchange (or key distribution) problem</b>, and it is the main drawback of symmetric encryption.</p>
+<div class="scroll"><table class="t"><tr><th>Advantages</th><th>Disadvantages</th></tr><tr><td>Fast: encrypting and decrypting need relatively little processing, so it suits large amounts of data</td><td>The key must be exchanged between the sender and receiver; if it is intercepted during that exchange, the encryption is broken</td></tr><tr><td>Simple: only one key needs to be generated, stored and used</td><td>Every pair of people who need to communicate securely needs its own shared key, which becomes difficult to manage as the number of users grows</td></tr></table></div>
+<div class="callout rule"><strong>Remember</strong><p>Symmetric = the SAME key encrypts and decrypts. Its strength is speed; its weakness is that the key has to be shared somehow, and could be intercepted during that exchange.</p></div>
+<div class="eg"><div class="eg-t">Example</div><p>A courier company uses symmetric encryption to transmit tracking data between two of its offices. Both offices hold an identical copy of the same key. The sending office encrypts the plaintext tracking data using the key, producing ciphertext, which is transmitted to the other office. The receiving office decrypts the ciphertext using its identical copy of the same key, recovering the original plaintext data.</p></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>In symmetric encryption, how many keys are used, and by whom?<details><summary>Answer</summary><div class="ans">One key, and the same key is used by both the sender (to encrypt) and the receiver (to decrypt).</div></details></li><li>Describe the process of symmetric encryption.<details><summary>Answer</summary><div class="ans">The sender and receiver hold an identical key; the sender encrypts the plaintext using the key to produce ciphertext, which is transmitted; the receiver decrypts the ciphertext using the same key to recover the plaintext.</div></details></li><li>What is the “key exchange problem”?<details><summary>Answer</summary><div class="ans">The key itself has to be given to the receiver somehow; if it is intercepted during this exchange, whoever intercepts it can decrypt all data encrypted with that key.</div></details></li><li>Give one advantage of symmetric encryption.<details><summary>Answer</summary><div class="ans">It is fast / needs relatively little processing, so it is suitable for encrypting large amounts of data.</div></details></li><li>Explain one drawback of using symmetric encryption to transmit sensitive data.<details><summary>Answer</summary><div class="ans">The same key must be exchanged between sender and receiver before it can be used; if that key is intercepted during the exchange, the interceptor can then decrypt all the data sent using that key.</div></details></li></ol></div></section>
+<section class="part" id="c3"><h3>3. Asymmetric encryption</h3><span class="obj">Syllabus objective 2</span><p>In <b>asymmetric encryption</b>, <b>two different keys</b> are used as a matching pair: a <b>public key</b> and a <b>private key</b>.</p>
+<ul><li>The <b>public key</b> is shared openly with anyone, and is used to <b>encrypt</b> data.</li><li>The <b>private key</b> is kept secret by its owner and is never shared or transmitted. It is the only key that can <b>decrypt</b> data that was encrypted with the matching public key.</li></ul>
+<h4 class="sub">How it works, step by step</h4>
+<ol><li>The receiver generates a matching pair of keys: one public, one private.</li><li>The receiver shares their public key openly; anyone who wants to send them data securely obtains a copy of it.</li><li>The sender encrypts the plaintext using the <b>receiver’s public key</b>, producing ciphertext.</li><li>The ciphertext is transmitted. Even someone who intercepts it, and who also has a copy of the public key, cannot decrypt it, because the public key can only encrypt, not decrypt.</li><li>The receiver decrypts the ciphertext using their own <b>private key</b>, recovering the plaintext.</li></ol>
+<div class="callout rule"><strong>Remember</strong><p>Asymmetric = TWO keys, a matching pair. The receiver’s <b>public</b> key encrypts; the receiver’s <b>private</b> key decrypts. The private key is never shared, so there is no key exchange problem.</p></div>
+<h4 class="sub">Symmetric compared with asymmetric encryption</h4>
+<div class="scroll"><table class="t"><tr><th></th><th>Symmetric</th><th>Asymmetric</th></tr><tr><td><b>Keys used</b></td><td>One key: the same key encrypts and decrypts</td><td>Two keys: a public key encrypts, the matching private key decrypts</td></tr><tr><td><b>Key sharing</b></td><td>The key must be exchanged, so there is a risk of interception</td><td>Only the public key is shared; the private key is never transmitted</td></tr><tr><td><b>Speed</b></td><td>Faster, needs less processing</td><td>Slower, needs more processing</td></tr></table></div>
+<div class="callout warn"><strong>A common mistake</strong><p>It is easy to muddle up which key does which job. Fix this rule in your memory: the <b>receiver’s public key encrypts</b>; the <b>receiver’s private key decrypts</b>. Both keys belong to the receiver — the sender does not generate any keys.</p></div>
+<div class="eg"><div class="eg-t">Example</div><p>A customer buys a concert ticket online. The website’s server has a matching pair of keys: a public key, shared openly, and a private key, kept secret. The customer’s browser encrypts their plaintext payment details using the server’s public key, producing ciphertext, which is transmitted. Even if this ciphertext were intercepted, along with a copy of the public key, it could not be decrypted, because only the server’s private key — which is never shared — can decrypt data encrypted with that public key. The server uses its private key to decrypt the ciphertext and recover the plaintext payment details.</p></div>
+<div class="check"><h4>Check yourself (5 questions)</h4><ol><li>How many keys are used in asymmetric encryption, and what are they called?<details><summary>Answer</summary><div class="ans">Two keys: a public key and a private key.</div></details></li><li>Which key is used to encrypt data in asymmetric encryption, and who can access it?<details><summary>Answer</summary><div class="ans">The receiver’s public key, which is shared openly and can be obtained by anyone.</div></details></li><li>Which key is used to decrypt data in asymmetric encryption, and who can access it?<details><summary>Answer</summary><div class="ans">The receiver’s private key, which is kept secret by the receiver and never shared or transmitted.</div></details></li><li>Why does asymmetric encryption not have a “key exchange problem” like symmetric encryption does?<details><summary>Answer</summary><div class="ans">Because the private key, which is needed to decrypt the data, is never shared or transmitted; only the public key (which can only encrypt) is shared, so intercepting it does not allow the data to be decrypted.</div></details></li><li>Give one difference between symmetric and asymmetric encryption.<details><summary>Answer</summary><div class="ans">Any one: symmetric uses one key for both encrypting and decrypting, while asymmetric uses two different keys (public to encrypt, private to decrypt); or, symmetric is faster than asymmetric because it needs less processing.</div></details></li></ol></div></section>
+</section>
+<section class="topic" id="summary">
+  <h2>Summary to memorise</h2>
+  <p class="topic-lead">The key rules and processes of the whole topic. Learn them before the exam.</p>
+  <div class="scroll"><table class="t"><tr><th>Topic</th><th>Rule</th></tr><tr><td>Packet structure</td><td>Header (destination address, packet number, originator’s address) + payload (the data) + trailer (end marker, error-check data)</td></tr><tr><td>Packet switching</td><td>Split into packets → routers direct each packet, possibly by a different route → packets may arrive out of order → reordered using packet numbers once the last packet arrives</td></tr><tr><td>Serial</td><td>One bit at a time, one wire; reliable over long distances; slower</td></tr><tr><td>Parallel</td><td>Multiple bits at a time, multiple wires; faster but only safe over short distances (skew, interference)</td></tr><tr><td>Simplex / half-duplex / full-duplex</td><td>One direction only / both directions but one at a time / both directions at the same time</td></tr><tr><td>Choosing a method</td><td>Distance decides serial vs parallel; direction (does data return? at the same time?) decides simplex/half/full-duplex</td></tr><tr><td>USB</td><td>A universal, serial interface; auto-detects the device and loads its driver; can supply power; limited cable length and speed</td></tr><tr><td>Why errors occur</td><td>Interference causes data loss, data gain, or data change during transmission</td></tr><tr><td>Parity check</td><td>Parity bit makes the count of 1s in a byte odd or even, as agreed; receiver recounts after transmission; detects an odd number of changed bits only</td></tr><tr><td>Parity block check</td><td>Row check (each byte’s own parity bit) + column check (the parity byte); one failing row and one failing column cross at the corrupted bit</td></tr><tr><td>Checksum</td><td>Calculated from the data using an algorithm → transmitted with the data → recalculated by the receiver using the same algorithm → compared</td></tr><tr><td>Echo check</td><td>Data sent → a copy sent back → sender compares original with copy; no calculation used; cannot say which direction the error happened in</td></tr><tr><td>ARQ</td><td>Uses acknowledgements (positive or negative) and a timer/timeout to trigger an automatic resend</td></tr><tr><td>Check digit</td><td>Calculated from a number’s digits → added to the number → recalculated on entry/scanning → compared; detects data-entry errors, not transmission errors; used in ISBNs and barcodes</td></tr><tr><td>Encryption purpose</td><td>Does NOT stop interception; makes intercepted data meaningless without the correct key</td></tr><tr><td>Plaintext / key / ciphertext</td><td>Plaintext (original data) → encrypted with a key → ciphertext (transmitted) → decrypted with a key → plaintext</td></tr><tr><td>Symmetric encryption</td><td>The SAME key encrypts and decrypts; fast, but the key must be exchanged (key exchange problem)</td></tr><tr><td>Asymmetric encryption</td><td>TWO keys: the receiver’s public key encrypts, the receiver’s private key (never shared) decrypts</td></tr></table></div>
+  <div class="callout warn"><strong>Mistakes that lose marks most often</strong><ol><li>Naming only some of the three header items (all three are needed: destination address, packet number, originator’s address).</li><li>Describing packet switching without mentioning that packets are reordered once the last one arrives.</li><li>Choosing parallel transmission for anything other than a very short distance.</li><li>Giving a transmission method with no reason linked to the scenario.</li><li>Saying a parity check or checksum will always catch every error (a parity check misses an even number of changed bits).</li><li>Confusing a check digit with a checksum — remember, a check digit is about data entry, not transmission.</li><li>Writing that encryption “stops data being intercepted” instead of “makes intercepted data meaningless”.</li><li>Mixing up which key does what in asymmetric encryption — the receiver’s public key encrypts, the receiver’s private key decrypts.</li></ol></div>
+</section>
+<section class="topic" id="exam">
+  <h2>IGCSE-style questions</h2>
+  <p class="topic-lead">10 questions, <b>57 marks</b> in total, in the style of Paper 1. They were written for practice and are not real past-paper questions.</p>
+  <div class="timebox"><span class="badge">Suggested time: about 70 minutes</span><span class="badge">46 marks or more: you are in good shape</span><span class="badge">34 to 45 marks: revise the sections where you lost marks</span><span class="badge">Below 34: study the topic again</span></div>
+  <p>Do these without looking at your notes. Write your working on paper, then open the mark scheme and mark yourself.</p>
+  <article class="exq"><h3>Question 1 <span class="tp">Data packets</span><span class="tot">[5]</span></h3>
+<ol class="parts"><li><span class="l">(a)</span><span class="txt">A photograph is broken down into packets before it is transmitted to an online storage service. State three items of information contained in the header of a packet.</span><span class="mk">[3]</span></li><li><span class="l">(b)</span><span class="txt">Give one reason why the photograph is broken down into packets rather than sent as a single unit.</span><span class="mk">[1]</span></li><li><span class="l">(c)</span><span class="txt">Identify the part of a packet that contains the actual image data.</span><span class="mk">[1]</span></li></ol>
+<details class="ms"><summary>Mark scheme</summary><div class="ms-body"><p><b>(a)</b> Any three [1 each]: destination address; packet number; originator’s address.</p><p><b>(b)</b> Any one: it would not be practical/possible to send such a large amount of data at once; packets let the network be shared by many users; if an error occurs, only the affected packet needs to be resent, not the whole photograph.</p><p><b>(c)</b> The payload [1].</p></div></details></article>
+<article class="exq"><h3>Question 2 <span class="tp">Packet switching</span><span class="tot">[6]</span></h3>
+<ol class="parts"><li><span class="l">(a)</span><span class="txt">A video call uses packet switching to transmit data. Describe the process of packet switching.</span><span class="mk">[4]</span></li><li><span class="l">(b)</span><span class="txt">Explain why a router is needed in this process.</span><span class="mk">[2]</span></li></ol>
+<details class="ms"><summary>Mark scheme</summary><div class="ms-body"><p><b>(a)</b> Any four [1 each]: the data is split into packets; each packet may take a different route across the network; packets may arrive out of order; once the last packet has arrived, the packets are reordered, using the packet numbers.</p><p><b>(b)</b> A router controls/decides the route (which pathway) a packet takes [1]; it directs each packet towards its destination address, so packets can avoid busy or broken parts of the network [1].</p></div></details></article>
+<article class="exq"><h3>Question 3 <span class="tp">Serial, parallel, simplex and duplex</span><span class="tot">[5]</span></h3>
+<ol class="parts"><li><span class="l">(a)</span><span class="txt">State the number of wires and the number of bits transmitted at a time in serial transmission.</span><span class="mk">[2]</span></li><li><span class="l">(b)</span><span class="txt">State one advantage of parallel transmission over serial transmission.</span><span class="mk">[1]</span></li><li><span class="l">(c)</span><span class="txt">A pair of two-way radios can transmit in both directions, but only one radio can transmit at any one time. Identify this method of transmission.</span><span class="mk">[1]</span></li><li><span class="l">(d)</span><span class="txt">State one disadvantage of half-duplex transmission compared with full-duplex transmission.</span><span class="mk">[1]</span></li></ol>
+<details class="ms"><summary>Mark scheme</summary><div class="ms-body"><p><b>(a)</b> One wire [1]; one bit at a time [1].</p><p><b>(b)</b> It is faster, since multiple bits are transmitted at the same time [1].</p><p><b>(c)</b> Half-duplex [1].</p><p><b>(d)</b> Devices must take turns to transmit, so it is slower than full-duplex [1].</p></div></details></article>
+<article class="exq"><h3>Question 4 <span class="tp">Choosing a transmission method</span><span class="tot">[6]</span></h3>
+<ol class="parts"><li><span class="l">(a)</span><span class="txt">A sensor in a greenhouse transmits temperature readings along a 50-metre wire to a controller. The sensor never receives any data back. State a suitable method for the number of bits transmitted at a time, and a suitable method for the direction of transmission. Justify each choice.</span><span class="mk">[4]</span></li><li><span class="l">(b)</span><span class="txt">Give two reasons why parallel transmission would be unsuitable for this connection.</span><span class="mk">[2]</span></li></ol>
+<details class="ms"><summary>Mark scheme</summary><div class="ms-body"><p><b>(a)</b> Serial [1] — the distance (50 m) would cause skew/interference with a parallel connection [1]. Simplex [1] — data only ever needs to travel from the sensor to the controller, which never sends data back [1].</p><p><b>(b)</b> Any two: bits could be skewed / arrive at different times over this distance; interference between the multiple wires could cause errors; multiple wires would increase the cost.</p></div></details></article>
+<article class="exq"><h3>Question 5 <span class="tp">The USB interface</span><span class="tot">[5]</span></h3>
+<ol class="parts"><li><span class="l">(a)</span><span class="txt">State the type of data transmission used by the USB interface.</span><span class="mk">[1]</span></li><li><span class="l">(b)</span><span class="txt">Describe what happens when a USB flash drive is first connected to a computer.</span><span class="mk">[2]</span></li><li><span class="l">(c)</span><span class="txt">Explain one drawback of using the USB interface to connect a device.</span><span class="mk">[2]</span></li></ol>
+<details class="ms"><summary>Mark scheme</summary><div class="ms-body"><p><b>(a)</b> Serial [1].</p><p><b>(b)</b> Any two: the computer automatically detects the flash drive; the correct device driver is loaded (automatically, or the user is asked to install one) so the devices can communicate.</p><p><b>(c)</b> Any one, with development: the cable only works over a limited length, so the device must stay close to the computer [1+1]; or, the transmission speed is limited by the USB standard being used, so an older port transfers data more slowly [1+1].</p></div></details></article>
+<article class="exq"><h3>Question 6 <span class="tp">Parity check</span><span class="tot">[6]</span></h3>
+<ol class="parts"><li><span class="l">(a)</span><span class="txt">The 7 data bits <code>1 0 0 1 0 1 1</code> are to be transmitted using even parity. State the parity bit that should be added.</span><span class="mk">[2]</span></li><li><span class="l">(b)</span><span class="txt">Odd parity is used. The byte received is <code>1 1 0 1 0 0 1 0</code>. State, with a reason, whether an error is detected.</span><span class="mk">[2]</span></li><li><span class="l">(c)</span><span class="txt">Explain one limitation of a simple (single-bit) parity check.</span><span class="mk">[2]</span></li></ol>
+<details class="ms"><summary>Mark scheme</summary><div class="ms-body"><p><b>(a)</b> The data bits contain 4 ones, which is already even [1]; so the parity bit = <b>0</b> to keep the total even [1].</p><p><b>(b)</b> The received byte contains 4 ones, which is even [1]; since odd parity was agreed, this does not match, so an error IS detected [1].</p><p><b>(c)</b> It can only detect an odd number of changed bits [1]; if exactly two bits in the byte are flipped, the count of 1s returns to the agreed parity and the error is missed [1].</p></div></details></article>
+<article class="exq"><h3>Question 7 <span class="tp">Checksum and echo check</span><span class="tot">[6]</span></h3>
+<ol class="parts"><li><span class="l">(a)</span><span class="txt">A checksum is used to check data for errors after it has been transmitted. Describe the process of the checksum error detection method.</span><span class="mk">[4]</span></li><li><span class="l">(b)</span><span class="txt">State one way in which an echo check is different from a checksum.</span><span class="mk">[2]</span></li></ol>
+<details class="ms"><summary>Mark scheme</summary><div class="ms-body"><p><b>(a)</b> Any four [1 each]: a checksum value is calculated from the data using an algorithm, before transmission; the checksum value is transmitted along with the data; the receiver recalculates a checksum value from the received data, using the same algorithm; the two checksum values are compared, and if they do not match, an error has occurred (data can be requested again).</p><p><b>(b)</b> Any one: an echo check does not use a calculated value, it compares the original data sent with a copy sent back, whereas a checksum uses a value calculated by an algorithm; or, an echo check cannot show which direction of the round trip the error happened in, while a checksum only checks the one-way transmission.</p></div></details></article>
+<article class="exq"><h3>Question 8 <span class="tp">Automatic repeat request (ARQ)</span><span class="tot">[6]</span></h3>
+<ol class="parts"><li><span class="l">(a)</span><span class="txt">An ARQ system uses a positive acknowledgement method. Explain how this ARQ system operates.</span><span class="mk">[5]</span></li><li><span class="l">(b)</span><span class="txt">State what is used, in an ARQ system, to trigger the sender to resend a packet when no acknowledgement is received.</span><span class="mk">[1]</span></li></ol>
+<details class="ms"><summary>Mark scheme</summary><div class="ms-body"><p><b>(a)</b> Any five [1 each]: a timer is started when the sender transmits a data packet; the receiver checks the packet for errors; if the packet is error-free, the receiver sends a positive acknowledgement back to the sender; the sender resets the timer and sends the next packet; if no acknowledgement is received before the timer runs out, a timeout occurs and the packet is resent.</p><p><b>(b)</b> A timeout [1].</p></div></details></article>
+<article class="exq"><h3>Question 9 <span class="tp">Check digit</span><span class="tot">[4]</span></h3>
+<ol class="parts"><li><span class="l">(a)</span><span class="txt">A library types in a book’s ISBN to check it out. Describe how a check digit is used to detect an error in this process.</span><span class="mk">[3]</span></li><li><span class="l">(b)</span><span class="txt">State one other example, besides ISBNs, of where a check digit is used.</span><span class="mk">[1]</span></li></ol>
+<details class="ms"><summary>Mark scheme</summary><div class="ms-body"><p><b>(a)</b> The check digit was calculated from the ISBN’s other digits using an algorithm, when the ISBN was first created [1]; when the ISBN is typed in, the check digit is recalculated from the digits entered, using the same algorithm [1]; if the recalculated check digit does not match the one stored in the ISBN, a data entry error has occurred [1].</p><p><b>(b)</b> Barcodes [1].</p></div></details></article>
+<article class="exq"><h3>Question 10 <span class="tp">Encryption</span><span class="tot">[8]</span></h3>
+<ol class="parts"><li><span class="l">(a)</span><span class="txt">Explain the purpose of encrypting data before it is transmitted.</span><span class="mk">[2]</span></li><li><span class="l">(b)</span><span class="txt">Describe how symmetric encryption is used to transmit data.</span><span class="mk">[3]</span></li><li><span class="l">(c)</span><span class="txt">Describe how asymmetric encryption is used to transmit data, naming the keys used at each step.</span><span class="mk">[3]</span></li></ol>
+<details class="ms"><summary>Mark scheme</summary><div class="ms-body"><p><b>(a)</b> The data is scrambled so it cannot be understood [1]; so that if it is intercepted during transmission, it is meaningless to the interceptor, who does not have the key to decrypt it [1]. (Do not accept: it prevents the data from being intercepted.)</p><p><b>(b)</b> Any three: the sender and receiver hold an identical (the same) key; the sender encrypts the plaintext with the key, producing ciphertext, which is transmitted; the receiver decrypts the ciphertext using the same key, recovering the plaintext.</p><p><b>(c)</b> Any three: the receiver has a matching pair of keys, a public key and a private key; the sender encrypts the plaintext using the receiver’s public key, producing ciphertext, which is transmitted; the receiver decrypts the ciphertext using their own private key (which is never shared), recovering the plaintext.</p></div></details></article>
+  <div class="callout tip"><strong>When you finish</strong><p>Add up your marks out of 57. Write down the sections where you made mistakes (for example parity check or choosing a transmission method), then revise them using the “Check yourself” questions. After that, practise with official Cambridge 0478 Paper 1 past papers.</p></div>
+</section>
+</main>
+</div>
+<footer><p>These notes follow the Cambridge IGCSE Computer Science 0478 syllabus (2026, 2027 and 2028), Topic 2: Data transmission, the Cambridge IGCSE & O Level Computer Science Coursebook (Lawrey &amp; Ellis), and the topic order used by moshikur.com. The examples and questions were written for practice.</p></footer>
+<script>
+(function(){
+'use strict';
+var $=function(s){return document.querySelector(s)};
+var pad=function(s,n){while(s.length<n)s='0'+s;return s};
+
+/* ---- hero: parity byte calculator ---- */
+var heroBits=[1,0,1,1,0,0,1];
+var heroEven=true;
+var heroReg=$('#hero-reg');
+var heroLabels=['b7','b6','b5','b4','b3','b2','b1'];
+heroLabels.forEach(function(lab,i){
+  var c=document.createElement('div');c.className='cell';
+  c.innerHTML='<span class="pv">'+lab+'</span>';
+  var b=document.createElement('button');b.type='button';
+  b.setAttribute('aria-label','Data bit '+lab);
+  b.addEventListener('click',function(){heroBits[i]=heroBits[i]?0:1;drawHero();});
+  c.appendChild(b);heroReg.appendChild(c);
+});
+function drawHero(){
+  var bs=heroReg.querySelectorAll('button'),ones=0,i;
+  for(i=0;i<7;i++){bs[i].textContent=heroBits[i];bs[i].setAttribute('aria-pressed',heroBits[i]?'true':'false');if(heroBits[i])ones++;}
+  var p = heroEven ? (ones%2===0?0:1) : (ones%2===0?1:0);
+  $('#hero-p').textContent=p;
+  $('#hero-count').textContent=ones;
+  $('#hero-total').textContent=ones+p;
+  $('#hero-byte').textContent=p+' '+heroBits.join(' ');
+}
+$('#hero-even').addEventListener('click',function(){heroEven=true;$('#hero-even').setAttribute('aria-pressed','true');$('#hero-odd').setAttribute('aria-pressed','false');$('#hero-even').classList.add('solid');$('#hero-odd').classList.remove('solid');drawHero();});
+$('#hero-odd').addEventListener('click',function(){heroEven=false;$('#hero-odd').setAttribute('aria-pressed','true');$('#hero-even').setAttribute('aria-pressed','false');$('#hero-odd').classList.add('solid');$('#hero-even').classList.remove('solid');drawHero();});
+drawHero();
+
+/* ---- packet diagram tool ---- */
+var pktInfo={
+  header:'<b>Header:</b> destination address, packet number, originator\u2019s address.',
+  payload:'<b>Payload:</b> the actual data being sent \u2014 a small slice of the file or message.',
+  trailer:'<b>Trailer:</b> an end-of-packet marker, plus data used by an error-detection method (e.g. a checksum).'
+};
+document.querySelectorAll('.pkt-part').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.pkt-part').forEach(function(b){b.setAttribute('aria-pressed','false');});
+    btn.setAttribute('aria-pressed','true');
+    $('#pkt-info').innerHTML=pktInfo[btn.getAttribute('data-part')];
+  });
+});
+
+/* ---- parity lab tool ---- */
+var parData=[1,1,0,0,1,0,1];
+var parEven=true;
+var parReg=$('#par-reg');
+var parCells=[];
+(function(){
+  var labels=['P','b7','b6','b5','b4','b3','b2','b1'];
+  labels.forEach(function(lab,i){
+    var c=document.createElement('div');c.className='cell';
+    c.innerHTML='<span class="pv">'+lab+'</span>';
+    var b=document.createElement('button');b.type='button';
+    if(i>0){
+      b.addEventListener('click',function(){parData[i-1]=parData[i-1]?0:1;drawParity();});
+    }else{
+      b.disabled=false;
+      b.style.opacity='.55';
+      b.title='The parity bit is calculated automatically.';
+    }
+    c.appendChild(b);parReg.appendChild(c);parCells.push(b);
+  });
+})();
+var parFlipped=null;
+function computeParity(bits){var ones=bits.reduce(function(a,x){return a+x;},0);return parEven?(ones%2===0?0:1):(ones%2===0?1:0);}
+function drawParity(){
+  parFlipped=null;
+  var p=computeParity(parData);
+  var full=[p].concat(parData);
+  for(var i=0;i<8;i++){parCells[i].textContent=full[i];parCells[i].setAttribute('aria-pressed',full[i]?'true':'false');}
+  var ones=full.reduce(function(a,x){return a+x;},0);
+  $('#par-sum').textContent='Byte: '+full.join(' ')+'  \u2014  total 1s = '+ones+' ('+(ones%2===0?'even':'odd')+')';
+  $('#par-result').innerHTML='';
+}
+function flipBits(n){
+  var p=computeParity(parData);
+  var full=[p].concat(parData);
+  var idxs=[];
+  while(idxs.length<n){var r=Math.floor(Math.random()*8);if(idxs.indexOf(r)===-1)idxs.push(r);}
+  idxs.forEach(function(i){full[i]=full[i]?0:1;});
+  for(var i=0;i<8;i++){parCells[i].textContent=full[i];parCells[i].setAttribute('aria-pressed',full[i]?'true':'false');}
+  var ones=full.reduce(function(a,x){return a+x;},0);
+  var matches = parEven ? (ones%2===0) : (ones%2!==0);
+  $('#par-sum').textContent='Received byte: '+full.join(' ')+'  \u2014  total 1s = '+ones+' ('+(ones%2===0?'even':'odd')+')';
+  $('#par-result').innerHTML = matches
+    ? '<span class="par-ok">No error detected'+(n===2?' \u2014 but the byte WAS corrupted! Two flipped bits cancel out.':'')+'.</span>'
+    : '<span class="par-fail">Error detected \u2014 the parity does not match.</span>';
+}
+$('#par-even').addEventListener('click',function(){parEven=true;$('#par-even').setAttribute('aria-pressed','true');$('#par-odd').setAttribute('aria-pressed','false');$('#par-even').classList.add('solid');$('#par-odd').classList.remove('solid');drawParity();});
+$('#par-odd').addEventListener('click',function(){parEven=false;$('#par-odd').setAttribute('aria-pressed','true');$('#par-even').setAttribute('aria-pressed','false');$('#par-odd').classList.add('solid');$('#par-even').classList.remove('solid');drawParity();});
+$('#par-flip1').addEventListener('click',function(){flipBits(1);});
+$('#par-flip2').addEventListener('click',function(){flipBits(2);});
+$('#par-reset').addEventListener('click',function(){drawParity();});
+drawParity();
+
+/* ---- answers toggle, toc, print ---- */
+var allOpen=false;
+var tog=$('#toggle-all');
+function setAll(v){document.querySelectorAll('.check details, details.ms').forEach(function(d){d.open=v;});}
+tog.addEventListener('click',function(){
+  allOpen=!allOpen;setAll(allOpen);
+  tog.textContent=allOpen?'Hide all answers':'Show all answers';
+});
+window.addEventListener('beforeprint',function(){setAll(true);});
+if(window.matchMedia('(min-width:1000px)').matches){$('#toc').open=true;}
+})();
+</script>
+</body>
+</html>
