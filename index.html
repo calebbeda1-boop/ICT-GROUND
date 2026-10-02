@@ -60,7 +60,15 @@
   html[data-theme="light"] body{ background:var(--bg); color:var(--text-primary); }
   html[data-theme="light"] .aura,
   html[data-theme="light"] .stars{ opacity:var(--space-visual-opacity); }
-
+.visitor-box {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  opacity: 0.8;
+}
+#visitor-count {
+  font-weight: 700;
+}
   /* Nav, menu, logo */
   html[data-theme="light"] .nav{ background:var(--nav-bg) !important; border-bottom:1px solid var(--border) !important; backdrop-filter:blur(8px); }
   html[data-theme="light"] .nav .logo, html[data-theme="light"] .nav .logo a{ color:var(--text-primary) !important; }
@@ -373,7 +381,9 @@
 <footer class="footer">
   <div class="logo"><a href="#" class="logo">ICT GROUND <span>// ALMIIS</span></a></div>
   <div class="credit"><span class="brand-name">ALMIIS</span> — Computer Science for Year 10 &amp; 11, ready for IGCSE</div>
-
+<p class="visitor-box">
+  Wageni: <span id="visitor-count">...</span>
+</p>
   <div class="footer-grid">
     <div class="founder-card">
       <div class="founder-avatar">
@@ -760,5 +770,22 @@ body {
     }
 }
 </style>
+     <script>
+(async function () {
+  const el = document.getElementById("visitor-count");
+  const base = "https://api.counterapi.dev/v1/ict-ground-vercel-app/visits";
+  try {
+    // Hesabu mara moja tu kwa kila kikao cha mgeni
+    const counted = sessionStorage.getItem("ict_counted");
+    const url = counted ? base : base + "/up";
+    const res = await fetch(url);
+    const data = await res.json();
+    el.textContent = Number(data.count).toLocaleString();
+    sessionStorage.setItem("ict_counted", "1");
+  } catch (e) {
+    el.textContent = "—";
+  }
+})();
+</script>
 </body>
 </html>
