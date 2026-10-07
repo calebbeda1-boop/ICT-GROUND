@@ -21,8 +21,12 @@ h1{font-size:clamp(2.1rem,7vw,3.8rem);font-weight:400;letter-spacing:.06em;text-
 .col{display:flex;flex-direction:column;transition:transform .8s cubic-bezier(.22,1,.36,1)}
 .col i{display:block;height:1em;line-height:1em;font-style:normal;text-align:center}
 .lab{font:600 clamp(.6rem,1.9vw,.75rem)/1 system-ui,Arial,sans-serif;letter-spacing:.24em;text-transform:uppercase}
-.msg{font-size:clamp(1.3rem,4vw,2rem);letter-spacing:.04em;display:none}
-.done .clock{display:none}.done .msg{display:block;animation:rise 1s both}
+.msg{display:none;flex-direction:column;align-items:center;gap:18px}
+.done .clock,.done .eyebrow{display:none}.done .msg{display:flex;animation:rise 1s both}
+.go{display:inline-flex;align-items:center;gap:14px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);padding:clamp(14px,3vw,20px) clamp(22px,5vw,44px);font:600 clamp(.85rem,2.4vw,1.05rem)/1 system-ui,Arial,sans-serif;letter-spacing:.26em;text-transform:uppercase;text-decoration:none;transition:background .5s,color .5s,transform .4s cubic-bezier(.22,1,.36,1),letter-spacing .5s}
+.go:hover{background:var(--paper);color:var(--ink);letter-spacing:.32em}.go:active{transform:scale(.97)}.go b{font-weight:400;transition:transform .5s cubic-bezier(.22,1,.36,1)}.go:hover b{transform:translateX(8px)}
+.best{font-style:italic;font-size:clamp(1.1rem,3.4vw,1.6rem);letter-spacing:.14em;text-transform:uppercase}
+.note{font:400 clamp(.78rem,2vw,.92rem)/1.6 system-ui,Arial,sans-serif;letter-spacing:.05em;border-top:1px solid var(--ink);padding-top:16px;max-width:520px;animation:rise 1s .75s both}.note b{letter-spacing:.2em}
 .foot{font:600 .72rem/1 system-ui,Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;animation:rise 1s .8s both}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style></head><body>
@@ -31,18 +35,19 @@ h1{font-size:clamp(2.1rem,7vw,3.8rem);font-weight:400;letter-spacing:.06em;text-
 <div class="rule"></div>
 <div class="eyebrow">Countdown to</div>
 <h1>Week 8 Test</h1>
-<div class="when">Thursday, 8 October 2026 &middot; 08:40 a.m.</div>
+<div class="when">Thursday, 8 October 2026</div>
 <div class="clock" id="c"></div>
-<div class="msg" id="m">The test has begun &mdash; good luck.</div>
-<div class="foot">Arrive early. Stay focused</div>
+<div class="msg" id="m"><a class="go" href="https://ict-ground.vercel.app/ANIMATION/0010.HTML">Click here to start <b>&rarr;</b></a><div class="best">All the best</div></div>
+<div class="note"><b>NOTE:</b> Make sure you come to class on time. You will have only 10 minutes to settle.</div>
+<div class="foot">ALL THE BEST</div>
 </main>
 <script>
-var T=new Date('2026-10-08T08:40:00+03:00'),U=['Days','Hours','Minutes','Seconds'],cols=[];
+var T=new Date('2026-10-08T12:00:00+03:00'),U=['Days','Hours','Minutes','Seconds'],cols=[];
 var c=document.getElementById('c');
 U.forEach(function(u){var n=u=='Days'?3:2,h='<div class="u"><div class="num">';for(var k=0;k<n;k++)h+='<div class="d"><div class="col">'+[0,1,2,3,4,5,6,7,8,9].map(function(x){return '<i>'+x+'</i>'}).join('')+'</div></div>';c.insertAdjacentHTML('beforeend',h+'</div><div class="lab">'+u+'</div></div>')});
 document.querySelectorAll('.num').forEach(function(n){cols.push([].slice.call(n.querySelectorAll('.col')))});
 function set(i,v){var s=String(v).padStart(cols[i].length,'0');cols[i].forEach(function(col,k){col.style.transform='translateY(-'+(+s[k]*10)+'%)'})}
-function tick(){var d=T-new Date();if(d<=0){document.getElementById('p').classList.add('done');return}
+function tick(){var d=T-new Date();if(d<=0){document.getElementById('p').classList.add('done');set(0,0);set(1,0);set(2,0);set(3,0);clearInterval(iv);return}
 var s=Math.floor(d/1000);set(0,Math.floor(s/86400));set(1,Math.floor(s%86400/3600));set(2,Math.floor(s%3600/60));set(3,s%60);}
-tick();setInterval(tick,250);
+tick();var iv=setInterval(tick,250);
 </script></body></html>
