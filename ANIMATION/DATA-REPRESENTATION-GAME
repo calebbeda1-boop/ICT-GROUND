@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Data Representation Racing — Year 10</title>
+<style>
+:root{
+ --bg:#050a10;--panel:#0b131d;--panel2:#101c29;--line:#24384a;--text:#edf5fa;
+ --muted:#8ea4b5;--cyan:#32d6ff;--green:#59e6a8;--red:#ff5e68;--gold:#ffd166;
+}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 50% -10%,#17344a,#050a10 48%);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif}
+button,input{font:inherit}button{cursor:pointer}
+.top{height:66px;border-bottom:1px solid var(--line);background:#050b12e8;display:flex;align-items:center;justify-content:space-between;padding:0 26px;position:sticky;top:0;z-index:20;backdrop-filter:blur(12px)}
+.logo{font-weight:900;letter-spacing:1.7px;font-size:13px}.logo b{color:var(--cyan)}
+.stats{display:flex;gap:22px;font-size:12px;color:var(--muted)}.stats b{color:var(--text)}
+.screen{display:none;max-width:1220px;margin:auto;padding:42px 24px}.screen.active{display:block}
+.panel{background:linear-gradient(145deg,#0d1823,#09111a);border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 60px #0007}
+.hero{padding:46px;text-align:center}.eyebrow{color:var(--cyan);font-size:11px;font-weight:900;letter-spacing:2px}.hero h1{font-size:clamp(34px,6vw,68px);margin:10px 0 5px;letter-spacing:-2px}.hero p{color:var(--muted);max-width:720px;margin:0 auto 28px;line-height:1.6}
+.btn{border:1px solid var(--cyan);background:#0b2936;color:#eafaff;padding:13px 20px;border-radius:9px;font-weight:800}.btn:hover{background:#103b4c}.btn.secondary{border-color:var(--line);background:#0b141e}
+.setup{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}.setup .panel{padding:22px}.setup h3{margin:0 0 14px}.mission-list{display:grid;gap:8px}.mission-btn{padding:13px;text-align:left;border:1px solid var(--line);border-radius:9px;background:#0a131c;color:var(--text)}.mission-btn.selected{border-color:var(--cyan);box-shadow:0 0 0 1px #32d6ff33 inset}.mission-btn small{display:block;color:var(--muted);margin-top:4px}
+.mode{display:flex;gap:8px;flex-wrap:wrap}.mode button{flex:1;min-width:130px;padding:13px;border:1px solid var(--line);background:#0a131c;color:var(--text);border-radius:9px}.mode button.selected{border-color:var(--gold);color:var(--gold)}
+#race{padding:18px;max-width:1450px}
+.racehud{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:9px;margin-bottom:12px}.metric{padding:12px 14px}.metric span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px}.metric b{font-size:20px}.metric .cyan{color:var(--cyan)}.metric .gold{color:var(--gold)}
+.trackwrap{position:relative;height:570px;overflow:hidden;border:1px solid #324657;border-radius:14px;background:#111820}
+.track{position:absolute;inset:0;overflow:hidden;background:
+ linear-gradient(90deg,#17211a 0 9%,#252c30 9% 91%,#17211a 91% 100%);
+}
+.road{position:absolute;left:9%;right:9%;top:0;bottom:0;background:repeating-linear-gradient(to bottom,#252a2e 0 55px,#292f33 55px 110px);transform:translateY(0)}
+.road:before,.road:after{content:"";position:absolute;top:0;bottom:0;width:5px;background:repeating-linear-gradient(to bottom,#f3f5f5 0 34px,transparent 34px 68px);opacity:.75}.road:before{left:33.333%}.road:after{left:66.666%}
+.edge{position:absolute;top:0;bottom:0;width:9%;background:repeating-linear-gradient(to bottom,#bd2630 0 34px,#f0eee9 34px 68px)}.edge.left{left:0}.edge.right{right:0}
+.grass{position:absolute;inset:0;background:linear-gradient(90deg,#142019,#20272a 9%,transparent 9% 91%,#20272a 91%,#142019)}
+.car{position:absolute;width:46px;height:78px;border-radius:15px 15px 10px 10px;z-index:8;transform:translateX(-50%);box-shadow:0 7px 18px #000b}
+.car:before{content:"";position:absolute;left:7px;right:7px;top:11px;height:22px;border-radius:8px;background:#dbe8ef33;border:1px solid #ffffff33}.car:after{content:"";position:absolute;left:8px;right:8px;bottom:8px;height:8px;background:#05070a;border-radius:3px}
+.player{background:linear-gradient(#43dcff,#087fa7);border:2px solid #8aeaff}.ai1{background:linear-gradient(#ffb84d,#a85109);border:2px solid #ffe0a0}.ai2{background:linear-gradient(#ff6872,#8e1f2b);border:2px solid #ffb0b5}.ai3{background:linear-gradient(#b58cff,#5c37a9);border:2px solid #d7c8ff}
+.nameplate{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:8px;white-space:nowrap;font-weight:900;letter-spacing:.5px}
+.question{position:absolute;z-index:15;left:50%;top:50%;transform:translate(-50%,-50%);width:min(760px,92%);max-height:90%;overflow:auto;padding:25px;background:#07111bf2;border:1px solid #456276;border-radius:15px;box-shadow:0 25px 80px #000c;backdrop-filter:blur(12px)}
+.question .tag{font-size:10px;color:var(--cyan);font-weight:900;letter-spacing:1.5px}.question h2{font-size:22px;line-height:1.35;margin:10px 0 18px}.options{display:grid;grid-template-columns:1fr 1fr;gap:9px}.option{padding:14px;text-align:left;background:#0b1823;color:var(--text);border:1px solid var(--line);border-radius:9px}.option:hover{border-color:#6b879a}.option.correct{border-color:var(--green);background:#0d2c23}.option.wrong{border-color:var(--red);background:#35171b}
+.typebox{display:flex;gap:9px}.typebox input{flex:1;padding:14px;background:#07111a;border:1px solid var(--line);color:var(--text);border-radius:9px;outline:none}.typebox input:focus{border-color:var(--cyan)}
+.dragarea{display:grid;gap:12px}.slots{display:flex;gap:7px;flex-wrap:wrap;min-height:52px;padding:8px;border:1px dashed #496172;border-radius:9px}.slot{min-width:75px;min-height:36px;border:1px dashed #516b7d;border-radius:7px;display:grid;place-items:center;color:#718b9b;font-size:12px}.tile{padding:11px 15px;border:1px solid #486275;border-radius:8px;background:#10202d;cursor:grab;font-weight:800}.tiles{display:flex;gap:7px;flex-wrap:wrap}
+.feedback{min-height:25px;margin-top:12px;font-weight:900}.good{color:var(--green)}.bad{color:var(--red)}
+.boost{position:absolute;z-index:14;left:50%;top:36%;transform:translate(-50%,-50%);font-size:31px;font-weight:1000;color:var(--gold);text-shadow:0 4px 18px #000;animation:pop .8s ease forwards;pointer-events:none}.boost.red{color:var(--red)}@keyframes pop{0%{opacity:0;transform:translate(-50%,-30%) scale(.7)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}100%{opacity:0;transform:translate(-50%,-80%) scale(1)}}
+.progress{height:8px;background:#071019;border-radius:99px;overflow:hidden;border:1px solid var(--line)}.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));width:0}
+.countdown{position:absolute;z-index:30;inset:0;display:grid;place-items:center;background:#02060ab8;font-size:100px;font-weight:1000;color:white;text-shadow:0 0 35px var(--cyan)}
+.result{padding:38px;text-align:center}.result h1{font-size:42px}.resultgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:25px 0}.resultgrid .metric{padding:20px}
+.instructions{margin-top:15px;color:var(--muted);font-size:12px;line-height:1.6}
+@media(max-width:850px){.setup,.racehud,.resultgrid{grid-template-columns:1fr 1fr}.options{grid-template-columns:1fr}.trackwrap{height:500px}.hero{padding:30px 18px}.stats{gap:9px}.top{padding:0 12px}}
+@media(max-width:520px){.setup,.racehud,.resultgrid{grid-template-columns:1fr}.topstats span{display:none}.question h2{font-size:18px}}
+</style>
+</head>
+<body>
+<header class="top">
+ <div class="logo">DATA REPRESENTATION <b>RACING</b> // YEAR 10</div>
+ <div class="stats"><span>SCORE <b id="topScore">0</b></span><span>RACES <b id="topRaces">0</b></span><span>BEST <b id="topBest">0</b></span></div>
+</header>
+
+<section id="home" class="screen active">
+ <div class="hero panel">
+  <div class="eyebrow">IGCSE COMPUTER SCIENCE 0478</div>
+  <h1>DATA REPRESENTATION<br><span style="color:var(--cyan)">RACING</span></h1>
+  <p>Race against AI riders while solving Data Representation challenges. Correct answers accelerate your bike. Build a combo to trigger TURBO and take the lead.</p>
+  <button class="btn" onclick="showSetup()">ENTER THE GRID</button>
+  <div class="instructions"><b>Controls:</b> Click the correct answer • Type the correct value • Drag tiles into the correct order.<br>Correct = acceleration boost • Wrong = speed penalty • Consecutive correct answers = turbo multiplier.</div>
+ </div>
+</section>
+
+<section id="setup" class="screen">
+ <div class="panel" style="padding:25px">
+  <div class="eyebrow">RACE CONFIGURATION</div>
+  <h2>Choose your race</h2>
+  <div class="setup">
+   <div class="panel" style="padding:18px">
+    <h3>Topic</h3><div id="missionList" class="mission-list"></div>
+   </div>
+   <div class="panel" style="padding:18px">
+    <h3>Race Length</h3>
+    <div class="mode">
+      <button id="m5" class="selected" onclick="setMode(5)">SPRINT<br><small>5 questions</small></button>
+      <button id="m10" onclick="setMode(10)">GRAND PRIX<br><small>10 questions</small></button>
+    </div>
+    <p class="instructions">Every race samples a different set of questions from the selected topic. Some races include calculation, concept and application questions.</p>
+    <button class="btn" style="width:100%;margin-top:15px" onclick="startRace()">START RACE</button>
+    <button class="btn secondary" style="width:100%;margin-top:8px" onclick="show('home')">BACK</button>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section id="race" class="screen">
+ <div class="racehud">
+  <div class="metric panel"><span>Speed</span><b><span id="speed">0</span> km/h</b></div>
+  <div class="metric panel"><span>Position</span><b id="position">4 / 4</b></div>
+  <div class="metric panel"><span>Combo</span><b class="gold">x<span id="combo">0</span></b></div>
+  <div class="metric panel"><span>Question</span><b id="qnum">1 / 5</b></div>
+ </div>
+ <div class="panel" style="padding:8px 10px;margin-bottom:10px"><div class="progress"><i id="raceProgress"></i></div></div>
+ <div id="trackwrap" class="trackwrap">
+  <div class="countdown" id="countdown">3</div>
+  <div class="grass"></div><div class="edge left"></div><div class="edge right"></div><div class="road" id="road"></div>
+  <div id="bikePlayer" class="car player" style="left:50%;bottom:55px"><span class="nameplate">YOU</span></div>
+  <div id="bike1" class="car ai1" style="left:27%;bottom:185px"><span class="nameplate">AI 01</span></div>
+  <div id="bike2" class="car ai2" style="left:61%;bottom:280px"><span class="nameplate">AI 02</span></div>
+  <div id="bike3" class="car ai3" style="left:76%;bottom:105px"><span class="nameplate">AI 03</span></div>
+  <div id="questionBox" class="question" style="display:none"></div>
+ </div>
+</section>
+
+<section id="result" class="screen">
+ <div class="result panel">
+  <div class="eyebrow">FINISH LINE</div><h1 id="resultTitle">RACE COMPLETE</h1>
+  <p id="resultMessage" style="color:var(--muted)"></p>
+  <div class="resultgrid">
+   <div class="metric panel"><span>Finish</span><b id="rPos">—</b></div>
+   <div class="metric panel"><span>Score</span><b id="rScore">0</b></div>
+   <div class="metric panel"><span>Accuracy</span><b id="rAcc">0%</b></div>
+   <div class="metric panel"><span>Max Speed</span><b id="rSpeed">0</b></div>
+  </div>
+  <button class="btn" onclick="showSetup()">RACE AGAIN</button>
+  <button class="btn secondary" onclick="show('home')">MAIN MENU</button>
+ </div>
+</section>
+
+<script>
+const missions=[
+{id:1,title:"Number Systems",desc:"Binary place values, denary-to-binary and binary-to-denary conversion.",tags:["Binary","Denary","8-bit"]},
+{id:2,title:"Hexadecimal",desc:"Convert between binary, hexadecimal and denary and identify practical uses of hexadecimal.",tags:["Hex","4-bit groups","Byte"]},
+{id:3,title:"Binary Addition & Overflow",desc:"Perform binary addition and identify overflow in 8-bit unsigned values.",tags:["Addition","8-bit","Overflow"]},
+{id:4,title:"Logical Shifts",desc:"Apply logical left and right shifts and determine the numerical effect.",tags:["Left shift","Right shift"]},
+{id:5,title:"Two's Complement",desc:"Represent negative numbers and interpret 8-bit two's complement values.",tags:["Signed binary","Negative values"]},
+{id:6,title:"Text Representation",desc:"Apply ASCII and Unicode concepts to characters, symbols and languages.",tags:["ASCII","Unicode"]},
+{id:7,title:"Sound Representation",desc:"Apply sample rate, sample resolution and sound file-size calculations.",tags:["Sample rate","Sample resolution","File size"]},
+{id:8,title:"Image Representation",desc:"Apply resolution, colour depth and image file-size calculations.",tags:["Pixels","Colour depth","File size"]},
+{id:9,title:"Storage & File Size",desc:"Convert between bits, bytes and binary storage units and solve storage scenarios.",tags:["Bits","Bytes","KiB","MiB","GiB"]},
+{id:10,title:"Compression",desc:"Explain compression and distinguish lossless from lossy compression.",tags:["Lossless","Lossy","File size"]},
+{id:11,title:"RLE Challenge",desc:"Encode and decode repeated data using run-length encoding.",tags:["RLE","Encoding","Decoding"]},
+{id:12,title:"Integrated Data Challenge",desc:"Apply mixed Data Representation skills in realistic technical scenarios.",tags:["Mixed","Application","IGCSE style"]}
+];
+
+/* LARGE QUESTION BANK
+   The pools below deliberately contain many generated variants.
+   The game samples 5 questions from the relevant pool each session.
+*/
+const Q={};
+
+function q(type,prompt,answer,extra={}){return {type,prompt,answer,...extra};}
+function choice(prompt,answer,options){return q("choice",prompt,answer,{options});}
+function text(prompt,answer){return q("text",prompt,answer)}
+function bitq(prompt,answer){return q("bits",prompt,answer)}
+
+function bin8(n){return n.toString(2).padStart(8,"0")}
+function hex2(n){return n.toString(16).toUpperCase().padStart(2,"0")}
+function pop(arr){return arr[Math.floor(Math.random()*arr.length)]}
+function uniquePool(arr){return [...arr]}
+
+/* Mission 1 — 30+ */
+Q[1]=[];
+[5,9,12,18,25,31,42,47,55,64,73,85,96,100,111,120,127,128,137,145,150,160,173,180,192,200,210,225,240,255].forEach(n=>{
+ Q[1].push(bitq(`Convert ${n} denary into an 8-bit binary value.`,bin8(n)));
+});
+[["00000101",5],["00001010",10],["00011111",31],["00110010",50],["01010101",85],["01100100",100],["01111111",127],["10000000",128],["10011010",154],["10101101",173],["11001000",200],["11110000",240]].forEach(x=>Q[1].push(text(`Convert ${x[0]} from binary to denary.`,String(x[1]))));
+[2,3,4,5,6,7,8,10].forEach(n=>Q[1].push(choice(`How many different values can ${n} bits represent?`,String(2**n),[String(2**n),String(2**n-1),String(n*2),String(n+2)])));
+Q[1].push(
+choice("What is the largest unsigned value that can be stored in 8 bits?","255",["127","128","255","256"]),
+choice("Which number system uses only the digits 0 and 1?","Binary",["Binary","Denary","Hexadecimal","ASCII"]),
+choice("What is the 8-bit place value of the leftmost bit?","128",["64","128","255","256"])
+);
+
+/* Mission 2 — 25+ */
+Q[2]=[];
+[0,15,16,26,31,32,45,64,75,90,127,128,154,160,173,180,192,200,205,220,240,255].forEach(n=>{
+ Q[2].push(text(`Convert ${n} denary to two-digit hexadecimal.`,hex2(n)));
+});
+[["0A",10],["1F",31],["2C",44],["40",64],["55",85],["64",100],["7F",127],["80",128],["9C",156],["A5",165],["BD",189],["C8",200],["F0",240],["FF",255]].forEach(x=>Q[2].push(text(`Convert hexadecimal ${x[0]} to denary.`,String(x[1]))));
+[
+["1010 1101","AD"],["1111 0000","F0"],["0101 1010","5A"],["1001 1100","9C"],["0011 0011","33"],["1111 1111","FF"],["0110 0100","64"],["1011 1101","BD"]
+].forEach(x=>Q[2].push(text(`Convert binary ${x[0]} to hexadecimal.`,x[1])));
+Q[2].push(
+choice("How many bits are represented by one hexadecimal digit?","4",["2","4","8","16"]),
+choice("How many hexadecimal digits represent one byte?","2",["1","2","4","8"]),
+choice("Which is a common use of hexadecimal?","HTML/CSS colour codes",["Typing long paragraphs","HTML/CSS colour codes","Sound sampling only","Keyboard layout only"]),
+choice("Why is hexadecimal useful compared with binary?","It is more compact and easier for humans to read",["It uses no bits","It is more compact and easier for humans to read","It stores more than 8 bits automatically","It removes the need for binary"])
+);
+
+/* Mission 3 — 25+ */
+Q[3]=[];
+[[5,3],[12,7],[25,14],[42,21],[64,31],[73,19],[85,42],[96,27],[100,55],[120,35],[127,1],[128,64],[137,55],[150,25],[160,70],[173,42],[180,30],[192,63],[200,50],[210,20]].forEach(([a,b])=>{
+ const s=a+b; Q[3].push(text(`Add ${bin8(a)} + ${bin8(b)} using 8-bit binary. Give the 8-bit result.`,bin8(s%256)));
+});
+[[200,55],[210,60],[230,40],[240,20],[250,10],[180,100],[200,100],[255,1],[150,120]].forEach(([a,b])=>{
+ const s=a+b; Q[3].push(choice(`Calculate ${a} + ${b} in an 8-bit unsigned register. Does overflow occur?`,s>255?"Yes":"No",["Yes","No"]));
+});
+Q[3].push(
+choice("What is overflow in an 8-bit unsigned calculation?","The result requires more than 8 bits",["The result contains no zeros","The result requires more than 8 bits","The computer has no memory","The answer is negative"]),
+choice("What is the maximum unsigned value in 8 bits?","255",["127","255","256","512"]),
+choice("What happens to a 9-bit result when only an 8-bit register is available?","The extra bit cannot be represented in the 8-bit result",["The computer creates a new byte automatically","The extra bit cannot be represented in the 8-bit result","The result becomes hexadecimal","The result becomes a sound file"])
+);
+
+/* Mission 4 — 22+ */
+Q[4]=[];
+[3,5,7,9,12,13,16,20,24,25,32,40,50,64,80,100,120].forEach(n=>{
+ const left=n*2;
+ if(left<256) Q[4].push(text(`Apply one logical left shift to ${bin8(n)}. Give the 8-bit result.`,bin8(left)));
+ const right=Math.floor(n/2);
+ Q[4].push(text(`Apply one logical right shift to ${bin8(n)}. Give the 8-bit result.`,bin8(right)));
+});
+Q[4].push(
+choice("A logical left shift by one place is equivalent to multiplying an unsigned binary value by:","2",["2","4","8","10"]),
+choice("A logical right shift by one place is equivalent to dividing an unsigned binary value by:","2",["2","4","8","10"]),
+choice("What enters the right side during a logical left shift?","0",["0","1","The MSB","The LSB"]),
+choice("What enters the left side during a logical right shift?","0",["0","1","The MSB","The LSB"]),
+choice("What can happen to the bit shifted out of the register?","It is lost",["It is duplicated","It is stored as hexadecimal","It is lost","It becomes Unicode"])
+);
+
+/* Mission 5 — 22+ */
+Q[5]=[];
+[1,2,3,5,7,8,10,12,15,16,18,20,25,30,32,40,50,63,64,75,100,127].forEach(n=>{
+ const pos=bin8(n), inv=pos.split("").map(c=>c==="0"?"1":"0").join("");
+ let tc=(parseInt(inv,2)+1)&255;
+ Q[5].push(text(`Using 8-bit two's complement, represent −${n}.`,bin8(tc)));
+});
+[["11100111",-25],["11111111",-1],["10000000",-128],["01111111",127],["11110000",-16],["11101011",-21]].forEach(x=>Q[5].push(text(`Interpret ${x[0]} as an 8-bit two's complement value.`,String(x[1]))));
+Q[5].push(
+choice("What is the range of 8-bit two's complement?","−128 to +127",["−255 to +255","−128 to +127","0 to 255","−127 to +128"]),
+choice("What is the most significant bit worth in 8-bit two's complement?","−128",["128","−128","−127","255"]),
+choice("What is the first step when converting a positive binary value to its negative two's complement representation?","Write the positive value in binary",["Add 1 immediately","Write the positive value in binary","Convert to hexadecimal","Remove the MSB"])
+);
+
+/* Mission 6 — 18+ */
+Q[6]=[
+choice("How many bits are normally used by standard ASCII?","7",["4","7","8","16"]),
+choice("How many characters can 7-bit ASCII represent?","128",["64","128","256","512"]),
+choice("What is a major advantage of Unicode over ASCII?","It supports many more characters, languages and symbols",["It uses no storage","It only supports English","It supports many more characters, languages and symbols","It cannot represent emojis"]),
+choice("Which character set is designed to support emojis and many writing systems?","Unicode",["ASCII","Unicode","Binary only","RLE"]),
+choice("Why does Unicode generally require more bits than basic ASCII?","It represents a much larger set of characters",["It stores images","It represents a much larger set of characters","It compresses sound","It removes binary"]),
+choice("Which of these is a character rather than an image?","A letter such as A",["A letter such as A","A photograph","A sound wave","A pixel grid"]),
+text("What is the decimal ASCII code for the character A?","65"),
+text("What is the decimal ASCII code for the character D?","68"),
+text("What is the 8-bit binary representation of ASCII 65?","01000001"),
+text("What is the 8-bit binary representation of ASCII 68?","01000100"),
+choice("Which requires more bits per character in general?","Unicode",["ASCII","Unicode","Neither always","RLE"]),
+choice("ASCII is sufficient for a system that only needs a small basic character set. Which statement is most accurate?","ASCII represents a limited set of characters",["ASCII represents every possible human language","ASCII represents a limited set of characters","ASCII stores photographs","ASCII is a compression method"])
+];
+["B","C","X","Z","0","1","9","?","@","#"].forEach(ch=>{
+ const code=ch.charCodeAt(0); Q[6].push(text(`What is the decimal ASCII code for ${ch}?`,String(code)));
+});
+
+/* Mission 7 — 24+ */
+Q[7]=[
+choice("What is sample rate?","The number of samples taken per second",["The number of bits in each sample","The number of samples taken per second","The number of channels only","The file name"]),
+choice("What is sample resolution?","The number of bits used to store each sample",["The number of samples per second","The number of bits used to store each sample","The duration only","The number of speakers"]),
+choice("What happens when sample rate increases?","Accuracy and file size increase",["Accuracy decreases","Accuracy and file size increase","File size becomes zero","Only colour depth changes"]),
+choice("What happens when sample resolution increases?","Accuracy and file size increase",["Accuracy and file size increase","File size decreases","Sample rate becomes zero","The sound becomes text"]),
+choice("What unit is commonly used for sample rate?","Hz",["Bytes","Hz","Pixels","GiB"]),
+text("Calculate the sound file size in bits: 8000 Hz × 8 bits × 10 seconds.","640000"),
+text("Calculate the sound file size in bits: 16000 Hz × 8 bits × 5 seconds.","640000"),
+text("Calculate the sound file size in bits: 44100 Hz × 16 bits × 2 seconds.","1411200"),
+text("Calculate the sound file size in bits: 22050 Hz × 8 bits × 4 seconds.","705600"),
+text("Calculate the sound file size in bits: 11025 Hz × 8 bits × 10 seconds.","882000"),
+choice("Which recording has the higher sample rate: 8000 Hz or 44100 Hz?","44100 Hz",["8000 Hz","44100 Hz","They are equal","Neither"]),
+choice("Which recording generally has greater accuracy: 8-bit resolution or 16-bit resolution?","16-bit",["8-bit","16-bit","Both always equal","Neither"]),
+choice("If duration stays constant and sample rate doubles, what happens to the uncompressed file size?","It doubles",["It halves","It doubles","It stays unchanged","It becomes four times smaller"])
+];
+[[4000,8,5],[8000,16,5],[16000,8,10],[22050,16,3],[44100,8,2],[44100,16,1],[48000,16,2],[8000,8,20]].forEach(([r,res,t])=>{
+ const bits=r*res*t; Q[7].push(text(`Calculate the sound file size in bytes: ${r} Hz × ${res} bits × ${t} seconds.`,String(bits/8)));
+});
+
+/* Mission 8 — 24+ */
+Q[8]=[
+choice("What does image resolution describe?","The number of pixels in the image",["The number of pixels in the image","The number of audio samples","The number of characters","The compression type"]),
+choice("What is colour depth?","The number of bits used to represent the colour of each pixel",["The number of pixels","The number of bits used to represent the colour of each pixel","The image width only","The file name"]),
+choice("How many colours can be represented with 8 bits per pixel?","256",["8","16","128","256"]),
+choice("How many colours can be represented with 24 bits per pixel?","16777216",["24","256","16777216","24000000"]),
+choice("What happens when image resolution increases?","Quality and file size generally increase",["Quality decreases","Quality and file size generally increase","File size becomes zero","Colour depth becomes zero"]),
+choice("What happens when colour depth increases?","More colours can be represented and file size generally increases",["Fewer colours can be represented","More colours can be represented and file size generally increases","Resolution becomes zero","The image becomes sound"]),
+text("Calculate image size in bits: 100 × 80 pixels × 8 bits.","64000"),
+text("Calculate image size in bytes: 100 × 80 pixels × 8 bits.","8000"),
+text("Calculate image size in bits: 200 × 100 pixels × 8 bits.","160000"),
+text("Calculate image size in bytes: 200 × 100 pixels × 8 bits.","20000"),
+text("Calculate image size in bits: 640 × 480 pixels × 8 bits.","2457600"),
+text("Calculate image size in bytes: 640 × 480 pixels × 8 bits.","307200"),
+text("Calculate image size in bytes: 100 × 100 pixels × 24 bits.","30000"),
+text("Calculate image size in bytes: 1920 × 1080 pixels × 24 bits.","6220800")
+];
+[[10,10,1],[20,20,4],[50,40,8],[80,60,8],[100,100,16],[120,80,8],[200,150,8],[320,200,16],[640,480,24],[800,600,8]].forEach(([w,h,d])=>{
+ const bits=w*h*d; Q[8].push(text(`Calculate the image size in bits: ${w} × ${h} pixels at ${d} bits per pixel.`,String(bits)));
+});
+
+/* Mission 9 — 25+ */
+Q[9]=[
+choice("How many bits are in one byte?","8",["2","4","8","16"]),
+choice("How many bytes are in one KiB?","1024",["1000","1024","2048","8"]),
+choice("How many KiB are in one MiB?","1024",["100","512","1024","2048"]),
+choice("How many MiB are in one GiB?","1024",["1000","1024","2048","4096"]),
+text("Convert 3 GiB to MiB.","3072"),
+text("Convert 5 GiB to MiB.","5120"),
+text("Convert 2 MiB to KiB.","2048"),
+text("Convert 7 MiB to KiB.","7168"),
+text("Convert 6 bytes to bits.","48"),
+text("Convert 12 bytes to bits.","96"),
+text("Convert 32 bytes to bits.","256"),
+text("Convert 1 KiB to bytes.","1024"),
+text("Convert 4 KiB to bytes.","4096"),
+text("Convert 2 MiB to bytes.","2097152"),
+text("Convert 1 GiB to MiB.","1024"),
+choice("Which conversion is correct?","1 byte = 8 bits",["1 byte = 4 bits","1 byte = 8 bits","1 byte = 10 bits","1 byte = 1024 bits"]),
+choice("Which value is larger?","1 GiB",["1 MiB","1 GiB","1 KiB","1 byte"]),
+choice("A student needs to store 70 GB of images but has only 50 GB free. What is the basic problem?","There is insufficient storage space",["There is too much RAM","There is insufficient storage space","The images are Unicode","The camera uses ASCII"])
+];
+[["6 bytes",48],["10 bytes",80],["25 bytes",200],["64 bytes",512],["128 bytes",1024]].forEach(x=>Q[9].push(text(`Convert ${x[0]} to bits.`,String(x[1]))));
+
+/* Mission 10 — 18+ */
+Q[10]=[
+choice("What is the main purpose of compression?","To reduce file size",["To increase file size","To reduce file size","To convert binary to denary","To increase resolution"]),
+choice("Which is a benefit of compression?","Less storage space is required",["More storage space is required","Less storage space is required","More pixels are created","Sample rate becomes zero"]),
+choice("Which is a benefit when sending compressed data?","Less bandwidth and transmission time may be required",["More bandwidth is always required","Less bandwidth and transmission time may be required","The file becomes uncompressed","The data becomes Unicode"]),
+choice("What is lossless compression?","The original data can be rebuilt exactly",["Some data is permanently removed","The original data can be rebuilt exactly","The file must be an image","Only sound can be compressed"]),
+choice("What is lossy compression?","Some data is permanently removed",["The original is always identical","Some data is permanently removed","No data changes","It only works on text"]),
+choice("Which is an example of lossless compression?","PNG",["JPEG","MP3","PNG","MP4"]),
+choice("Which is an example of lossy compression?","JPEG",["ZIP","PNG","RLE","JPEG"]),
+choice("Which is an example of lossy audio compression?","MP3",["PNG","ZIP","MP3","RLE"]),
+choice("Which compression method is specifically based on repeated runs of data?","RLE",["JPEG","RLE","ASCII","Unicode"]),
+choice("If a compressed file can be restored exactly to the original, which type is it?","Lossless",["Lossy","Lossless","Analogue","Unicode"]),
+choice("Why can lossy compression produce a smaller file?","It permanently removes some data",["It adds more pixels","It permanently removes some data","It doubles the sample rate","It adds characters"]),
+choice("Which statement about lossy compression is correct?","The removed information cannot be recovered exactly",["The removed information cannot be recovered exactly","All original information is always restored","It never changes file size","It only applies to binary addition"])
+];
+
+/* Mission 11 — 25+ */
+Q[11]=[
+text("Run-length encode: AAAABBBCCD.","4A3B2C1D"),
+text("Run-length encode: AAAAAABBCC.","6A2B2C"),
+text("Run-length encode: BBBBCCCCA.","4B4C1A"),
+text("Run-length encode: XXXXXYYZ.","5X2Y1Z"),
+text("Run-length encode: AAAZZZZBB.","3A4Z2B"),
+text("Run-length encode: QQQQRRSTTT.","4Q2R1S3T"),
+text("Run-length encode: AABBBAAAAA.","2A3B5A"),
+text("Run-length encode: CCCCCDDDA.","5C3D1A"),
+text("Run-length encode: MMMNNNNOPP.","3M4N1O2P"),
+text("Decode 4A3B2C1D.","AAAABBBCC"),
+text("Decode 6A2B2C.","AAAAAABBCC"),
+text("Decode 5X2Y1Z.","XXXXXXYZ"),
+text("Decode 3A4Z2B.","AAAZZZZBB"),
+text("Decode 2A3B5A.","AABBB AAAAA".replace(" ","")),
+text("Decode 4Q2R1S3T.","QQQQRRSTTT"),
+choice("What does RLE store for each run?","A count and a value",["A colour and a sound","A count and a value","A pixel and a sample rate","A Unicode code point only"]),
+choice("Which data is most suitable for RLE?","Data containing long runs of repeated values",["Completely random data only","Data containing long runs of repeated values","Data with no repetition","Only hexadecimal addresses"]),
+choice("What is one advantage of RLE?","It can reduce the size of data with repeated values",["It always increases file size","It can reduce the size of data with repeated values","It removes all information","It changes ASCII to Unicode"]),
+choice("Is RLE lossless or lossy?","Lossless",["Lossy","Lossless","Both at the same time","Neither"]),
+choice("For AAAABBBCC, what is the uncompressed length?","9",["3","8","9","10"]),
+choice("For AAAABBBCC, what is the RLE form?","4A3B2C",["4A3B2C","3A4B2C","4A2B3C","1A1B1C"]),
+choice("For AAAABBBCC, what is the encoded length when each count and symbol use one character?","6",["5","6","7","9"])
+];
+
+/* Mission 12 — 30+ */
+Q[12]=[
+choice("A value of 173 must be stored as an unsigned 8-bit binary number. What is it?","10101101",["10101101","11001101","10100111","11101101"]),
+choice("Binary 1011 1101 is equivalent to which hexadecimal value?","BD",["AD","BD","CB","FD"]),
+choice("What is the maximum unsigned value in 8 bits?","255",["127","128","255","256"]),
+choice("What is the range of 8-bit two's complement?","−128 to +127",["0 to 255","−127 to +128","−128 to +127","−255 to +255"]),
+choice("Which change generally increases sound file size?","Increasing sample rate",["Reducing sample rate","Increasing sample rate","Reducing duration to zero","Removing samples"]),
+choice("Which change generally increases image file size?","Increasing colour depth",["Reducing colour depth","Increasing colour depth","Removing pixels","Reducing resolution"]),
+choice("Which compression type preserves the original exactly?","Lossless",["Lossy","Lossless","JPEG only","MP3 only"]),
+choice("Which technique stores repeated values as count + value?","RLE",["ASCII","Unicode","RLE","Two's complement"]),
+text("Convert 200 denary to 8-bit binary.","11001000"),
+text("Convert 154 denary to hexadecimal.","9A"),
+text("Convert hexadecimal C8 to denary.","200"),
+text("Convert binary 01111111 to denary.","127"),
+text("Convert 3 GiB to MiB.","3072"),
+text("Convert 12 bytes to bits.","96"),
+text("Calculate 100 × 80 × 8 bits for an image.","64000"),
+text("Calculate 8000 × 8 × 10 bits for a sound file.","640000"),
+text("Calculate 640000 bits in bytes.","80000"),
+text("Represent −25 in 8-bit two's complement.","11100111"),
+text("Apply one logical left shift to 00001101.","00011010"),
+text("Apply one logical right shift to 00101000.","00010100"),
+text("Run-length encode AAAABBBCCD.","4A3B2C1D"),
+choice("A system has 50 GB free and needs 70 GB of image storage. What should be investigated first?","Whether storage can be increased or the data can be reduced/compressed",["Whether binary should be removed","Whether storage can be increased or the data can be reduced/compressed","Whether ASCII can store the images","Whether sample rate should be increased"]),
+choice("Why might hexadecimal be used to display a memory address?","It is a compact representation of binary",["It removes memory","It is a compact representation of binary","It stores sound automatically","It is always decimal"]),
+choice("A 24-bit image uses 1920 × 1080 pixels. Which factor directly affects the uncompressed file size?","Resolution and colour depth",["Only the file name","Resolution and colour depth","Only ASCII","Only sample rate"]),
+choice("A sound is sampled at a higher rate while everything else stays constant. What is the expected effect?","More samples are stored and file size increases",["Fewer samples are stored","More samples are stored and file size increases","The image resolution changes","Unicode is used"]),
+choice("A student calculates a file size in bits but writes the answer as bytes without dividing by 8. What is the error?","The result has not been converted from bits to bytes",["The sample rate is wrong","The result has not been converted from bits to bytes","The colour depth is wrong","The file is lossy"]),
+choice("Which statement is correct?","1 byte = 8 bits",["1 byte = 4 bits","1 byte = 8 bits","1 byte = 16 bits","1 byte = 1024 bits"])
+];
+// --- Racing engine ---
+const raceState={score:0,races:0,best:0};
+const saved=JSON.parse(localStorage.getItem("dr_racing_v3")||"{}");
+Object.assign(raceState,saved);
+let selectedMission=1, raceQuestions=[], raceIndex=0, mode=5;
+let running=false, countdownDone=false, lastFrame=0, playerDist=0, aiDist=[0,0,0];
+let speed=0, maxSpeed=0, combo=0, correct=0, answered=0, raceScore=0;
+let qLocked=false, raceTimer=0, animId=0;
+
+function saveRace(){localStorage.setItem("dr_racing_v3",JSON.stringify(raceState))}
+function show(id){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active")}
+function showSetup(){
+ renderMissionList(); show("setup");
+}
+function renderMissionList(){
+ const box=document.getElementById("missionList"); box.innerHTML="";
+ missions.forEach(m=>{
+   const b=document.createElement("button"); b.className="mission-btn"+(m.id===selectedMission?" selected":"");
+   b.innerHTML=`<b>${String(m.id).padStart(2,"0")} — ${m.title}</b><small>${m.desc}</small>`;
+   b.onclick=()=>{selectedMission=m.id;renderMissionList()}; box.appendChild(b);
+ });
+}
+function setMode(n){mode=n;document.getElementById("m5").classList.toggle("selected",n===5);document.getElementById("m10").classList.toggle("selected",n===10)}
+function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+function norm(v){return String(v??"").trim().toLowerCase().replace(/\s+/g,"")}
+function pickQuestions(){
+ let pool=Q[selectedMission]||[];
+ let arr=shuffle(pool);
+ // Add dedicated drag challenges so the racing game genuinely uses drag interaction.
+ const dragBank=[
+  {type:"drag",prompt:"Drag the binary place values into descending order (highest to lowest).",answer:["128","64","32","16","8","4","2","1"],items:["8","128","2","64","1","32","16","4"]},
+  {type:"drag",prompt:"Drag the conversion steps into the correct order for converting a denary number to binary.",answer:["Choose largest place value","Subtract the place value if it fits","Continue with the remaining place values","Write 1 or 0 for each place value"],items:["Write 1 or 0 for each place value","Choose largest place value","Continue with the remaining place values","Subtract the place value if it fits"]},
+  {type:"drag",prompt:"Drag the RLE process into the correct order.",answer:["Identify repeated items","Count each run","Write count followed by value","Check the encoded result"],items:["Check the encoded result","Count each run","Identify repeated items","Write count followed by value"]}
+ ];
+ if(!arr.some(x=>x.type==="drag")) arr.push(dragBank[(selectedMission-1)%dragBank.length]);
+ return shuffle(arr).slice(0,mode);
+}
+function startRace(){
+ raceQuestions=pickQuestions(); raceIndex=0; playerDist=0; aiDist=[0,0,0]; speed=0;maxSpeed=0;combo=0;correct=0;answered=0;raceScore=0;qLocked=false;raceTimer=0;running=true;
+ document.getElementById("qnum").textContent=`1 / ${raceQuestions.length}`;
+ document.getElementById("countdown").style.display="grid";
+ show("race"); beginCountdown();
+}
+function beginCountdown(){
+ let n=3; const c=document.getElementById("countdown"); c.textContent=n;
+ const t=setInterval(()=>{n--; if(n>0)c.textContent=n; else if(n===0)c.textContent="GO"; else{clearInterval(t);c.style.display="none";countdownDone=true;lastFrame=performance.now();animId=requestAnimationFrame(loop);openQuestion();}},700);
+}
+function loop(now){
+ if(!running)return;
+ const dt=Math.min(.05,(now-lastFrame)/1000); lastFrame=now;
+ if(countdownDone){
+   // Speed is an abstract racing speed; correct answers determine acceleration.
+   speed += (95-speed)*dt*.08;
+   speed=Math.max(0,Math.min(260,speed));
+   playerDist += speed*dt*.22;
+   const aiBase=[146,157,168];
+   for(let i=0;i<3;i++) aiDist[i]+=aiBase[i]*dt*.22*(0.94+Math.sin((raceTimer+i)*.7)*.025);
+   raceTimer+=dt;
+   updateVisual(dt);
+   if(playerDist>=1000 || Math.max(...aiDist)>=1000){finishRace();return}
+ }
+ animId=requestAnimationFrame(loop);
+}
+function updateVisual(dt){
+ document.getElementById("speed").textContent=Math.round(speed);
+ const all=[playerDist,...aiDist].map((d,i)=>({d,i})).sort((a,b)=>b.d-a.d);
+ const pos=all.findIndex(x=>x.i===0)+1; document.getElementById("position").textContent=`${pos} / 4`;
+ document.getElementById("combo").textContent=combo;
+ document.getElementById("raceProgress").style.width=Math.min(100,playerDist/10)+"%";
+ maxSpeed=Math.max(maxSpeed,speed);
+ // Camera/track motion.
+ const road=document.getElementById("road");
+ road.style.backgroundPosition=`0 ${-(playerDist*2.2)%110}px`;
+ const wrapH=document.getElementById("trackwrap").clientHeight;
+ const ids=["bikePlayer","bike1","bike2","bike3"];
+ const ds=[playerDist,...aiDist];
+ ds.forEach((d,i)=>{
+   const lane=[50,27,61,76][i];
+   const y=55+((d*2.2)%420);
+   const el=document.getElementById(ids[i]); el.style.left=lane+"%"; el.style.bottom=Math.min(440,y)+"px";
+ });
+}
+function openQuestion(){
+ if(!running || raceIndex>=raceQuestions.length)return;
+ qLocked=false;
+ const q=raceQuestions[raceIndex], box=document.getElementById("questionBox");
+ box.style.display="block";
+ document.getElementById("qnum").textContent=`${raceIndex+1} / ${raceQuestions.length}`;
+ if(q.type==="choice") renderChoice(q,box);
+ else if(q.type==="text") renderText(q,box);
+ else if(q.type==="bits") renderText(q,box);
+ else if(q.type==="drag") renderDrag(q,box);
+}
+function renderChoice(q,box){
+ box.innerHTML=`<div class="tag">CLICK CHALLENGE</div><h2>${q.prompt}</h2><div class="options">${shuffle(q.options).map((o,i)=>`<button class="option" onclick="answerChoice(this,${JSON.stringify(o)})">${o}</button>`).join("")}</div><div class="feedback" id="feedback"></div>`;
+}
+function renderText(q,box){
+ box.innerHTML=`<div class="tag">TYPE CHALLENGE</div><h2>${q.prompt}</h2><div class="typebox"><input id="answerInput" autocomplete="off" autofocus placeholder="Type your answer..."><button class="btn" onclick="submitText()">ACCELERATE</button></div><div class="feedback" id="feedback"></div>`;
+ const inp=document.getElementById("answerInput"); inp.addEventListener("keydown",e=>{if(e.key==="Enter")submitText()}); setTimeout(()=>inp.focus(),50);
+}
+function renderDrag(q,box){
+ const tiles=shuffle(q.items); box.innerHTML=`<div class="tag">DRAG CHALLENGE</div><h2>${q.prompt}</h2><div class="dragarea"><div><small style="color:var(--muted)">Drag tiles into the target order.</small><div class="slots" id="slots"></div></div><div class="tiles" id="tiles">${tiles.map((x,i)=>`<div class="tile" draggable="true" data-value="${x}">${x}</div>`).join("")}</div><button class="btn" onclick="submitDrag()">ACCELERATE</button><div class="feedback" id="feedback"></div></div>`;
+ const tilesEl=[...document.querySelectorAll(".tile")]; let dragged=null;
+ tilesEl.forEach(t=>{
+   t.addEventListener("dragstart",()=>dragged=t);
+   t.addEventListener("dragend",()=>dragged=null);
+ });
+ const slots=document.getElementById("slots");
+ slots.addEventListener("dragover",e=>e.preventDefault());
+ slots.addEventListener("drop",e=>{e.preventDefault();if(dragged){slots.appendChild(dragged);}});
+}
+function answerChoice(btn,value){
+ if(qLocked)return; const q=raceQuestions[raceIndex];
+ qLocked=true; [...btn.parentElement.children].forEach(x=>x.disabled=true);
+ const ok=norm(value)===norm(q.answer); resolveAnswer(ok,btn);
+}
+function submitText(){
+ if(qLocked)return; const q=raceQuestions[raceIndex], input=document.getElementById("answerInput");
+ const value=input.value; if(!value.trim())return;
+ qLocked=true; const ok=(q.answer instanceof Array?q.answer:norm(q.answer)===norm(value)) && !(q.answer instanceof Array);
+ resolveAnswer(ok,input);
+}
+function submitDrag(){
+ if(qLocked)return;
+ const q=raceQuestions[raceIndex], vals=[...document.querySelectorAll("#slots .tile")].map(x=>x.dataset.value);
+ qLocked=true; resolveAnswer(JSON.stringify(vals)===JSON.stringify(q.answer),document.getElementById("slots"));
+}
+function resolveAnswer(ok,el){
+ answered++;
+ const fb=document.getElementById("feedback");
+ if(ok){
+   correct++; combo++;
+   const turbo=1+Math.min(combo,5)*.12;
+   const boost=38*turbo;
+   speed=Math.min(280,speed+boost);
+   raceScore+=100*Math.round(turbo*10)/10;
+   fb.className="feedback good";fb.textContent=`CORRECT — ACCELERATION +${Math.round(boost)} km/h • TURBO x${(turbo).toFixed(2)}`;
+   flash(`+${Math.round(boost)} KM/H`,false);
+ }else{
+   combo=0; speed=Math.max(45,speed-42); raceScore=Math.max(0,raceScore-25);
+   fb.className="feedback bad";fb.textContent="INCORRECT — BRAKE PENALTY −42 km/h";
+   flash("BRAKE −42",true);
+ }
+ setTimeout(()=>{raceIndex++; if(raceIndex>=raceQuestions.length){document.getElementById("questionBox").style.display="none";return} openQuestion()},700);
+}
+function flash(txt,red){
+ const d=document.createElement("div");d.className="boost"+(red?" red":"");d.textContent=txt;document.getElementById("trackwrap").appendChild(d);setTimeout(()=>d.remove(),800);
+}
+function finishRace(){
+ if(!running)return; running=false; cancelAnimationFrame(animId);
+ document.getElementById("questionBox").style.display="none";
+ const all=[playerDist,...aiDist].map((d,i)=>({d,i})).sort((a,b)=>b.d-a.d);
+ const pos=all.findIndex(x=>x.i===0)+1;
+ const acc=answered?Math.round(correct/answered*100):0;
+ raceScore+=Math.max(0,Math.round(1000-Math.abs(1000-playerDist)));
+ if(pos===1)raceScore+=300; else if(pos===2)raceScore+=180; else if(pos===3)raceScore+=80;
+ raceState.score+=raceScore;raceState.races++;raceState.best=Math.max(raceState.best,raceScore);saveRace();
+ document.getElementById("topScore").textContent=raceState.score;document.getElementById("topRaces").textContent=raceState.races;document.getElementById("topBest").textContent=raceState.best;
+ document.getElementById("rPos").textContent=`${pos} / 4`;document.getElementById("rScore").textContent=raceScore;document.getElementById("rAcc").textContent=acc+"%";document.getElementById("rSpeed").textContent=Math.round(maxSpeed)+" km/h";
+ document.getElementById("resultTitle").textContent=pos===1?"P1 — FINISH LINE":"RACE COMPLETE";
+ document.getElementById("resultMessage").textContent=`${missions[selectedMission-1].title} • ${correct}/${answered} correct • ${Math.round(raceTimer)} seconds`;
+ show("result");
+}
+document.getElementById("topScore").textContent=raceState.score;
+document.getElementById("topRaces").textContent=raceState.races;
+document.getElementById("topBest").textContent=raceState.best;
+renderMissionList();
+</script>
+</body>
+</html>
