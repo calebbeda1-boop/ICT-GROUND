@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Week 8 Test | Al Muntazir Islamic International School</title>
+<style>
+:root{--primary:#1a3a6b;--primary-dark:#0f2347;--accent:#2563eb;--accent-light:#dbeafe;--green:#1a7f3c;--gold:#b45309;--danger:#dc2626;--success:#16a34a;--card:#fff;--bg:#f1f5f9;--border:#e2e8f0;--muted:#64748b;--radius:12px;--shadow:0 2px 12px rgba(0,0,0,.08)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:#1e293b;font-size:15px}
+.site-header{background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 20px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.hdr-left{display:flex;align-items:center;gap:12px}
+.hdr-logo{height:44px;width:auto;object-fit:contain;border-radius:4px;background:#fff;padding:3px}
+.school-name{font-size:.9rem;font-weight:900;letter-spacing:.5px;text-transform:uppercase;line-height:1.2}
+.exam-label{font-size:.7rem;opacity:.8;letter-spacing:.5px}
+.hdr-right{display:flex;align-items:center;gap:14px}
+.student-chip{background:rgba(255,255,255,.12);border-radius:20px;padding:4px 12px;font-size:.75rem;font-weight:700;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.security-badge{background:rgba(22,163,74,.2);border:1px solid #4ade80;border-radius:6px;padding:3px 8px;font-size:.65rem;font-weight:800;color:#4ade80;text-transform:uppercase}
+#timer-banner-wrap{position:sticky;top:64px;z-index:99;display:flex;justify-content:center;padding:8px 10px 0;pointer-events:none}
+#timer-display{pointer-events:auto;background:rgba(15,23,71,.96);border:3px solid rgba(255,255,255,.55);border-radius:14px;padding:8px 32px;font-size:2.4rem;font-weight:900;letter-spacing:5px;color:#fff;font-variant-numeric:tabular-nums;text-align:center;box-shadow:0 4px 18px rgba(0,0,0,.4);min-width:180px}
+#timer-display.warn{background:rgba(127,29,29,.97);border-color:#ef4444;animation:timerRedGlow 1s ease-in-out infinite}
+@keyframes timerRedGlow{0%,100%{box-shadow:0 0 14px rgba(239,68,68,.75),0 0 28px rgba(239,68,68,.5)}50%{box-shadow:0 0 28px rgba(239,68,68,1),0 0 52px rgba(239,68,68,.9)}}
+@media (max-width:480px){#timer-display{font-size:1.7rem;padding:6px 20px;letter-spacing:3px;min-width:130px}}
+.progress-wrap{background:rgba(0,0,0,.15);height:4px}
+.progress-bar{height:4px;background:linear-gradient(90deg,#4ade80,#22d3ee);transition:width .4s;border-radius:0 4px 4px 0}
+.screen{display:none;min-height:calc(100vh - 130px);padding:28px 16px}
+.screen.active{display:block}
+.container{max-width:780px;margin:0 auto}
+.reg-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:36px 32px;border-top:5px solid var(--primary);max-width:480px;margin:30px auto}
+.reg-logo-wrap{text-align:center;margin-bottom:20px}
+.reg-logo{height:90px;width:auto;object-fit:contain}
+.reg-card h2{font-size:1.5rem;font-weight:900;color:var(--primary);margin-bottom:4px;text-align:center}
+.subtitle{font-size:.85rem;color:var(--muted);text-align:center;margin-bottom:22px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-weight:700;font-size:.8rem;margin-bottom:6px;color:var(--primary);text-transform:uppercase;letter-spacing:.5px}
+.form-group input,.form-group select{width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:8px;font-size:.95rem;font-family:inherit}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.exam-info-box{background:var(--accent-light);border:1.5px solid #93c5fd;border-radius:10px;padding:14px 18px;margin-bottom:22px;font-size:.82rem}
+.exam-info-box h4{color:var(--primary);font-weight:800;margin-bottom:8px;font-size:.85rem}
+.exam-info-row{display:flex;justify-content:space-between;padding:3px 0;color:var(--primary)}
+.exam-info-row span:last-child{font-weight:700}
+.locked-notice{background:#fef2f2;border:2px solid #fca5a5;border-radius:10px;padding:16px;text-align:center;color:var(--danger);font-weight:700;font-size:.9rem}
+.lock-icon{font-size:2rem;margin-bottom:8px;display:block}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border:none;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#1d4ed8}
+.btn-gold{background:var(--gold);color:#fff}.btn-gold:hover{background:#92400e}
+.btn-danger{background:var(--danger);color:#fff}.btn-danger:hover{background:#b91c1c}
+.btn-secondary{background:#e5e7eb;color:var(--primary)}.btn-secondary:hover{background:#d1d5db}
+.btn-lg{padding:13px 28px;font-size:1rem}
+.section-nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;background:var(--card);padding:12px;border-radius:var(--radius);box-shadow:var(--shadow)}
+.snav-btn{padding:7px 14px;border:2px solid var(--border);border-radius:8px;background:#fff;font-weight:700;font-size:.78rem;cursor:pointer;text-transform:uppercase;letter-spacing:.5px}
+.snav-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.section-head{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;border-radius:var(--radius);padding:18px 22px;margin-bottom:18px;box-shadow:var(--shadow)}
+.section-head h2{font-size:1.05rem;font-weight:900;margin-bottom:3px}
+.section-head p{font-size:.82rem;opacity:.85}
+.marks-badge{display:inline-block;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);border-radius:20px;padding:3px 10px;font-size:.72rem;font-weight:800;margin-top:6px}
+.q-card{background:var(--card);border-radius:var(--radius);padding:22px 24px;margin-bottom:14px;box-shadow:var(--shadow);border:1.5px solid var(--border)}
+.q-num{font-size:.7rem;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:7px}
+.q-text{font-size:.98rem;font-weight:600;line-height:1.55;margin-bottom:14px}
+.q-card.answered{border-left:4px solid var(--success)}
+.mc-options{display:flex;flex-direction:column;gap:8px}
+.mc-opt{display:flex;align-items:center;gap:10px;padding:11px 14px;border:2px solid var(--border);border-radius:8px;cursor:pointer;font-size:.9rem}
+.mc-opt:hover{border-color:var(--accent);background:var(--accent-light)}
+.mc-opt.selected{border-color:var(--accent);background:var(--accent-light);font-weight:700}
+.mc-letter{width:26px;height:26px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.78rem;flex-shrink:0}
+.mc-opt.selected .mc-letter{background:var(--accent);color:#fff}
+.short-input{width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:8px;font-size:.95rem;font-family:inherit}
+.short-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.sub-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.sub-row span{flex:1;min-width:180px;font-size:.9rem;font-weight:600}
+.sub-row select{padding:9px 12px;border:2px solid var(--border);border-radius:8px;font-size:.9rem;font-family:inherit;min-width:180px;max-width:100%}
+.working-note{font-size:.78rem;color:var(--muted);font-style:italic;margin-top:6px;display:block}
+.quiz-actions{display:flex;justify-content:space-between;align-items:center;margin-top:22px;padding:16px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow)}
+.answered-count{font-size:.8rem;color:var(--muted);font-weight:600}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.show{display:flex}
+.modal-box{background:#fff;border-radius:var(--radius);padding:28px;max-width:420px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.2);border-top:5px solid var(--primary)}
+.modal-box h3{color:var(--primary);font-size:1.15rem;margin-bottom:12px;font-weight:900}
+.modal-box p{font-size:.88rem;color:var(--muted);margin-bottom:18px;line-height:1.6}
+.modal-actions{display:flex;gap:10px;flex-wrap:wrap}
+.warning-list{background:#fef3c7;border:1.5px solid var(--gold);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:.82rem;color:var(--gold)}
+.results-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px;margin-bottom:22px}
+.results-header{text-align:center;padding-bottom:22px;border-bottom:2px solid var(--border);margin-bottom:22px}
+.results-header h2{font-size:1.6rem;font-weight:900;color:var(--primary)}
+.score-circle{width:140px;height:140px;border-radius:50%;background:conic-gradient(var(--accent) calc(var(--pct)*1%),#e5e7eb 0);display:flex;align-items:center;justify-content:center;margin:16px auto}
+.score-inner{width:108px;height:108px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-pct{font-size:1.8rem;font-weight:900;color:var(--primary);line-height:1}
+.score-label{font-size:.6rem;color:var(--muted);font-weight:700;text-transform:uppercase;margin-top:2px}
+.grade-badge{display:inline-block;padding:6px 20px;border-radius:20px;font-weight:900;font-size:1.1rem;margin-top:8px}
+.grade-A{background:#dcfce7;color:var(--success)}.grade-B{background:#dbeafe;color:var(--accent)}.grade-C{background:#fef3c7;color:var(--gold)}.grade-D,.grade-F{background:#fee2e2;color:var(--danger)}
+.pass-badge{padding:4px 14px;border-radius:20px;font-weight:800;font-size:.82rem;margin-left:8px}
+.pass-badge.pass{background:#dcfce7;color:var(--success)}.pass-badge.fail{background:#fee2e2;color:var(--danger)}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px}
+.stat-box{background:#f8fafc;border:1.5px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.slabel{font-size:.68rem;font-weight:800;color:var(--muted);text-transform:uppercase}
+.sval{font-size:1.3rem;font-weight:900;margin-top:4px}
+.stat-box.green .sval{color:var(--success)}.stat-box.red .sval{color:var(--danger)}.stat-box.blue .sval{color:var(--accent)}.stat-box.gold .sval{color:var(--gold)}
+.section-scores{margin-bottom:20px}
+.section-scores h4,.security-log h4{font-weight:800;color:var(--primary);margin-bottom:10px;font-size:.9rem;text-transform:uppercase}
+.sec-score-row{display:flex;align-items:center;gap:12px;padding:8px 12px;background:#f8fafc;border-radius:8px;margin-bottom:6px;border:1px solid var(--border)}
+.sec-name{font-weight:700;font-size:.85rem;flex:1}
+.sec-bar{flex:2;height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden}
+.sec-bar-fill{height:100%;background:var(--accent);border-radius:4px}
+.sec-score-num{font-weight:800;font-size:.85rem;color:var(--primary);min-width:50px;text-align:right}
+.security-log{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:12px}
+.sec-event{font-size:.75rem;color:var(--muted);padding:3px 0;border-bottom:1px solid var(--border);font-family:'Courier New',monospace}
+.review-header{text-align:center;margin-bottom:22px;padding-bottom:16px;border-bottom:3px solid var(--primary)}
+.rh-school{font-size:1.1rem;font-weight:900;color:var(--primary);letter-spacing:1px;text-transform:uppercase}
+.rh-title{font-size:.95rem;font-weight:800;margin-top:4px}
+.review-score-bar{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;background:#f9fafb;border:1.5px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:24px}
+.rs-item{text-align:center;min-width:100px}
+.rs-label{font-size:.65rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700}
+.rs-value{font-size:1.4rem;font-weight:900;color:var(--primary);margin-top:2px}
+.rv-section-head{font-weight:800;font-size:.92rem;color:#fff;padding:9px 16px;border-radius:8px;margin:24px 0 12px;background:linear-gradient(135deg,var(--primary),var(--accent))}
+.rv-q{border-radius:10px;padding:14px 16px;margin-bottom:10px;border:1.5px solid var(--border);background:#fff}
+.rv-q.is-correct{border-color:#86efac;background:#f0fdf4}.rv-q.is-wrong{border-color:#fca5a5;background:#fef2f2}
+.rv-q-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+.rv-mark{font-size:1.15rem;font-weight:900;flex-shrink:0;line-height:1.4}
+.rv-q.is-correct .rv-mark,.rv-q.is-correct .rv-given{color:var(--success)}
+.rv-q.is-wrong .rv-mark,.rv-q.is-wrong .rv-given{color:var(--danger)}
+.rv-q-text{font-weight:600;font-size:.92rem;line-height:1.5}
+.rv-q-num{font-size:.68rem;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.rv-answer-row{font-size:.84rem;margin-top:6px;padding-left:26px}
+.rv-given{font-weight:700}
+.rv-correct-ans{font-size:.84rem;margin-top:4px;padding-left:26px;color:var(--success);font-weight:700}
+.rv-no-answer{font-style:italic;color:var(--muted);font-weight:600}
+@media print{
+  html,body{height:auto!important;overflow:visible!important;background:#fff!important;font-size:11pt!important}
+  body *{visibility:hidden!important}
+  #cert-screen,#cert-screen *{visibility:visible!important}
+  #cert-screen{display:block!important;position:static!important;width:100%!important;height:auto!important;min-height:0!important;overflow:visible!important;padding:0!important;margin:0!important}
+  .screen{min-height:0!important}.container{max-width:100%!important}
+  .results-card{box-shadow:none!important;border:none!important;padding:8px!important}
+  .no-print,.print-bar,.cert-actions,.modal-overlay{display:none!important}
+  .rv-q,.rv-section-head,.review-header,.review-score-bar{page-break-inside:avoid;break-inside:avoid}
+  @page{size:A4;margin:20mm 16mm}
+}
+.cert-wrap{background:linear-gradient(135deg,#f0f4ff,#fff);border:3px solid var(--primary);border-radius:16px;padding:36px;text-align:center;position:relative;overflow:hidden}
+.cert-wrap::before{content:'';position:absolute;inset:8px;border:1.5px solid rgba(26,58,107,.2);border-radius:12px;pointer-events:none}
+.cert-logo{height:70px;width:auto;object-fit:contain;margin-bottom:10px}
+.cert-school{font-size:.95rem;font-weight:900;color:var(--primary);letter-spacing:2px;text-transform:uppercase}
+.cert-heading{font-size:1.6rem;font-weight:900;color:var(--primary);letter-spacing:1px;text-transform:uppercase;margin:10px 0}
+.cert-name{font-size:2rem;font-weight:900;color:var(--primary);font-style:italic;border-bottom:2px solid var(--gold);display:inline-block;padding-bottom:4px;margin-bottom:10px}
+.cert-grade-circle{width:90px;height:90px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;margin:12px auto;font-size:2rem;font-weight:900;border:4px solid var(--primary)}
+.cert-score-line{font-size:1rem;font-weight:700;color:var(--primary);margin:6px 0}
+.cert-sigs{display:flex;justify-content:space-around;margin-top:28px;gap:20px}
+.cert-sig{border-top:2px solid var(--primary);padding-top:8px;min-width:140px;text-align:center;font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase}
+.error-msg{color:var(--danger);font-size:.78rem;margin-top:4px;font-weight:700;display:none}
+.error-msg.show{display:block}
+.flex-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:20px}
+.security-banner{background:#7f1d1d;color:#fff;text-align:center;font-weight:900;font-size:.85rem;letter-spacing:.5px;padding:10px 12px;border-radius:10px;margin-bottom:14px;border:2px solid #ff4444;text-shadow:0 0 6px #f00,0 0 14px #f00;animation:banner-glow 1.2s ease-in-out infinite alternate}
+@keyframes banner-glow{from{text-shadow:0 0 6px #f00,0 0 14px #f00;box-shadow:0 0 6px rgba(255,0,0,.4)}to{text-shadow:0 0 14px #f22,0 0 26px #f00;box-shadow:0 0 18px rgba(255,0,0,.7)}}
+.glow-danger-text{font-size:1.6rem;font-weight:900;color:#ff1a1a;text-shadow:0 0 8px #f00,0 0 18px #f00,0 0 32px #b91c1c;animation:pulse-red .6s ease-in-out infinite alternate;letter-spacing:1px;margin:10px 0}
+#security-overlay.critical{background:rgba(40,0,0,.96)}
+#security-overlay.critical #overlay-title,#security-overlay.critical #overlay-msg{color:#ff1a1a;font-weight:900;text-shadow:0 0 8px #f00,0 0 18px #f00,0 0 32px #b91c1c;animation:pulse-red .7s ease-in-out infinite alternate}
+#security-overlay.critical #overlay-msg{font-size:1.35rem!important;line-height:1.4;max-width:560px}
+#security-overlay.critical #overlay-icon{animation:pulse-red .7s ease-in-out infinite alternate}
+@keyframes pulse-red{from{text-shadow:0 0 8px #f00,0 0 18px #f00;transform:scale(1)}to{text-shadow:0 0 20px #f00,0 0 40px #f00,0 0 60px #b91c1c;transform:scale(1.03)}}
+body.exam-lockdown{-webkit-user-select:none;user-select:none}
+body.exam-lockdown input,body.exam-lockdown textarea{-webkit-user-select:text;user-select:text}
+.footer-credit{position:fixed;left:0;right:0;bottom:0;text-align:center;padding:9px 10px;font-size:.78rem;font-weight:900;letter-spacing:1.2px;background:rgba(15,15,15,.92);color:#ff9500;text-shadow:0 0 4px #ff9500,0 0 10px #ff6a00,0 0 18px #ff4500;z-index:9000;animation:footer-glow 1.6s ease-in-out infinite alternate}
+@keyframes footer-glow{from{text-shadow:0 0 4px #ff9500,0 0 10px #ff6a00}to{text-shadow:0 0 12px #ffb347,0 0 22px #ff6a00,0 0 32px #ff4500}}
+@media print{.footer-credit{display:none!important}}
+</style>
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<div id="security-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;align-items:center;justify-content:center;flex-direction:column;color:#fff;text-align:center;padding:20px">
+  <div id="overlay-icon" style="font-size:3rem;margin-bottom:12px">⚠️</div>
+  <h2 id="overlay-title" style="font-size:1.4rem;margin-bottom:8px;color:#fbbf24">SECURITY WARNING</h2>
+  <div id="overlay-msg" style="font-size:.95rem;color:#e2e8f0;max-width:460px;line-height:1.6;margin-bottom:20px"></div>
+  <button onclick="dismissOverlay()" style="padding:10px 24px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer">RETURN TO EXAM</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal-box">
+    <h3>📋 Submit Examination?</h3>
+    <div class="warning-list" id="unanswered-warn"></div>
+    <p>Once submitted, your exam will be permanently locked and marked. You <strong>cannot</strong> return to your answers.</p>
+    <div class="modal-actions">
+      <button class="btn btn-danger btn-lg" onclick="confirmSubmit()">✅ Submit Exam</button>
+      <button class="btn btn-secondary" onclick="closeModal()">← Go Back</button>
+    </div>
+  </div>
+</div>
+
+<header class="site-header" id="main-header">
+  <div class="hdr-left">
+    <img src="LOGO_DATA_URI_HERE" alt="Al Muntazir Logo" class="hdr-logo" onerror="this.style.display='none'">
+    <div class="hdr-titles">
+      <div class="school-name">Al Muntazir Islamic Int'l School</div>
+      <div class="exam-label">Year 10 · Week 8 Test · Computer Science</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <span class="security-badge" id="sec-badge">🔒 SECURE</span>
+    <span class="student-chip" id="student-chip" style="display:none"></span>
+  </div>
+</header>
+<div id="timer-banner-wrap"><div id="timer-display" style="display:none">40:00</div></div>
+<div class="progress-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+
+<div class="screen active" id="reg-screen">
+  <div class="container">
+    <div class="reg-card">
+      <div class="reg-logo-wrap">
+        <img src="LOGO_DATA_URI_HERE" alt="School Logo" class="reg-logo" onerror="this.parentElement.innerHTML='<div style=\'font-weight:900;font-size:20px;color:var(--primary);text-align:center;border:3px solid var(--primary);padding:12px 20px;border-radius:8px\'>AL MUNTAZIR<br>ISLAMIC INT\'L SCHOOL</div>'">
+      </div>
+      <h2>Computer Science</h2>
+      <p class="subtitle">Week 8 Test – Data Transmission | Year 10</p>
+      <div class="exam-info-box">
+        <h4>📋 Examination Details</h4>
+        <div class="exam-info-row"><span>Subject</span><span>Computer Science</span></div>
+        <div class="exam-info-row"><span>Topic</span><span>Data Transmission (Week 8)</span></div>
+        <div class="exam-info-row"><span>Total Marks</span><span>50 Marks</span></div>
+        <div class="exam-info-row"><span>Time Allowed</span><span>40 Minutes</span></div>
+        <div class="exam-info-row"><span>Sections</span><span>A · B · C · D · E · F · G · H</span></div>
+        <div class="exam-info-row"><span>Teacher</span><span>Mr. Beda</span></div>
+      </div>
+      <div id="locked-msg" class="locked-notice" style="display:none">
+        <span class="lock-icon">🔒</span>
+        <div id="locked-text">This examination has already been submitted and is permanently locked.</div>
+        <br>
+        <button class="btn btn-primary" onclick="showLockedResults()" style="margin-top:10px">View My Results</button>
+      </div>
+      <div id="reg-form">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" id="inp-name" placeholder="Enter your full name" autocomplete="off">
+          <div class="error-msg" id="err-name">Please enter your full name</div>
+        </div>
+        <div class="form-group">
+          <label>CAMPUS *</label>
+          <input type="text" id="inp-cand" placeholder="e.g. GIRLS WING/ BOYS WING" autocomplete="off">
+          <div class="error-msg" id="err-cand">CAMPUS</div>
+        </div>
+        <div class="form-group">
+          <label>Class *</label>
+          <select id="inp-class">
+            <option value="">-- Select Class --</option>
+            <option value="10Al Falaq">Year 10Al Falaq</option>
+            <option value="10An Najm">Year 10An Najm</option>
+            <option value="10An Nur">Year 10An Nur</option>
+            <option value="10Al Qama">Year 10Al Qamar</option>
+            <option value="10Ash Shams">Year 10Ash Shams</option>
+          </select>
+          <div class="error-msg" id="err-class">Please select your class</div>
+        </div>
+        <div style="margin-top:6px;margin-bottom:18px;font-size:.78rem;color:var(--muted);line-height:1.5">
+          ⚠️ By starting this exam you agree that: (1) You will not copy or share answers. (2) You will not switch browser tabs during the exam. (3) Tab-switching will be recorded as a security violation.
+        </div>
+        <button class="btn btn-primary btn-lg" onclick="startExam()" style="width:100%">Start Examination →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="quiz-screen">
+  <div class="container">
+    <div class="security-banner">⚠️ Switching tabs 3 times = 2 marks will be deducted ⚠️</div>
+    <div class="section-nav" id="section-nav"></div>
+    <div id="sections-wrap"></div>
+    <div class="quiz-actions">
+      <div class="answered-count" id="ans-count">0 / 50 answered</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-secondary no-print" onclick="prevSection()">← Previous</button>
+        <button class="btn btn-primary no-print" id="next-btn" onclick="nextSection()">Next Section →</button>
+        <button class="btn btn-danger no-print" id="submit-btn" style="display:none" onclick="openSubmitModal()">✅ Submit Exam</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="results-screen">
+  <div class="container">
+    <div class="results-card">
+      <div class="results-header">
+        <h2>📊 Examination Results</h2>
+        <p style="color:var(--muted);font-size:.85rem;margin-top:4px" id="res-student-line"></p>
+        <div class="score-circle" id="score-circle"><div class="score-inner"><div class="score-pct" id="score-pct-text">0%</div><div class="score-label">Score</div></div></div>
+        <div id="res-grade-badge"></div>
+      </div>
+      <div class="stat-grid" id="stat-grid"></div>
+      <div class="section-scores" id="section-scores"></div>
+      <div class="security-log" id="security-log-display"></div>
+    </div>
+    <div class="flex-actions">
+      <button class="btn btn-primary btn-lg" onclick="showFeedback()">📝 View Marked Exam</button>
+      <button class="btn btn-gold btn-lg" onclick="showCert()">🏅 View Certificate</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="cert-screen"><div class="container" id="cert-container"></div></div>
+
+<script>
+/* ════════ QUESTION BANK – Week 8 Test (Data Transmission) · 50 marks ════════ */
+const SECS=[
+ {k:'A',nav:'A · MCQ',title:'Multiple Choice Questions',desc:'Choose the ONE correct answer.'},
+ {k:'B',nav:'B · Multi-Select',title:'Multiple Select',desc:'Select ALL correct answers. You must select every correct option to earn the mark.'},
+ {k:'C',nav:'C · True/False',title:'True / False',desc:'Choose True or False.'},
+ {k:'D',nav:'D · Matching',title:'Matching Items',desc:'Match each term with the correct description.'},
+ {k:'E',nav:'E · Blanks',title:'Fill in the Blanks',desc:'Type the missing word.'},
+ {k:'F',nav:'F · Ordering',title:'Ordering / Sequencing',desc:'Choose the correct order for each position.'},
+ {k:'G',nav:'G · Classify',title:'Classification / Categorisation',desc:'Choose the correct category for every line.'},
+ {k:'H',nav:'H · Scenarios',title:'Scenario-Based MCQ',desc:'Read the scenario and choose the best answer.'}
+];
+const Q=[];
+function add(sec,type,o){Q.push(Object.assign({sec,type,marks:1,n:Q.length+1,id:'q'+(Q.length+1)},o));}
+const L='ABCDEFGH';
+// A – MCQ (15)
+[
+["What is serial transmission?",["Several bits are sent at the same time","One bit is sent at a time","Data is only received","Data is sent in two directions at the same time"],"B"],
+["What is parallel transmission?",["One bit is sent at a time","Data is sent in one direction only","Several bits are sent at the same time","Data is sent without wires"],"C"],
+["Which transmission method normally uses a single wire to transmit data?",["Parallel","Serial","Simplex","Full-duplex"],"B"],
+["Which is an advantage of serial transmission?",["It always sends more bits at once","It uses more wires","It has less skewing","It is always faster than parallel"],"C"],
+["Which is a disadvantage of parallel transmission?",["It sends only one bit at a time","It can suffer from skewing","It uses only one wire","It cannot transmit data"],"B"],
+["Which method is generally more suitable for longer distances?",["Parallel","Serial","Simplex","Half-duplex"],"B"],
+["Which method allows data to travel in only one direction?",["Simplex","Half-duplex","Full-duplex","Parallel"],"A"],
+["Which method allows data to travel in both directions, but not at the same time?",["Simplex","Serial","Half-duplex","Full-duplex"],"C"],
+["Which method allows data to travel in both directions at the same time?",["Simplex","Half-duplex","Parallel","Full-duplex"],"D"],
+["Which of the following is an example of simplex communication?",["Telephone conversation","Walkie-talkie","Keyboard sending data to a computer","Two people using a video call"],"C"],
+["Which is an example of half-duplex communication?",["Telephone conversation","Walkie-talkie","Keyboard sending data to a computer","Television broadcast"],"B"],
+["Which is an example of full-duplex communication?",["Keyboard → computer","Television broadcast","Walkie-talkie","Telephone conversation"],"D"],
+["Why can parallel transmission suffer from skewing?",["The bits may arrive at slightly different times","Only one bit is transmitted","It uses no wires","Data can only travel one way"],"A"],
+["Which statement about parallel transmission is correct?",["It normally sends one bit at a time","It can send several bits at the same time","It is always better for long distances","It uses fewer wires than serial transmission"],"B"],
+["Which statement correctly describes the difference between serial and parallel transmission?",["Serial describes direction; parallel describes speed","Serial sends bits one at a time; parallel sends several bits at the same time","Serial is simplex; parallel is full-duplex","Serial is wireless; parallel is wired"],"B"]
+].forEach(r=>add('A','mcq',{prompt:r[0],opts:r[1],ans:r[2]}));
+// B – Multi (5)
+[
+["Which are advantages of serial transmission?",["Less skewing","Cheaper cable","Less interference","Always faster than parallel","Suitable for longer distances"],"A,B,C,E"],
+["Which are disadvantages of parallel transmission?",["More skewing","More interference","More expensive cable","It can send several bits at once","More suitable for shorter distances"],"A,B,C,E"],
+["Which statements correctly describe half-duplex transmission?",["Data can travel in both directions","Data travels in only one direction","Both sides cannot transmit at exactly the same time","A walkie-talkie is an example","It is the same as full-duplex"],"A,C,D"],
+["Which statements correctly describe full-duplex transmission?",["Data can travel in both directions","Both directions can operate at the same time","A telephone conversation is an example","Data can only travel from sender to receiver","It is different from simplex"],"A,B,C,E"],
+["Which factors can affect the choice between serial and parallel transmission?",["Distance","Speed required","Cost of cable","Interference/skewing","Colour of the cable"],"A,B,C,D"]
+].forEach(r=>add('B','multi',{prompt:r[0],opts:r[1],ans:r[2]}));
+// C – True/False (5)
+[["Serial transmission sends one bit at a time.","True"],["Parallel transmission normally uses multiple wires to transmit several bits at the same time.","True"],["Simplex transmission allows communication in both directions at the same time.","False"],["Half-duplex transmission allows data to travel in both directions, but not at the same time.","True"],["Full-duplex transmission allows data to travel in both directions at the same time.","True"]]
+.forEach(r=>add('C','tf',{prompt:r[0],ans:r[1]}));
+// D – Matching (5)
+const MD=["Both directions at the same time","One direction only","One bit at a time","Several bits at the same time","Both directions, but not at the same time"];
+[["Serial","C"],["Parallel","D"],["Simplex","B"],["Half-duplex","E"],["Full-duplex","A"]].forEach(r=>add('D','match',{prompt:"Match the term: <strong>"+r[0]+"</strong>",opts:MD,ans:r[1]}));
+// E – Fill (5)
+[["In __________ transmission, one bit is sent at a time.","serial"],["In __________ transmission, several bits can be sent at the same time.","parallel"],["__________ transmission allows data to travel in only one direction.","simplex"],["__________ transmission allows data to travel in both directions, but not at the same time.","halfduplex"],["__________ transmission allows data to travel in both directions at the same time.","fullduplex"]]
+.forEach(r=>add('E','fill',{prompt:r[0],ans:r[1],shown:r[1]==='halfduplex'?'Half-duplex':r[1]==='fullduplex'?'Full-duplex':r[1].charAt(0).toUpperCase()+r[1].slice(1)}));
+// F – Ordering (5)
+const OS=["A. Receiver receives the bits","B. Data is divided into bits","C. Bits are transmitted one after another"];
+const OP=["A. Several bits are transmitted at the same time","B. Data is divided into groups of bits","C. Receiver receives the bits"];
+const OT=["A. Person B sends voice data","B. Person A sends voice data","C. Both directions operate at the same time"];
+add('F','order',{prompt:"Put these stages of <strong>serial transmission</strong> in the correct order.",opts:OS,ans:[OS[1],OS[2],OS[0]]});
+add('F','order',{prompt:"Put these stages of <strong>parallel transmission</strong> in the correct order.",opts:OP,ans:[OP[1],OP[0],OP[2]]});
+add('F','order',{prompt:"Arrange these from <strong>one-way communication to two-way simultaneous communication</strong>.",opts:["Full-duplex","Simplex","Half-duplex"],ans:["Simplex","Half-duplex","Full-duplex"]});
+add('F','order',{prompt:"Arrange these transmission methods according to the number of bits sent at one time, from <strong>fewest to most</strong>.",opts:["Parallel","Serial"],ans:["Serial","Parallel"]});
+add('F','order',{prompt:"A telephone conversation is full-duplex. Arrange the communication process.",opts:OT,ans:[OT[1],OT[0],OT[2]]});
+// G – Classify (5)
+const SP=["Serial","Parallel"],SHF=["Simplex","Half-duplex","Full-duplex"],AD=["Advantage","Disadvantage"],ALL=["Simplex","Half-duplex","Full-duplex","Parallel","Serial"];
+function cl(p,o,rows){add('G','classify',{prompt:p,opts:o,rows:rows.map(r=>r[0]),ans:rows.map(r=>r[1])});}
+cl("Classify each as <strong>SERIAL</strong> or <strong>PARALLEL</strong>.",SP,[["a) One bit is sent after another","Serial"],["b) Eight bits are sent at the same time","Parallel"],["c) Uses multiple wires for several bits","Parallel"],["d) Uses a single wire to transmit bits","Serial"]]);
+cl("Classify each as <strong>SIMPLEX, HALF-DUPLEX or FULL-DUPLEX</strong>.",SHF,[["a) Keyboard → computer","Simplex"],["b) Walkie-talkie","Half-duplex"],["c) Telephone conversation","Full-duplex"]]);
+cl("Classify each statement as an advantage or disadvantage of <strong>SERIAL transmission</strong>.",AD,[["a) Less skewing","Advantage"],["b) Cheaper cable","Advantage"],["c) May be slower","Disadvantage"],["d) May require start/stop bits","Disadvantage"]]);
+cl("Classify each statement as an advantage or disadvantage of <strong>PARALLEL transmission</strong>.",AD,[["a) Several bits can be sent at once","Advantage"],["b) More skewing","Disadvantage"],["c) Faster over short distances","Advantage"],["d) More expensive cable","Disadvantage"]]);
+cl("Classify each scenario according to the most suitable transmission method.",ALL,[["a) Telephone conversation","Full-duplex"],["b) Keyboard sending information to a computer","Simplex"],["c) Walkie-talkie conversation","Half-duplex"],["d) Sending several bits simultaneously over multiple wires","Parallel"],["e) Sending data over a longer distance where reducing interference is important","Serial"]]);
+// H – Scenario MCQ (5)
+[
+["A printer is only <strong>3 metres</strong> from a computer. The computer needs to send large amounts of data quickly to the printer. Which transmission method is most suitable?",["Serial","Parallel","Simplex only","Half-duplex only"],"B"],
+["Two people are using a telephone. Person A can speak while Person B is speaking, and both can hear each other at the same time. Which method is being used?",["Simplex","Half-duplex","Full-duplex","Parallel"],"C"],
+["A student is using a walkie-talkie. One person speaks while the other listens. They must wait for the first person to finish before replying. Which method is being used?",["Simplex","Half-duplex","Full-duplex","Parallel"],"B"],
+["A company needs to communicate with a file server <strong>500 metres away</strong>. The system must be able to send data to the server and receive data from the server <strong>at the same time</strong>. Which combination is most suitable?",["Parallel and simplex","Serial and full-duplex","Parallel and half-duplex","Serial and half-duplex"],"B"],
+["A school wants to connect a computer to a device using a method that sends data <strong>one bit at a time</strong> and is suitable for a relatively long distance because it is less affected by skewing. Which method should be selected?",["Parallel","Serial","Simplex","Half-duplex"],"B"]
+].forEach(r=>add('H','mcq',{prompt:r[0],opts:r[1],ans:r[2]}));
+
+const TOTAL_MARKS=Q.reduce((a,q)=>a+q.marks,0);
+const TOTAL_QUESTIONS=Q.length;
+const secMax=k=>Q.filter(q=>q.sec===k).reduce((a,q)=>a+q.marks,0);
+
+/* ════════ STATE & SECURITY ════════ */
+const STORAGE_KEY='almuntazir_y10_datarep_exam_2026';
+let student={name:'',cand:'',cls:''};
+let timerInterval=null,timerStartEpoch=null,securityLog=[],currentSection=0,tabSwitchCount=0,penaltyMarks=0,sharedAudioCtx=null;
+const EXAM_DURATION=40*60;
+const MAX_WARNINGS_BEFORE_PENALTY=3;
+const PENALTY_PER_VIOLATION=2;
+
+function norm(s){return (s||'').toString().trim().toLowerCase().replace(/[\s\-]+/g,'');}
+function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+function strip(h){return String(h||'').replace(/<[^>]+>/g,'');}
+function today(){return new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});}
+function calcGrade(p){if(p>=75)return 'A';if(p>=60)return 'B';if(p>=50)return 'C';if(p>=40)return 'D';return 'F';}
+function logSecurity(m){const t=new Date().toLocaleTimeString('en-GB');securityLog.push(`[${t}] ${m}`);saveState();}
+
+function saveState(){
+  const state={student,timerStart:timerStartEpoch,submitted:isSubmitted(),answers:collectAllAnswers(),securityLog,tabSwitchCount,penaltyMarks,scoreInfo:getStoredScoreInfo(),timestamp:Date.now()};
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){}
+}
+function loadState(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY));}catch(e){return null;}}
+function isSubmitted(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}').submitted===true;}catch(e){return false;}}
+function getTimerStart(){return timerStartEpoch;}
+function getStoredScoreInfo(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}').scoreInfo||null;}catch(e){return null;}}
+
+function collectAllAnswers(){const a={};Q.forEach(q=>{const el=document.getElementById('inp-'+q.id);if(el)a[q.id]=el.value;});return a;}
+function restoreAnswers(a){
+  if(!a)return;
+  Q.forEach(q=>{const el=document.getElementById('inp-'+q.id);if(el&&a[q.id]!=null){el.value=a[q.id];applyUI(q);}});
+  markAnsweredCards();
+}
+function markAnsweredCards(){Q.forEach(q=>{const el=document.getElementById('inp-'+q.id),c=document.getElementById('qcard-'+q.id);if(el&&c)c.classList.toggle('answered',!!el.value.trim());});}
+function updateAnsweredCount(){
+  let n=0;Q.forEach(q=>{const el=document.getElementById('inp-'+q.id);if(el&&el.value.trim())n++;});
+  document.getElementById('ans-count').textContent=`${n} / ${TOTAL_QUESTIONS} answered`;
+  document.getElementById('progress-bar').style.width=`${(n/TOTAL_QUESTIONS)*100}%`;
+  saveState();
+}
+function onFieldInput(id){const el=document.getElementById('inp-'+id),c=document.getElementById('qcard-'+id);if(el&&c)c.classList.toggle('answered',!!el.value.trim());updateAnsweredCount();}
+
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id)?.classList.add('active');window.scrollTo(0,0);}
+
+/* ════════ BUILD QUIZ ════════ */
+function setVal(id,v){document.getElementById('inp-'+id).value=v;applyUI(Q.find(q=>q.id===id));onFieldInput(id);}
+function pick(id,v){setVal(id,v);}
+function toggleMulti(id,v){
+  const el=document.getElementById('inp-'+id);const s=new Set(el.value?el.value.split(','):[]);
+  s.has(v)?s.delete(v):s.add(v);setVal(id,[...s].sort().join(','));
+}
+function syncSub(id){
+  const parts=[...document.querySelectorAll('.sub-'+id)].map(s=>s.value);
+  setVal(id,parts.some(p=>p)?parts.join('|'):'');
+}
+function applyUI(q){
+  const v=document.getElementById('inp-'+q.id).value;
+  if(q.type==='mcq'||q.type==='tf'||q.type==='multi'){
+    const sel=q.type==='multi'?v.split(','):[v];
+    document.querySelectorAll('#qcard-'+q.id+' .mc-opt').forEach(o=>o.classList.toggle('selected',sel.includes(o.dataset.v)));
+  }else if(q.type==='order'||q.type==='classify'){
+    const parts=v.split('|');
+    document.querySelectorAll('.sub-'+q.id).forEach((s,i)=>s.value=parts[i]||'');
+  }
+}
+function optList(q,fn){return `<div class="mc-options">${q.opts.map((t,i)=>`<div class="mc-opt" data-v="${L[i]}" onclick="${fn}('${q.id}','${L[i]}')"><span class="mc-letter">${L[i]}</span><span>${t}</span></div>`).join('')}</div>`;}
+function subSelects(q,labels){
+  return labels.map((lb,i)=>`<div class="sub-row"><span>${lb}</span><select class="sub-${q.id}" onchange="syncSub('${q.id}')"><option value="">-- choose --</option>${q.opts.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('')}</select></div>`).join('');
+}
+function qBody(q){
+  if(q.type==='mcq')return `<input type="hidden" id="inp-${q.id}">`+optList(q,'pick');
+  if(q.type==='multi')return `<input type="hidden" id="inp-${q.id}">`+optList(q,'toggleMulti')+`<span class="working-note">Select all that apply.</span>`;
+  if(q.type==='tf')return `<input type="hidden" id="inp-${q.id}"><div class="mc-options">${['True','False'].map(t=>`<div class="mc-opt" data-v="${t}" onclick="pick('${q.id}','${t}')"><span>${t}</span></div>`).join('')}</div>`;
+  if(q.type==='match')return `<select class="short-input" id="inp-${q.id}" onchange="onFieldInput('${q.id}')"><option value="">-- choose the matching description --</option>${q.opts.map((o,i)=>`<option value="${L[i]}">${L[i]}. ${o}</option>`).join('')}</select>`;
+  if(q.type==='fill')return `<input type="text" class="short-input" id="inp-${q.id}" oninput="onFieldInput('${q.id}')" placeholder="Type your answer here..." autocomplete="off">`;
+  if(q.type==='order')return `<input type="hidden" id="inp-${q.id}">`+subSelects(q,q.opts.map((_,i)=>'Position '+(i+1)))+`<span class="working-note">First → last</span>`;
+  if(q.type==='classify')return `<input type="hidden" id="inp-${q.id}">`+subSelects(q,q.rows);
+}
+function buildQuiz(){
+  document.getElementById('section-nav').innerHTML=SECS.map((s,i)=>`<button class="snav-btn${i?'':' active'}" onclick="showSection(${i})">${s.nav}</button>`).join('');
+  document.getElementById('sections-wrap').innerHTML=SECS.map((s,i)=>`
+    <div id="section-${i}" style="${i?'display:none':''}">
+      <div class="section-head"><h2>Section ${s.k} – ${s.title}</h2><p>${s.desc}</p><span class="marks-badge">${secMax(s.k)} Marks</span></div>
+      ${Q.filter(q=>q.sec===s.k).map(q=>`<div class="q-card" id="qcard-${q.id}"><div class="q-num">Section ${s.k} · Question ${q.n} · (${q.marks} mark)</div><div class="q-text">${q.prompt}</div>${qBody(q)}</div>`).join('')}
+    </div>`).join('');
+}
+
+/* ════════ SECTION NAVIGATION ════════ */
+function showSection(idx){
+  currentSection=idx;
+  SECS.forEach((s,i)=>{document.getElementById('section-'+i).style.display=(i===idx)?'block':'none';});
+  document.querySelectorAll('.snav-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  document.getElementById('next-btn').style.display=(idx===SECS.length-1)?'none':'inline-flex';
+  document.getElementById('submit-btn').style.display=(idx===SECS.length-1)?'inline-flex':'none';
+  window.scrollTo(0,0);
+}
+function nextSection(){if(currentSection<SECS.length-1)showSection(currentSection+1);}
+function prevSection(){if(currentSection>0)showSection(currentSection-1);}
+
+function openSubmitModal(){
+  let un=0;Q.forEach(q=>{const el=document.getElementById('inp-'+q.id);if(!el||!el.value.trim())un++;});
+  const w=document.getElementById('unanswered-warn');
+  if(un>0){w.style.display='block';w.textContent=`⚠️ You have ${un} unanswered question(s). Unanswered questions will be marked as incorrect.`;}else w.style.display='none';
+  document.getElementById('submit-modal').classList.add('show');
+}
+function closeModal(){document.getElementById('submit-modal').classList.remove('show');}
+function confirmSubmit(){closeModal();gradeAndSubmit();}
+
+/* ════════ GRADING ════════ */
+let LAST_RESULTS=null;
+function isCorrect(q,v){
+  if(!v)return false;
+  if(q.type==='fill')return norm(v)===q.ans;
+  if(q.type==='order'||q.type==='classify')return v===q.ans.join('|');
+  return v===q.ans;
+}
+function disp(q,v){
+  if(!v)return '';
+  if(q.type==='mcq'||q.type==='match'){const i=L.indexOf(v);return `${v}. ${strip(q.opts[i]||'')}`;}
+  if(q.type==='multi')return v.split(',').map(x=>`${x}. ${q.opts[L.indexOf(x)]}`).join(' | ');
+  if(q.type==='order')return v.split('|').map(x=>x||'—').join(' → ');
+  if(q.type==='classify'){const p=v.split('|');return q.rows.map((r,i)=>`${r}: ${p[i]||'—'}`).join(' | ');}
+  return v;
+}
+function correctDisp(q){
+  if(q.type==='mcq'||q.type==='match')return `${q.ans}. ${strip(q.opts[L.indexOf(q.ans)])}`;
+  if(q.type==='multi')return q.ans.split(',').map(x=>`${x}. ${q.opts[L.indexOf(x)]}`).join(' | ');
+  if(q.type==='order')return q.ans.join(' → ');
+  if(q.type==='classify')return q.rows.map((r,i)=>`${r}: ${q.ans[i]}`).join(' | ');
+  if(q.type==='fill')return q.shown;
+  return q.ans;
+}
+function gradeAndSubmit(){
+  const results={},earnedSec={};
+  SECS.forEach(s=>{results[s.k]=[];earnedSec[s.k]=0;});
+  Q.forEach(q=>{
+    const val=document.getElementById('inp-'+q.id)?.value||'';
+    const ok=isCorrect(q,val),earned=ok?q.marks:0;
+    earnedSec[q.sec]+=earned;
+    results[q.sec].push({q,given:val,ok,earned});
+  });
+  const rawTotal=Object.values(earnedSec).reduce((a,b)=>a+b,0);
+  const totalCorrect=Math.max(0,rawTotal-penaltyMarks);
+  const pct=Math.round((totalCorrect/TOTAL_MARKS)*100);
+  const grade=calcGrade(pct);
+  LAST_RESULTS={results,earnedSec,rawTotal,penaltyMarks,totalCorrect,pct,grade,tabSwitchCount,submittedAt:Date.now()};
+  const state=loadState()||{};
+  state.submitted=true;state.scoreInfo=LAST_RESULTS;state.student=student;state.securityLog=securityLog;state.tabSwitchCount=tabSwitchCount;state.penaltyMarks=penaltyMarks;
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){}
+  clearInterval(timerInterval);
+  document.body.classList.remove('exam-lockdown');
+  exitFullscreenSafely();
+  showResults(LAST_RESULTS);
+  syncResultToServer();
+}
+
+/* ════════ SERVER SYNC ════════ */
+const SYNC_QUEUE_KEY='almuntazir_y10_datarep_pending_sync';
+function buildSyncPayload(){
+  const state=loadState()||{};
+  return {id:state.submissionId||(state.submissionId=(Date.now()+'-'+Math.random().toString(36).slice(2,9))),student,rawTotal:LAST_RESULTS.rawTotal,penaltyMarks:LAST_RESULTS.penaltyMarks,totalCorrect:LAST_RESULTS.totalCorrect,totalMarks:TOTAL_MARKS,pct:LAST_RESULTS.pct,grade:LAST_RESULTS.grade,tabSwitchCount:LAST_RESULTS.tabSwitchCount,submittedAt:LAST_RESULTS.submittedAt};
+}
+function queueForRetry(p){try{const q=JSON.parse(localStorage.getItem(SYNC_QUEUE_KEY)||'[]');if(!q.some(x=>x.id===p.id))q.push(p);localStorage.setItem(SYNC_QUEUE_KEY,JSON.stringify(q));}catch(e){}}
+function clearFromRetryQueue(id){try{const q=JSON.parse(localStorage.getItem(SYNC_QUEUE_KEY)||'[]').filter(p=>p.id!==id);localStorage.setItem(SYNC_QUEUE_KEY,JSON.stringify(q));}catch(e){}}
+async function sendPayload(p){const r=await fetch('/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});if(!r.ok)throw new Error('bad status');}
+
+function generateMarkedPdfBase64(){
+  return new Promise(resolve=>{
+    try{
+      const info=LAST_RESULTS;
+      if(!window.jspdf||!window.jspdf.jsPDF||!info){resolve(null);return;}
+      const {jsPDF}=window.jspdf;
+      const doc=new jsPDF({unit:'pt',format:'a4'});
+      const mx=40,pw=doc.internal.pageSize.getWidth(),ph=doc.internal.pageSize.getHeight(),maxW=pw-mx*2;
+      let y=50;
+      function ensure(n){if(y+n*13>ph-40){doc.addPage();y=50;}}
+      function wrap(t,size,style,color){
+        doc.setFont('helvetica',style||'normal');doc.setFontSize(size||10);
+        const c=color||[30,30,30];doc.setTextColor(c[0],c[1],c[2]);
+        const lines=doc.splitTextToSize(String(t||''),maxW);ensure(lines.length);doc.text(lines,mx,y);y+=lines.length*(size*1.15)+4;
+      }
+      doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(26,58,107);
+      doc.text("Al Muntazir Islamic Int'l School",mx,y);y+=18;
+      doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(80,80,80);
+      doc.text('Computer Science – Week 8 Test – Marked Paper',mx,y);y+=22;
+      doc.setDrawColor(220,220,220);doc.line(mx,y,pw-mx,y);y+=16;
+      wrap(`Student: ${student.name}    Class: ${student.cls||''}    Campus: ${student.cand||''}`,11,'bold');
+      wrap(`Total: ${info.totalCorrect}/${TOTAL_MARKS}    Percentage: ${info.pct}%    Grade: ${info.grade}`,11,'bold');
+      y+=6;
+      SECS.forEach(s=>{
+        ensure(2);
+        doc.setFillColor(26,58,107);doc.rect(mx,y-11,maxW,18,'F');
+        doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(10.5);
+        doc.text(`SECTION ${s.k} - ${s.title} (${secMax(s.k)} marks)`,mx+6,y+1);y+=20;
+        info.results[s.k].forEach(item=>{
+          const {q,given,ok,earned}=item;
+          const col=ok?[22,163,74]:[220,38,38];
+          wrap(`${q.n}. ${strip(q.prompt)}`,10,'bold',[20,20,20]);
+          wrap(`Your answer: ${given&&given.trim()?disp(q,given):'No answer given'}`,9.5,'normal',[60,60,60]);
+          ensure(1);doc.setFont('helvetica','bold');doc.setFontSize(9.5);doc.setTextColor(col[0],col[1],col[2]);
+          doc.text(`${ok?'CORRECT':'WRONG'} (${earned}/${q.marks} mark)`,mx,y);y+=13;
+          if(!ok)wrap(`Correct answer: ${correctDisp(q)}`,9,'italic',[90,90,90]);
+          y+=6;
+        });
+        y+=4;
+      });
+      resolve(doc.output('datauristring').split(',')[1]);
+    }catch(e){resolve(null);}
+  });
+}
+async function syncResultToServer(){
+  const payload=buildSyncPayload();
+  const pdf=await generateMarkedPdfBase64();
+  if(pdf)payload.pdfBase64=pdf;
+  const st=loadState()||{};st.submissionId=payload.id;
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(st));}catch(e){}
+  try{await sendPayload(payload);}catch(e){queueForRetry(payload);}
+}
+function flushPendingSync(){
+  let q=[];try{q=JSON.parse(localStorage.getItem(SYNC_QUEUE_KEY)||'[]');}catch(e){}
+  q.forEach(p=>{sendPayload(p).then(()=>clearFromRetryQueue(p.id)).catch(()=>{});});
+}
+window.addEventListener('online',flushPendingSync);
+document.addEventListener('DOMContentLoaded',flushPendingSync);
+
+/* ════════ RESULTS ════════ */
+function showResults(info){
+  document.getElementById('res-student-line').textContent=`${student.name} · ${student.cand} · ${student.cls}`;
+  document.getElementById('score-circle').style.setProperty('--pct',info.pct);
+  document.getElementById('score-pct-text').textContent=`${info.pct}%`;
+  document.getElementById('res-grade-badge').innerHTML=`<span class="grade-badge grade-${info.grade}">Grade ${info.grade}</span>`;
+  document.getElementById('stat-grid').innerHTML=`
+    <div class="stat-box blue"><div class="slabel">Total Marks</div><div class="sval">${info.totalCorrect}/${TOTAL_MARKS}</div></div>
+    <div class="stat-box ${info.pct>=50?'green':'red'}"><div class="slabel">Result</div><div class="sval">${info.pct>=50?'PASS':'FAIL'}</div></div>
+    <div class="stat-box gold"><div class="slabel">Grade</div><div class="sval">${info.grade}</div></div>`;
+  document.getElementById('section-scores').innerHTML=`<h4>Section Breakdown</h4>
+    ${SECS.map(s=>{const e=info.earnedSec[s.k],m=secMax(s.k);return `<div class="sec-score-row"><div class="sec-name">Section ${s.k} – ${s.title}</div><div class="sec-bar"><div class="sec-bar-fill" style="width:${(e/m)*100}%"></div></div><div class="sec-score-num">${e}/${m}</div></div>`;}).join('')}
+    ${info.penaltyMarks>0?`
+      <div class="sec-score-row" style="margin-top:10px;border-top:1.5px dashed #fca5a5;padding-top:10px"><div class="sec-name" style="color:#dc2626;font-weight:900">⚠ Security Penalty (${info.tabSwitchCount} tab-switch violation${info.tabSwitchCount>1?'s':''})</div><div class="sec-bar"></div><div class="sec-score-num" style="color:#dc2626">−${info.penaltyMarks}</div></div>
+      <div class="sec-score-row"><div class="sec-name" style="font-weight:900">Raw Score Before Penalty</div><div class="sec-bar"></div><div class="sec-score-num">${info.rawTotal}/${TOTAL_MARKS}</div></div>`:''}`;
+  document.getElementById('security-log-display').innerHTML=`<h4>Security Log</h4>${securityLog.length?securityLog.map(e=>`<div class="sec-event">${esc(e)}</div>`).join(''):'<div class="sec-event">No security events recorded.</div>'}`;
+  showScreen('results-screen');
+}
+function showLockedResults(){
+  const st=loadState();
+  if(st&&st.scoreInfo){student=st.student||student;securityLog=st.securityLog||[];LAST_RESULTS=st.scoreInfo;showResults(LAST_RESULTS);}
+}
+
+/* ════════ MARKED PAPER ════════ */
+function buildMarkedPaperHTML(info){
+  let html=`<div class="results-card">
+    <div class="review-header"><div class="rh-school">Al Muntazir Islamic Int'l School</div><div class="rh-title">Week 8 Test – Marked Paper</div></div>
+    <div class="review-score-bar">
+      <div class="rs-item"><div class="rs-label">Student</div><div class="rs-value" style="font-size:1rem">${esc(student.name)}</div></div>
+      <div class="rs-item"><div class="rs-label">Total</div><div class="rs-value">${info.totalCorrect}/${TOTAL_MARKS}</div></div>
+      <div class="rs-item"><div class="rs-label">Percentage</div><div class="rs-value">${info.pct}%</div></div>
+      <div class="rs-item"><div class="rs-label">Grade</div><div class="rs-value">${info.grade}</div></div>
+    </div>`;
+  SECS.forEach(s=>{
+    html+=`<div class="rv-section-head">SECTION ${s.k} – ${s.title} (${secMax(s.k)} marks)</div>`;
+    info.results[s.k].forEach(({q,given,ok,earned})=>{
+      const g=given&&given.trim()?esc(disp(q,given)):null;
+      html+=`<div class="rv-q ${ok?'is-correct':'is-wrong'}">
+        <div class="rv-q-top"><div class="rv-mark">${ok?'✓':'✗'}</div><div style="flex:1"><div class="rv-q-num">Q${q.n} · ${earned}/${q.marks} mark</div><div class="rv-q-text">${q.prompt}</div></div></div>
+        <div class="rv-answer-row">Your answer: ${g?`<span class="rv-given">${g}</span>`:`<span class="rv-no-answer">No answer given</span>`}</div>
+        ${!ok?`<div class="rv-correct-ans">✓ Correct answer: ${esc(correctDisp(q))}</div>`:''}
+      </div>`;
+    });
+  });
+  return html+`</div>`;
+}
+function showFeedback(){
+  if(!LAST_RESULTS)return;
+  document.getElementById('cert-container').innerHTML=buildMarkedPaperHTML(LAST_RESULTS)+`
+    <div class="flex-actions no-print">
+      <button class="btn btn-gold btn-lg" onclick="showCert()">🏅 View Certificate</button>
+      <button class="btn btn-secondary" onclick="showScreen('results-screen')">← Back</button>
+      <button class="btn btn-primary" onclick="printFeedback()">🖨 Print</button>
+    </div>`;
+  showScreen('cert-screen');
+}
+function printFeedback(){window.print();}
+
+/* ════════ CERTIFICATE ════════ */
+function showCert(){
+  const info=LAST_RESULTS;if(!info)return;
+  const logo=document.querySelector('.hdr-logo')?.src||'';
+  document.getElementById('cert-container').innerHTML=`
+    <div class="results-card" style="padding:0"><div class="cert-wrap">
+      <img src="${logo}" class="cert-logo" alt="Logo" onerror="this.style.display='none'">
+      <div class="cert-school">Al Muntazir Islamic Int'l School</div>
+      <div style="font-size:.75rem;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Department of Computer Science</div>
+      <div class="cert-heading">Certificate of Achievement</div>
+      <div style="color:var(--muted);font-size:.85rem;margin-bottom:14px">This is to certify that</div>
+      <div class="cert-name">${esc(student.name)}</div>
+      <div style="font-size:.9rem;color:var(--muted);margin-bottom:8px">Campus: ${esc(student.cand)} · Class: ${esc(student.cls)}</div>
+      <div style="color:var(--muted);font-size:.85rem;margin-bottom:6px">has successfully completed the examination</div>
+      <div style="font-size:1rem;font-weight:800;color:var(--primary);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase">Week 8 Test</div>
+      <div style="font-size:.82rem;color:var(--muted);margin-bottom:16px">${today()}</div>
+      <div class="cert-grade-circle">${info.grade}</div>
+      <div class="cert-score-line">Marks: <strong>${info.totalCorrect}/${TOTAL_MARKS}</strong> &nbsp;·&nbsp; Percentage: <strong>${info.pct}%</strong> &nbsp;·&nbsp; <span class="pass-badge ${info.pct>=50?'pass':'fail'}">${info.pct>=50?'PASS':'FAIL'}</span></div>
+      <div class="cert-sigs"><div class="cert-sig">Mr. Beda<br>Computer Science Teacher</div><div class="cert-sig">Principal<br>Al Muntazir Islamic Int'l School</div><div class="cert-sig">Date<br>${today()}</div></div>
+    </div>
+    <div class="flex-actions no-print" style="padding:16px">
+      <button class="btn btn-primary" onclick="window.print()">🖨 Print Certificate</button>
+      <button class="btn btn-secondary" onclick="showFeedback()">📝 View Marked Exam</button>
+      <button class="btn btn-secondary" onclick="showScreen('results-screen')">← Back</button>
+    </div></div>`;
+  showScreen('cert-screen');
+}
+
+/* ════════ REGISTRATION / START ════════ */
+function startExam(){
+  const name=document.getElementById('inp-name').value.trim(),cand=document.getElementById('inp-cand').value.trim(),cls=document.getElementById('inp-class').value;
+  let ok=true;
+  document.getElementById('err-name').classList.toggle('show',!name);if(!name)ok=false;
+  document.getElementById('err-cand').classList.toggle('show',!cand);if(!cand)ok=false;
+  document.getElementById('err-class').classList.toggle('show',!cls);if(!cls)ok=false;
+  if(!ok)return;
+  student={name,cand,cls};
+  document.getElementById('student-chip').textContent=name;
+  document.getElementById('student-chip').style.display='block';
+  unlockAlarmAudio();
+  tabSwitchCount=0;penaltyMarks=0;
+  document.body.classList.add('exam-lockdown');
+  requestExamFullscreen();
+  buildQuiz();showSection(0);showScreen('quiz-screen');
+  const start=Date.now();timerStartEpoch=start;startTimer(start);
+  saveState();updateAnsweredCount();logSecurity('Exam started');
+}
+function startTimer(startEpoch){
+  const disp_=document.getElementById('timer-display');disp_.style.display='block';
+  function tick(){
+    const remaining=Math.max(0,EXAM_DURATION-Math.floor((Date.now()-startEpoch)/1000));
+    disp_.textContent=`${String(Math.floor(remaining/60)).padStart(2,'0')}:${String(remaining%60).padStart(2,'0')}`;
+    disp_.classList.toggle('warn',remaining<=300);
+    if(remaining<=0){clearInterval(timerInterval);logSecurity('Time expired – auto-submitting');gradeAndSubmit();}
+  }
+  tick();timerInterval=setInterval(tick,1000);
+}
+
+/* ════════ SECURITY ════════ */
+function examActive(){return !!getTimerStart()&&!isSubmitted();}
+function handleTabSwitch(reason){
+  if(!examActive())return;
+  tabSwitchCount++;
+  logSecurity(`Tab/window switch detected (violation #${tabSwitchCount}): ${reason}`);
+  let applied=false;
+  if(tabSwitchCount%MAX_WARNINGS_BEFORE_PENALTY===0){penaltyMarks+=PENALTY_PER_VIOLATION;applied=true;logSecurity(`Penalty applied: -${PENALTY_PER_VIOLATION} marks (after ${tabSwitchCount} tab switches)`);}
+  playAlarmBeeps();showOverlay(reason,applied);saveState();
+}
+function unlockAlarmAudio(){
+  try{
+    const A=window.AudioContext||window.webkitAudioContext;if(!A)return;
+    if(!sharedAudioCtx)sharedAudioCtx=new A();
+    if(sharedAudioCtx.state==='suspended')sharedAudioCtx.resume();
+    const o=sharedAudioCtx.createOscillator(),g=sharedAudioCtx.createGain();
+    g.gain.setValueAtTime(0.0001,sharedAudioCtx.currentTime);
+    o.connect(g).connect(sharedAudioCtx.destination);o.start(sharedAudioCtx.currentTime);o.stop(sharedAudioCtx.currentTime+0.05);
+  }catch(e){}
+}
+function playAlarmBeeps(){
+  try{
+    const A=window.AudioContext||window.webkitAudioContext;if(!A)return;
+    if(!sharedAudioCtx)sharedAudioCtx=new A();
+    const ctx=sharedAudioCtx;if(ctx.state==='suspended')ctx.resume();
+    let t=ctx.currentTime;
+    for(let i=0;i<3;i++){
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type='square';o.frequency.setValueAtTime(950,t);
+      g.gain.setValueAtTime(0.001,t);g.gain.exponentialRampToValueAtTime(0.2,t+0.02);g.gain.exponentialRampToValueAtTime(0.001,t+0.17);
+      o.connect(g).connect(ctx.destination);o.start(t);o.stop(t+0.2);t+=0.25;
+    }
+  }catch(e){}
+}
+function setupSecurity(){
+  document.addEventListener('click',unlockAlarmAudio,{once:true});
+  document.addEventListener('keydown',unlockAlarmAudio,{once:true});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)handleTabSwitch('You switched away from the exam tab');});
+  window.addEventListener('blur',()=>{if(examActive())logSecurity('Window lost focus (blur event)');});
+  document.addEventListener('copy',e=>{if(examActive()){e.preventDefault();logSecurity('Copy attempt blocked');}});
+  document.addEventListener('cut',e=>{if(examActive()){e.preventDefault();logSecurity('Cut attempt blocked');}});
+  document.addEventListener('paste',e=>{if(examActive()){e.preventDefault();logSecurity('Paste attempt blocked');}});
+  document.addEventListener('contextmenu',e=>{if(examActive()){e.preventDefault();logSecurity('Right-click menu blocked');}});
+  document.addEventListener('keydown',e=>{
+    if(!examActive())return;
+    const k=e.key?e.key.toLowerCase():'';
+    const b=e.key==='F12'||(e.ctrlKey&&e.shiftKey&&['i','j','c'].includes(k))||(e.metaKey&&e.altKey&&['i','j','c'].includes(k))||(e.ctrlKey&&['u','s','p'].includes(k))||(e.ctrlKey&&e.shiftKey&&k==='k');
+    if(b){e.preventDefault();logSecurity(`Blocked restricted key combination (${e.key})`);}
+  });
+  document.addEventListener('fullscreenchange',()=>{if(examActive()&&!document.fullscreenElement)handleTabSwitch('You exited full-screen mode');});
+  window.addEventListener('beforeunload',e=>{if(examActive()){logSecurity('Attempted to close/reload the page');e.preventDefault();e.returnValue='';}});
+}
+function requestExamFullscreen(){const el=document.documentElement;const r=el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen;if(r){const p=r.call(el);if(p&&p.catch)p.catch(()=>{});}}
+function exitFullscreenSafely(){if(document.fullscreenElement&&document.exitFullscreen){document.exitFullscreen().catch(()=>{});}}
+function syncTimerBannerPosition(){const h=document.getElementById('main-header'),tb=document.getElementById('timer-banner-wrap');if(h&&tb)tb.style.top=h.offsetHeight+'px';}
+window.addEventListener('resize',syncTimerBannerPosition);
+function showOverlay(reason,applied){
+  const box=document.getElementById('security-overlay');
+  box.classList.toggle('critical',!!applied);
+  document.getElementById('overlay-title').textContent=applied?'PENALTY APPLIED':'SECURITY VIOLATION DETECTED';
+  document.getElementById('overlay-icon').textContent=applied?'🚫':'⚠️';
+  const rem=tabSwitchCount%MAX_WARNINGS_BEFORE_PENALTY;
+  const until=rem===0?MAX_WARNINGS_BEFORE_PENALTY:(MAX_WARNINGS_BEFORE_PENALTY-rem);
+  document.getElementById('overlay-msg').innerHTML=`
+    <div style="margin-bottom:8px;font-size:1rem">Violation #${tabSwitchCount}: ${esc(reason)}.</div>
+    <div class="glow-danger-text">2 MARKS WILL BE DEDUCTED</div>
+    <div style="margin-top:6px;font-size:.85rem;font-weight:700;color:#fecaca">Every 3 tab/window switches = 2 marks deducted from your final score.</div>
+    ${applied?`<div style="margin-top:14px;font-size:1.05rem;font-weight:900;color:#ff4444">PENALTY APPLIED: −${PENALTY_PER_VIOLATION} MARKS<br>(Total penalty so far: ${penaltyMarks} marks)</div>`
+    :`<div style="margin-top:12px;font-size:.85rem;color:#fde68a;font-weight:700">${until} more switch${until>1?'es':''} until the next penalty.</div>`}`;
+  box.style.display='flex';
+}
+function dismissOverlay(){
+  document.getElementById('security-overlay').style.display='none';
+  unlockAlarmAudio();
+  if(examActive()&&!document.fullscreenElement)requestExamFullscreen();
+}
+
+/* ════════ INIT ════════ */
+(function init(){
+  setupSecurity();syncTimerBannerPosition();
+  const state=loadState();
+  if(!state){showScreen('reg-screen');return;}
+  student=state.student||{name:'',cand:'',cls:''};
+  securityLog=state.securityLog||[];tabSwitchCount=state.tabSwitchCount||0;penaltyMarks=state.penaltyMarks||0;
+  if(state.submitted){
+    document.getElementById('reg-form').style.display='none';
+    document.getElementById('locked-msg').style.display='block';
+    const info=state.scoreInfo;
+    document.getElementById('locked-text').textContent=info
+      ?`This exam was submitted on ${state.timerStart?new Date(state.timerStart).toLocaleDateString('en-GB'):'a previous date'}. Score: ${info.totalCorrect}/${TOTAL_MARKS} (${info.pct}%) – Grade ${info.grade}.`
+      :'This exam has already been submitted.';
+    showScreen('reg-screen');return;
+  }
+  if(state.timerStart&&student.name){
+    timerStartEpoch=state.timerStart;
+    document.getElementById('student-chip').textContent=student.name;
+    document.getElementById('student-chip').style.display='block';
+    document.body.classList.add('exam-lockdown');
+    buildQuiz();restoreAnswers(state.answers);showSection(0);showScreen('quiz-screen');
+    startTimer(state.timerStart);updateAnsweredCount();
+    logSecurity('Exam resumed after page reload');requestExamFullscreen();
+  }else showScreen('reg-screen');
+})();
+</script>
+<div class="footer-credit no-print">⚡ DESIGNED BY MR. BEDA (COMPUTER SCIENCE MASTER) ⚡</div>
+
+<script>
+document.addEventListener('contextmenu',function(e){e.preventDefault();});
+document.addEventListener('copy',function(e){e.preventDefault();});
+document.addEventListener('cut',function(e){e.preventDefault();});
+document.addEventListener('paste',function(e){e.preventDefault();});
+document.addEventListener('dragstart',function(e){e.preventDefault();});
+</script>
+</body>
+</html>
