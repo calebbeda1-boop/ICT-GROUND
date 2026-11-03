@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mind Map Revision – Prepared by Mr. Beda</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef3f7;--card:#fff;--ink:#0f1d26;--mute:#2f4350;--line:#cbd8e0;--a:#1f8a9c;--b:#5b5bd6;--shadow:0 14px 34px -14px rgba(20,35,45,.35);box-sizing:border-box}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d161c;--card:#15222b;--ink:#f1f6f9;--mute:#c3d2db;--line:#2c4252;--shadow:0 14px 34px -14px rgba(0,0,0,.8)}}
+:root[data-theme="dark"]{--bg:#0d161c;--card:#15222b;--ink:#f1f6f9;--mute:#c3d2db;--line:#2c4252;--shadow:0 14px 34px -14px rgba(0,0,0,.8)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.4 "Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;overflow:hidden}
+/* HOME */
+#home{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:calc(24px + env(safe-area-inset-top,0px)) 20px calc(20px + env(safe-area-inset-bottom,0px));background:radial-gradient(900px 420px at 50% -80px,color-mix(in srgb,var(--a) 30%,transparent),transparent 70%),radial-gradient(700px 400px at 100% 100%,color-mix(in srgb,var(--b) 22%,transparent),transparent 70%),var(--bg);transition:opacity .4s,transform .4s,visibility .4s}
+body.in-map #home{opacity:0;transform:scale(.97);visibility:hidden}
+.mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;width:100%;max-width:520px}
+h1{margin:0;text-align:center;font:800 clamp(36px,9vw,64px)/1.05 Sora,"Atkinson Hyperlegible",system-ui,sans-serif;letter-spacing:-.02em;background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.btns{display:flex;flex-direction:column;gap:16px;width:100%}
+.big{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;min-height:72px;padding:18px 26px;border-radius:20px;color:#fff;font:700 clamp(18px,4.8vw,22px) Sora,"Atkinson Hyperlegible",sans-serif;background:linear-gradient(135deg,var(--a),var(--b));box-shadow:var(--shadow);transition:transform .3s cubic-bezier(.2,.9,.25,1.2),box-shadow .3s,filter .3s}
+.big:nth-child(2){background:linear-gradient(135deg,var(--b),#c04f9a)}
+.big svg{flex:none;width:26px;height:26px;transition:transform .3s}
+.big:hover{transform:translateY(-5px) scale(1.02);filter:brightness(1.08);box-shadow:0 22px 40px -14px var(--b)}
+.big:hover svg{transform:translateX(6px)}
+.big:active{transform:scale(.97)}
+.big:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
+.by{font-size:15px;color:var(--mute);text-align:center}
+.by b{color:var(--ink)}
+/* MAP SCREEN */
+#mapscreen{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--card);transform:translateX(100%);visibility:hidden;transition:transform .45s cubic-bezier(.2,.85,.25,1),visibility .45s}
+body.in-map #mapscreen{transform:none;visibility:visible}
+.top{display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 10px;border-bottom:1px solid var(--line);background:var(--card)}
+.top h2{flex:1;min-width:0;margin:0;font:700 clamp(15px,4vw,19px)/1.2 Sora,"Atkinson Hyperlegible",sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top button{font:inherit;font-size:15px;font-weight:700;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:8px 16px;min-height:44px;cursor:pointer;white-space:nowrap;transition:transform .2s,box-shadow .2s,border-color .2s}
+.top button:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--a)}
+.top button:active{transform:scale(.95)}
+#back{display:flex;align-items:center;gap:6px;color:#fff;border:0;background:linear-gradient(135deg,var(--a),var(--b))}
+@media (max-width:520px){.top .opt{padding:8px 11px;font-size:14px}}
+#canvas{flex:1;min-height:0;position:relative;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;cursor:grab;background:var(--card)}
+#canvas.drag{cursor:grabbing}
+.inner{position:relative;width:max-content;min-width:100%;padding:36px 60px calc(60px + env(safe-area-inset-bottom,0px)) 22px}
+svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+svg path{fill:none;stroke-width:2.4;stroke-linecap:round}
+ul{list-style:none;margin:0;padding:0}
+li.node{display:flex;align-items:center}
+.kids{display:none;flex-direction:column;margin-left:54px}
+li.open>.kids{display:flex;animation:in .38s cubic-bezier(.2,.8,.25,1)}
+@keyframes in{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:none}}
+.self{all:unset;box-sizing:border-box;position:relative;display:block;max-width:290px;min-width:80px;margin:7px 0;padding:10px 30px 9px 6px;border-bottom:2.5px solid hsl(var(--h) 60% 42%);line-height:1.4;border-radius:8px 8px 0 0;transition:background .25s,transform .25s,border-color .25s}
+button.self{cursor:pointer;font-weight:700;font-size:17px;color:var(--ink)}
+button.self:hover{background:hsl(var(--h) 70% 50%/.14);transform:translateX(3px)}
+button.self:focus-visible{outline:3px solid hsl(var(--h) 70% 50%);outline-offset:2px}
+.leafself{font-size:16px;color:var(--ink);max-width:360px;padding-right:14px;border-bottom-width:2px}
+.leafself:hover{background:hsl(var(--h) 70% 50%/.12);transform:translateX(4px)}
+.dot{position:absolute;right:-14px;bottom:-15px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font:700 12px/1 Sora,sans-serif;color:#fff;background:hsl(var(--h) 62% 40%);border:3px solid hsl(var(--h) 62% 40%);transition:transform .25s cubic-bezier(.3,1.6,.5,1),background .25s,color .25s,box-shadow .25s;z-index:2}
+.dot::after{content:"";position:absolute;inset:-12px}
+button.self:hover .dot{transform:scale(1.2);box-shadow:0 0 0 6px hsl(var(--h) 70% 50%/.22)}
+li.open>.self>.dot{background:var(--card);color:var(--ink)}
+button.self:active .dot{transform:scale(.8)}
+.root>.self{font:700 21px/1.3 Sora,"Atkinson Hyperlegible",sans-serif;max-width:270px;padding-bottom:14px}
+.root>.self .dot{width:36px;height:36px;right:-18px;bottom:-19px;font-size:14px}
+.hint>.self>.dot{animation:pulse 1.6s ease-out infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 hsl(var(--h) 70% 50%/.65)}100%{box-shadow:0 0 0 24px hsl(var(--h) 70% 50%/0)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<section id="home">
+  <div></div>
+  <div class="mid">
+    <h1>Mind Map Revision</h1>
+    <div class="btns">
+      <button class="big" data-k="representation">Data Representation<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      <button class="big" data-k="transmission">Data Transmission<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+    </div>
+  </div>
+  <div class="by">Prepared by <b>Mr. Beda</b></div>
+</section>
+<section id="mapscreen" aria-label="Mind map">
+  <div class="top">
+    <button id="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Back</button>
+    <h2 id="ttl"></h2>
+    <button class="opt" id="ex">Expand all</button><button class="opt" id="co">Collapse</button>
+  </div>
+  <div id="canvas"><div class="inner" id="inner"><svg id="svg"></svg><ul id="tree"></ul></div></div>
+</section>
+<script>
+const D1=["Data Representation – Number Systems and Compression Techniques",
+["Data Representation and Number Systems",
+ ["Why computers use binary","Computers process data using binary, a base-2 system","Only two digits: 0 and 1","Hardware is built from electronic components (logic gates) that are either on (1) or off (0)","Analogue data (sound waves, light) must be converted to digital data first"],
+ ["Key vocabulary","Hexadecimal: base-16 system using digits 0–9 and letters A–F","Binary: base-2 system using digits 0 and 1","Analogue data: continuous data, such as sound waves","Digital data: discrete data represented by binary digits","Register: small storage component in a CPU","Denary: base-10 system, our everyday numbers"],
+ ["Debugging using hexadecimal","Programmers use hex to make long binary data easier to read","Memory addresses and error values are shown in hex","Example: 111100101010100101 is easier to view as F2A5","0000 or FFFF can indicate uninitialised variables"]],
+["Number Systems Explained",
+ ["Denary (base-10)","Place values: 1000, 100, 10, 1","Digits 0 to 9"],
+ ["Binary (base-2)","Digits 0 and 1","Each place value increases by powers of 2","Computers need data in binary format to process it"]],
+["Converting Between Denary and Binary",
+ ["Binary number size and bits","The size of a binary number is the number of bits it contains","A 4-bit binary number has 4 digits, e.g. 1001","Numbers can be up to 64 bits or more"],
+ ["Denary to 4-bit binary","Place values: 8, 4, 2, 1","Example: 13 = 8 + 4 + 1 = 1101"],
+ ["Questions on 4-bit binary","Largest 4-bit number = 2⁴ − 1 = 15","6 → 0110","9 → 1001"],
+ ["Denary to 8-bit binary","Place values: 128, 64, 32, 16, 8, 4, 2, 1","Example: 150 = 128 + 16 + 4 + 2 = 10010110"]],
+["Analogue vs Digital Data",
+ "Analogue: continuous, infinite range, processed by humans, e.g. sound waves, temperature",
+ "Digital: discrete, finite set (0 or 1), processed by computer logic gates",
+ "Registers are small storage units holding binary data temporarily",
+ "Logic gates create the binary signals computers use internally"],
+["Debugging Example with Hexadecimal",
+ "Hex addresses like F2A5 are easier to recognise than 1111001010100101",
+ "Uninitialised variables often show up as 0000 or FFFF in hexadecimal",
+ "Programmers use these clues to trace and fix errors"],
+["Place Values Summary",
+ "Denary: base 10, digits 0–9, values 10³, 10², 10¹, 10⁰",
+ "Binary: base 2, digits 0, 1, values 2³, 2², 2¹, 2⁰",
+ "Hexadecimal: base 16, digits 0–9 and A–F, values 16³, 16², 16¹, 16⁰"],
+["Converting Between Denary and Binary Numbers",
+ ["Denary to binary","Express the number as a sum of powers of 2","Example: 150 = 10010110","Check: odd denary means the rightmost bit is 1; even means 0"],
+ ["Binary to denary","Add the place values where there is a 1","Example: 10010110 = 128 + 16 + 4 + 2 = 150"],
+ ["Practice questions","Convert denary 56 to 8-bit binary","Convert denary 123 to 8-bit binary","Find the largest denary number in 8-bit binary (255)","Convert binary 01100011 to denary"]],
+["Hexadecimal Number System",
+ ["Hexadecimal basics","Denary 0–15 map to 0–9 and A–F (10=A, 11=B, 12=C, 13=D, 14=E, 15=F)"],
+ ["Denary to hex via binary","Example: 7 → 0111 → 7","Example: 12 → 1100 → C","Larger: 201 → 11001001 → split 1100 1001 → C9"],
+ ["Hex to binary or denary","Example: 5E → 0101 1110 → 94","Each hex digit = one 4-bit group"],
+ ["Practice questions","Convert hex A2 to binary","Convert binary 10011101 to hex","Convert denary 350 to hexadecimal","Convert hex 3AC to denary"]],
+["Why Hexadecimal Is Used in Computer Science",
+ ["Benefits","Shorter representation than binary (fewer digits)","Easier for humans to read, write and understand","Simplifies debugging and error detection"],
+ ["Data comparison","Binary is hard to compare visually","Hex makes a mismatch at a glance","Given 9CBB8EE2F5A vs correct 9CBB96E2F5A, the error is easy to spot"]],
+["MAC Address",
+ "A MAC address is a unique hardware identifier for a computer, written in hexadecimal",
+ "Hex is widely used for addresses, colour codes, memory dumps and more"],
+["Binary Addition",
+ ["Rules for binary addition","0 + 0 = 0","0 + 1 = 1","1 + 1 = 10 (write 0, carry 1)","1 + 1 + 1 = 11 (write 1, carry 1)"],
+ ["Example","Add 10010100 and 00011110 working right to left, carrying as needed"],
+ ["Step-by-step with carry","Start from the rightmost bit","Write the sum bit, pass the carry to the next column","Repeat until the leftmost bit"],
+ ["Overflow error","If the result needs more bits than the register holds, the extra bit is lost","Example: adding two 8-bit numbers that give a 9-bit result"]],
+["Logical Binary Shifts",
+ ["Logical left shift","01011000 (88) → one shift → 10110000 (176)","Leftmost bit is discarded, rightmost filled with 0","Same as multiplying by 2"],
+ ["Logical right shift","00010110 (22) → one shift → 00001011 (11)","Rightmost bit is discarded, leftmost filled with 0","Same as dividing by 2"],
+ ["Data loss in shifts","Bits shifted off the end are lost","Example: 11110100 (244) shifted twice right → 00111101 (61), not exact"],
+ ["Multiple shifts","Shift several places at once, e.g. two left shifts on 11101100"]],
+["Negative Numbers and Two’s Complement",
+ "Example: representing −35 in binary",
+ "Step 1: convert 35 to 8-bit → 00100011",
+ "Step 2: invert the bits → 11011100",
+ "Step 3: add 1 → 11011101"],
+["Data Representation of Text",
+ ["Basics","Computers convert all data, including text, images and sound, into binary","Text is converted using character sets"],
+ ["Two main character sets","ASCII: uses 8-bit binary to represent characters","Unicode: wider range of characters (not covered in detail here)"],
+ ["Practice questions","Add 8-bit values 00011001 and 01000001","Add 8-bit values 00110110 and 01010111","Describe what happens in a logical shift","Perform two right shifts on 11011000"]],
+["Character Sets and Encoding Systems",
+ ["ASCII vs Unicode","ASCII: 8 bits (1 byte), up to 256 characters (0–255), suits basic English and some symbols","Unicode: 16 bits (2 bytes), about 65,000 characters, supports many alphabets, symbols and emoji","Example: letter A in ASCII = 01000001"],
+ ["Decoding ASCII","Look up each binary code in the table and convert it back into a character"]],
+["Representing Images in Binary",
+ ["Binary representation of pixels","Black and white: black = 1, white = 0","An image is a sequence of 1s and 0s representing pixels","If a computer knows the dimensions (e.g. 9 × 10 pixels), it can rebuild the image"],
+ ["Metadata","Extra information stored with the image, such as dimensions and date taken"],
+ ["Colour images and RGB model","Hex colour example: #FF0000","RR = red, GG = green, BB = blue"],
+ ["Image quality","Resolution: number of pixels wide × pixels high","Colour depth: number of bits used to represent each pixel (e.g. 1-bit, 8-bit, 16-bit, 24-bit)"],
+ ["Computer science in context","Large file sizes slow down website loading","Users may feel frustration waiting for pages with many images","Compression and careful quality choices help"]],
+["Converting Sound to Binary",
+ ["Sound sampling","Sound is sampled at regular time intervals","Each sample is stored as a binary number"],
+ ["Sample rate and sample resolution","Sample rate: number of samples per second (Hz). Example: 44.1 kHz = 44,100 samples/sec","Sample resolution: number of bits per sample (e.g. 16-bit), determines amplitude precision"]],
+["Data Measurement Units",
+ "Bit: smallest unit, 1 bit",
+ "Nibble: 4 bits",
+ "Byte: 8 bits",
+ "Kibibyte (KiB): 1024 bytes",
+ "Mebibyte (MiB): 1024 KiB",
+ "Gibibyte (GiB): 1024 MiB",
+ "Tebibyte (TiB): 1024 GiB",
+ "Pebibyte (PiB): 1024 TiB",
+ "Exbibyte (EiB): 1024 PiB"],
+["Calculating File Size",
+ ["Images","Formula: pixels × colour depth (in bits)","Example: 150 × 100 = 15,000 pixels","Colour depth 8 → 15,000 × 8 = 120,000 bits","Convert bits to bytes (÷ 8), then to KiB (÷ 1024)","Example Q: 10 images, 100 × 150 pixels, 8-bit colour depth → total size in bits"],
+ ["Conversion to other units","Bits to bytes: divide by 8","Bytes to kibibytes: divide by 1024","Example: 1500 × 1000 pixels at 8 bits per pixel ÷ 8 ÷ 1024 ÷ 1024 → MiB"],
+ ["Sound","Information needed: sample rate (Hz), sample resolution (bits), length of soundtrack (seconds)","Formula: sample rate × resolution × length","Example: 30 seconds, 44,100 Hz, 8-bit → bits per second then total bits","Convert bits → bytes → mebibytes (MiB)"]],
+["Key Terms Recap",
+ "Character set: set of all characters and their binary values used in encoding",
+ "Pixel: tiny dot of colour in an image",
+ "Metadata: extra information stored with data, such as image dimensions or date",
+ "Resolution: number of pixels wide and high in an image",
+ "Colour depth: number of bits used to represent each colour in an image",
+ "Sound sampling: capturing sound amplitude at regular time intervals",
+ "Sample rate: number of sound samples taken per second (Hz)",
+ "Sample resolution: number of bits used to represent each sound sample"],
+["Data Compression",
+ ["Benefits of compression","Saves storage space","Faster transmission between devices","Quicker upload and download","Requires less bandwidth on the internet"],
+ ["Types of compression","Lossy: permanently removes data to reduce file size (images, sound files). Quality may be reduced","Lossless: temporarily alters data without losing any information; data can be fully restored"],
+ ["Lossy compression details","Images: removes colours indistinguishable to the human eye, reduces resolution or colour depth","Sound: removes inaudible or softer sounds masked by louder ones (perceptual music shaping)","Common in MP3 files","Reducing sample rate and sample resolution also reduces file size"],
+ ["Lossy compression impact","Why is lossy not commonly used on text files? Removing data would corrupt the text","Does lossy affect image quality? Yes, quality can drop as resolution or colour depth are reduced","Does lossy affect sound quality? Yes, because some sounds are permanently removed"],
+ ["Lossless compression explained","Finds repeating data and groups it to reduce file size","Data can be fully restored to its original form","Example text message compression: each repeated word is stored once, with its positions in the message"],
+ ["Run Length Encoding (RLE) for images","Groups consecutive repeating pixels and stores the pixel colour and count","Reduces the amount of data needed to represent the image","Example: W (white) 12, Y (yellow) 3, R (red) 1, G (green) 10 and so on"]],
+["Key Terms and Definitions",
+ "Compression: a method using an algorithm to reduce file size",
+ "Lossy compression: permanently removes data to reduce file size",
+ "Lossless compression: temporarily alters data without losing any information",
+ "Perceptual music shaping: a lossy technique that removes sounds inaudible to the human ear, used in MP3s",
+ "Run Length Encoding (RLE): a lossless algorithm grouping repeating data and storing count and value"],
+["Summary of Data Representation Concepts",
+ "Binary data storage: all data must be converted to binary before processing",
+ "Number systems: denary, binary and hexadecimal are used for different purposes",
+ "Binary operations: addition and logical shifts affect calculation and accuracy; overflow errors may occur",
+ "Text encoding: ASCII and Unicode convert characters to binary",
+ "Image data: pixels assigned colour codes; higher resolution and colour depth increase file size and quality",
+ "Sound data: sampling rate and resolution affect file size and sound accuracy",
+ "Data units: bits, bytes, kibibytes, mebibytes, gibibytes etc.",
+ "Compression: reduces file size and improves storage and transmission efficiency"],
+["Exam-Style Questions",
+ "Define analogue data. Answer hint: data represented in continuous signals",
+ "Calculate pixels in an image with given resolution. Answer hint: width × height",
+ "Explain why lossy compression is unsuitable for text files. Answer hint: permanent data loss corrupts text integrity",
+ "Describe the effect of reducing sample rate on sound quality and file size. Answer hint: lower rate reduces file size but decreases sound quality"],
+["Number Systems and Data Representation",
+ ["Difference between denary and binary","Denary: base 10, digits 0 to 9, used in everyday counting and human-readable numbers","Binary: base 2, digits 0 and 1, used in internal computer processing and storage"],
+ ["Hexadecimal and binary conversion","7A = 01111010 = 122","90D = 100110010001","Binary number 00001001100 → break into 4-bit groups 0000 1001 1100","Convert to hex → 0 9 C → displayed as 09C"],
+ ["Binary addition of 8-bit registers","Add two registers bit by bit from the LSB (bit position 0) up to the MSB (position 7)","Track sum and carry in each column"],
+ ["Logical left shift on Register 1","Original: 00110111","Left shift by 3 places","Result: 10111000"],
+ ["Two’s complement representation of −28","1. Find binary of 28 → 00011100","2. Invert → 11100011","3. Add 1 → 11100100"]],
+["Image Data Storage",
+ ["Reducing data size for images","Compress the image file (reduce file size by encoding data efficiently)","Use lower resolution or reduce colour depth"],
+ ["Calculating file size of images","Number of images: 20","Resolution: 150 × 250 pixels","Colour depth: 16-bit (2 bytes per pixel)","1. Calculate total pixels per image","2. Multiply by colour depth, then by number of images","3. Convert bits to bytes and larger units"]],
+["Data Compression Revisited",
+ ["Benefits of compressing image files","Faster loading times: images load more quickly on websites","Reduced storage space: saves disk space or bandwidth when transmitting"],
+ ["Lossless compression explained","The file can be restored exactly to its original form after decompression","Used for sound files where quality loss is unacceptable","Techniques include repeated sequences with shorter representations"]],
+["Comparing File Sizes",
+ "1 GiB = 2³⁰ = 1,073,741,824 bytes",
+ "2033 bytes",
+ "1050 MiB = 1050 × 2²⁰ = 1,101,004,800 bytes",
+ "1500 KiB = 1500 × 2¹⁰ = 1,536,000 bytes",
+ "Convert all to the same unit, then compare to find the largest"],
+["Command Words and Their Meanings",
+ "State: express in clear terms",
+ "Describe: give points, characteristics or main features",
+ "Show (that): provide structured evidence leading to a result",
+ "Calculate: work out from given facts, figures or information",
+ "Give: produce an answer from memory or source",
+ "Explain: set out purposes or reasons, relationships, or how and why something happens, with evidence"],
+["Self-Evaluation Checklist",
+ "Explain why data is converted to binary for computers (1.1)",
+ "Convert between denary, binary and hexadecimal (1.1)",
+ "Provide examples and reasons for using hexadecimal (1.1)",
+ "Add two 8-bit binary numbers and understand overflow errors (1.2)",
+ "Perform logical binary shifts (left and right, multiple places) (1.2)",
+ "Use two’s complement for negative numbers (1.2)",
+ "Explain character sets for text representation (1.3)",
+ "Explain pixels, resolution and colour depth in image file size (1.3)",
+ "Explain sound sampling, sample rate and sample resolution (1.3)",
+ "Understand data units and calculate image and sound file sizes (1.4)",
+ "Understand data compression needs and effects (1.5)",
+ "Explain lossy and lossless compression methods (1.5)"]
+];
+const D2=["Data Transmission – Methods, Error Detection, and Encryption",
+["Structure of a Data Packet",
+ ["Key points about the packet header","Destination address: needed to route the packet to the correct recipient device","Packet number: important because packets may arrive out of order; the destination uses it to reassemble the original data correctly","Originator’s address: useful for tracing data sources or requesting retransmission if errors occur"],
+ ["Purpose of breaking data into packets","Sending very large files all at once is impractical due to physical limitations of transmission media (wires, radio waves)","Smaller packets can be sent independently and efficiently through networks"]],
+["Packet Switching",
+ ["Network example","Packets can travel through different routers, e.g. A to B: Router 1 → Router 2 – Router 1 → Router 4 → Router 5 – Router 1 → Router 3 → Router 2, etc."],
+ ["Key terms","Router: a device that forwards packets by examining their destination address and deciding the next path","Network: a collection of interconnected devices using cables or wireless connections to communicate"]],
+["Methods of Data Transmission",
+ ["Serial data transmission","Uses a single wire","Transmits bits sequentially, one after another","Simpler wiring but slower compared to parallel transmission for the same clock speed"]],
+["Contextual Example: Banking",
+ "Banks transmit millions of financial transactions daily, requiring high accuracy",
+ "Errors in transmission could result in money being transferred to the wrong accounts",
+ "Interference in transmission can cause data errors",
+ "Banks use multiple error detection methods to ensure data integrity",
+ "The cost of error detection systems is justified by the potential financial and reputational damage caused by errors",
+ "Even though banks do not always own all transmission hardware, they must ensure error checking to protect customers"],
+["Important Definitions",
+ "Packet: small unit of data used for transmission",
+ "Packet header: contains routing and sequencing information",
+ "Payload: actual data content of the packet",
+ "Trailer: packet section containing end marker and error-checking info",
+ "Internet Protocol (IP) address: unique identifier for a device on a network",
+ "Packet switching: transmitting packets individually, each possibly taking different routes",
+ "Router: network device that directs packets based on destination address",
+ "Network: system of interconnected devices communicating via cables or wireless technology"],
+["Practice Questions",
+ "1. Name the three main sections of a data packet",
+ "2. What information is contained in the packet header?",
+ "3. Which part of the packet carries the actual data (the file)?",
+ "4. Why is data broken down into packets before transmission?"],
+["Activity: Tracing Packet Routes",
+ "Packet 1: Router 1 → Router 2",
+ "Packet 2: Router 1 → Router 4 → Router 5",
+ "Packet 3: Router 1 → Router 3 → Router 2",
+ "Packet 4: Router 1 → Router 4 → Router 3 → Router 2",
+ "Packet 5: Router 1 → Router 3 → Router 5"],
+["Serial Data Transmission",
+ ["Key features of serial transmission","Advantages: data arrives in order, reducing the chance of data skew","Advantages: uses a single wire, reducing interference and errors","Advantages: cheaper to manufacture and buy due to needing only one wire","Disadvantages: transmission is slower because bits are sent one at a time","Disadvantages: requires start and stop bits to indicate transmission boundaries, adding overhead"],
+ ["Important terms","Serial: data sent one bit at a time along a single wire","Interference: disruption (e.g. electromagnetic) that causes errors during data transmission"],
+ ["Application context","Commonly used internally in devices, avoiding conversion to serial for network communication"]],
+["Parallel Data Transmission",
+ ["Key features of parallel transmission","Advantages: sends multiple bits simultaneously, making it quicker","Disadvantages: bits may arrive out of order, requiring reordering (risk of skew)","Disadvantages: increased chances of interference and data errors","Disadvantages: requires multiple wires, making cables more expensive to produce and purchase"],
+ ["Application context","Used where short distances and high speed matter, e.g. inside computers"]],
+["Simplex, Half-Duplex and Full-Duplex",
+ ["Simplex transmission","Only one device sends data; the other only receives","No need for data to be sent back","Example: keyboard sends keystrokes to computer; the computer does not send data back to the keyboard"],
+ ["Half-duplex transmission","Devices can send and receive data but not at the same time","Useful when bidirectional communication is needed but simultaneous communication is not required","Can be enhanced by creating two half-duplex channels for simultaneous bidirectional communication over separate channels","Example: Wi-Fi uses half-duplex to avoid signal interference"],
+ ["Full-duplex transmission","Devices send and receive data at the same time","Essential where simultaneous two-way communication is needed","Example: telephone conversations where both parties can speak simultaneously"]],
+["Relationship Between Transmission Types",
+ "Serial Simplex: one bit at a time, one direction only",
+ "Parallel Half-Duplex: multiple bits at once, both directions but one at a time",
+ "Serial Full-Duplex: one bit at a time, both directions simultaneously"],
+["Practical Application Question Example",
+ ["Sending leaflets 3 metres away to a printer","Parallel transmission should be used because the distance is short","Speed is important to print many leaflets quickly","Parallel transmission is faster due to multiple bits sent simultaneously"]],
+["Key Questions and Answers",
+ "Which method sends data along a single wire? Serial data transmission",
+ "Which method sends multiple bits at a time? Parallel data transmission",
+ "Which transmission method sends one bit at a time, in both directions, but not simultaneously? Serial half-duplex",
+ "Two advantages of serial data transmission? 1. Data arrives in order (less skew). 2. Less interference due to single wire",
+ "Two disadvantages of parallel data transmission? 1. Increased data skew. 2. More interference and higher cost due to multiple wires",
+ "For a 100-metre data file server needing simultaneous send/receive and data accuracy, which method to use? Serial full-duplex"],
+["USB Interface",
+ ["Universal Serial Bus (USB) meanings","The term USB can refer to different things: USB port, USB cable, USB connection, or USB storage device","Understanding the difference helps in troubleshooting"],
+ ["USB devices and connections","USB devices connect to computers through USB ports","Data transmission over USB uses serial data transmission, with bits sent sequentially over a single channel","USB serial transmission is a special high-speed serial type, designed to transfer data faster than typical serial transmission","USB cables connect devices such as mice, memory sticks and more"],
+ ["Industry standard and versions","USB is an industry standard, meaning it ensures compatibility across devices from different manufacturers","USB 4 is one of the latest versions, with improvements over previous versions (USB 1, 2, 3)","Students can research differences in data transfer speeds and features"]],
+["Advantages and Disadvantages of USB",
+ "Advantage: simple interface; the cable can only be inserted one way, reducing connection errors",
+ "Advantage: relatively high data transfer speed, faster than many other serial connections",
+ "Advantage: USB ports are universal and used in many devices",
+ "Advantage: automatic device detection and driver installation on first connection",
+ "Advantage: USB connection can power devices and charge devices like mobile phones",
+ "Disadvantage: USB cable length is limited, typically to 5 metres",
+ "Disadvantage: speed is high but slower than some other connections like Ethernet"],
+["Key USB Terms",
+ "USB: an industry standard used for data transmission",
+ "USB port: a socket on a device or computer to connect a USB cable",
+ "USB cable: transmission media using the USB method for data transfer",
+ "USB connection: the use of a USB cable plugged into USB ports to transfer data between devices",
+ "USB device: a device that connects via USB to a computer or other device",
+ "Ethernet: an alternative data transmission connection used in networks"],
+["Limitations of USB Cables",
+ "USB cables are limited in length to around 5 metres to maintain signal integrity and speed",
+ "Longer cables may degrade signal quality, leading to transmission errors or slower speeds"],
+["Detecting Errors in Data Transmission",
+ ["Error detection methods","Parity check: adds an extra parity bit to each byte so the total number of 1 bits is odd or even","Checksum: calculates a value from the data (e.g. modulus 11) and sends it with the data to verify accuracy","Echo check: the receiver sends back a copy of received data to the sender, who compares it with the original"]],
+["Parity Check",
+ ["How a parity check works","1. Count the number of 1s in the 7 bits","2. Add a parity bit (0 or 1) to make the total number of 1s odd or even, based on the chosen parity","3. Transmit the byte with the parity bit","4. Receiver checks parity: if it does not match the expected odd/even number of 1s, an error is detected"],
+ ["Example","Data bits: 0010001 → number of 1s = 2","Odd parity bit added as 1 → total 1s = 3 (odd)","Even parity bit would be 0 → total 1s = 2 (even)"]],
+["Parity Check Examples",
+ "10111011: even parity error? Yes. Odd parity error? No",
+ "01110111: even parity error? No. Odd parity error? No",
+ "10101000: even parity error? Yes. Odd parity error? No",
+ "00110001: even parity error? No. Odd parity error? Yes",
+ "10110101: even parity error? No. Odd parity error? No",
+ "10001000: even parity error? No. Odd parity error? Yes"],
+["Limitation of Parity Check",
+ "Some errors may not be detected if they do not change the parity (e.g. two bits flipped)",
+ "Parity check only detects odd numbers of bit errors"],
+["Checksum",
+ "A checksum is a calculated numerical value derived from the data before transmission",
+ "Example method: modulus 11 calculation",
+ "The checksum value is sent along with the data",
+ "The receiver recalculates the checksum from the received data",
+ "If the checksum matches, no error is detected; if not, an error occurred"],
+["Echo Check",
+ "After sending data, the receiver sends the exact data back (echo)",
+ "The sender compares the echoed data with the original",
+ "If data matches, no error is detected; if not, error detected"],
+["Automatic Repeat Request (ARQ)",
+ ["Positive acknowledgement ARQ process","1. Sender transmits a data packet","2. Receiver checks the packet for errors","3. If error-free, receiver sends positive acknowledgement","4. Sender receives acknowledgement and sends the next packet","5. If no acknowledgement is received within a timeout, sender retransmits the packet"]],
+["Key Terms Summary",
+ "Parity check: error detection adding a parity bit to make total bits odd or even",
+ "Checksum: error detection calculating a numeric value from data to verify accuracy after transmission",
+ "Echo check: error detection by sending received data back to the sender for comparison",
+ "Automatic Repeat Request (ARQ): a method that retransmits data based on acknowledgements and timeouts when errors occur"],
+["Questions from the Material",
+ "What does USB stand for? Universal Serial Bus",
+ "What type of data transmission method does USB use? Serial data transmission",
+ "Give two advantages of USB interface. Simple connection, automatic detection, universal compatibility, power supply",
+ "Name five devices connected using USB. Mouse, keyboard, printer, USB memory stick, mobile phone",
+ "What is the maximum cable length for USB? Typically 5 metres",
+ "Why is USB cable length limited? To maintain signal quality and transmission speed",
+ "What is the purpose of a parity bit? To detect errors by ensuring odd or even number of 1 bits in a byte",
+ "How does a checksum detect errors? By comparing calculated checksum values before and after transmission",
+ "What does ARQ stand for and what does it do? Automatic Repeat Request; manages retransmission on error detection"],
+["Automatic Repeat Request (ARQ) Systems",
+ ["ARQ with positive acknowledgement","The sender transmits a data packet","The receiver checks the packet for errors","If no errors are detected, the receiver sends a positive acknowledgement back to the sender","The sender waits for this acknowledgement. If it arrives before a timeout, the sender sends the next data packet","If a timeout occurs (no acknowledgement received), the sender resends the data packet","This process continues until a positive acknowledgement is received or a resend limit (e.g. 20 times) is reached"],
+ ["ARQ with negative acknowledgement","Sender waits for: positive acknowledgement (positive ARQ) or negative acknowledgement/timeout (negative ARQ)","Receiver sends acknowledgement only when data received correctly (positive) or only when error detected (negative)","Timeout: resend if no positive ack received / resend if negative ack received or timeout","Resend condition: no positive ack or timeout / negative ack received"]],
+["Check Digit for Data Entry Validation",
+ ["How a check digit works","A check digit is calculated from the original data (e.g. barcode or ISBN) and stored with it","When data is entered, the check digit is recalculated from the entered data","The recalculated check digit is compared with the stored check digit: if they match, the data is considered correct; if they do not match, the data entry is incorrect"]],
+["Encryption of Data During Transmission",
+ ["Purpose of encryption","Protects data during transmission from being understood if intercepted by unauthorised parties (hackers)","Data before encryption is called plain text","Encrypted data is called cipher text, which is meaningless until decrypted"],
+ ["Encryption process","Plain text: original data before encryption","Encryption key (algorithm): used to scramble the plain text into cipher text","Cipher text: encrypted, scrambled data sent over network","Decryption key: used to convert cipher text back to plain text"],
+ ["Important note on encryption","Encryption does not prevent data theft","It ensures stolen data is unreadable without the decryption key"]],
+["Types of Encryption Methods",
+ ["Reverse process: digital signatures","Private key used to encrypt","Public key used to decrypt","Used in security protocols like SSL (Secure Sockets Layer)"]],
+["Key Words Summary",
+ "automatic repeat request (ARQ): error detection method using acknowledgements and timeouts to ensure correct data received",
+ "acknowledgement: message sent to confirm whether data is received correctly",
+ "timeout: set period to wait for an acknowledgement before resending data",
+ "check digit: error detection method for data entry; compares calculated digit to stored digit",
+ "encryption: process of scrambling data to make it meaningless for secure storage or transmission",
+ "plain text: data before encryption",
+ "encryption key: algorithm used to encrypt data",
+ "cipher text: encrypted data that appears meaningless",
+ "symmetric: encryption using the same key for both encrypting and decrypting",
+ "asymmetric: encryption using a pair of keys: public key for encrypting and private key for decrypting"],
+["Practical Context: Encryption in Banking",
+ "Banks use asymmetric encryption for securing sensitive financial transactions",
+ "This ensures that personal and financial data remain confidential and secure during transmission"],
+["Questions and Answers",
+ "What is the name given to an encryption algorithm? Encryption key",
+ "What is the name given to data that has been encrypted? Cipher text",
+ "Does encryption stop data being stolen by a hacker? Why or why not? No; encryption does not stop theft, it makes stolen data meaningless without the key",
+ "Why is asymmetric encryption more secure than symmetric? Because it uses two keys (public and private), so even if the public key is known, the private key keeps data secure"],
+["Data Transmission and Error Detection Summary",
+ "Packet structure: packets contain header (addresses, packet number), payload (data) and trailer (error detection)",
+ "Packet switching: method to send data packets from sender to receiver across a network",
+ "Transmission modes: serial, parallel, simplex, half-duplex, full-duplex",
+ "USB interface: common interface to connect hardware and transmit data",
+ "Error detection methods: parity check, checksum, echo check, ARQ (positive and negative acknowledgement)",
+ "Error causes: interference during transmission or errors in data entry",
+ "Combined error checking: companies often use multiple error detection methods for reliability"],
+["Data Transmission and Error Detection",
+ ["Packet data header contents","Source address","Destination address","Packet number (for reordering)","Protocol information","Error-checking data"],
+ ["Packet switching and reordering","Packets may be sent via different routes and arrive out of order","Packets are reordered at the destination using packet numbers in the header to reconstruct the original data sequence"],
+ ["Serial half-duplex data transmission","Serial: data bits sent one after the other over a single channel or wire","Half-duplex: transmission can occur in both directions, but only one direction at a time (like walkie-talkies)","Use: suitable for two-way communication but not simultaneous"],
+ ["USB interface benefits","Universal connectivity: supports many device types","Plug and play: devices can be connected or disconnected without rebooting","Power supply: can power connected devices","High speed: allows fast data transfer compared to older interfaces"]],
+["Error Detection Methods",
+ ["Application of statements to methods","Checks for errors in data after it has been transmitted: checksum, parity check","Can use an odd or even process: parity check","Sends data back from the receiver to the sender to compare the data: echo check","Uses a value calculated from the data to check for errors: checksum"],
+ ["Automatic Repeat reQuest (ARQ)","A protocol that checks if data is received correctly","If errors are detected, the sender retransmits the data"],
+ ["Check digit","A single digit added to data (e.g. barcodes, ID numbers) to detect errors in data entry","Calculated using an algorithm on the main data digits"]],
+["Data Encryption",
+ ["Reasons for encryption","To keep data secure during transmission","Prevent unauthorised access and protect confidentiality"],
+ ["Types of encryption","Symmetric encryption: the same key is used to both encrypt and decrypt the data","Asymmetric encryption: uses two different keys, a public key to encrypt and a private key to decrypt"],
+ ["Symmetric encryption process (fill-in-the-blanks)","Plain text is scrambled using a key into cipher text","The same key decrypts the cipher text back into plain text"]],
+["Exam-Style Questions Focus",
+ "Packet header data items: source/destination address, packet number, protocol",
+ "Packet reordering explanation: different routes can cause out-of-order arrival; reordered using packet numbers",
+ "Serial half-duplex transmission explanation: one bit at a time, bidirectional but not simultaneous",
+ "USB interface benefits: universal, plug and play, power supply, fast speed",
+ "Suitable data transmission for company file server: choose method (e.g. full-duplex serial), justify with distance and simultaneous use",
+ "Error detection method statements: match statements with checksum, echo check, parity check",
+ "Symmetric encryption terminology: plain text, cipher, cipher text, meaningless, decrypted, same key"],
+["Self-Evaluation Checklist",
+ "Packet structure: understand components and purpose of headers in data packets",
+ "Packet switching process: how data is split into packets and routed, then reordered",
+ "Serial and parallel transmission: differences and use cases",
+ "Simplex, half-duplex, full-duplex transmission: directionality and simultaneous transmission capabilities",
+ "USB data transmission: how USB sends data and connects devices",
+ "Causes and detection of transmission errors: parity bit, checksum, echo check, ARQ, check digit",
+ "Symmetric and asymmetric encryption: key differences and usage scenarios"]
+];
+
+const MAPS={representation:D1,transmission:D2};
+const tree=document.getElementById('tree'),svg=document.getElementById('svg'),inner=document.getElementById('inner'),canvas=document.getElementById('canvas'),ttl=document.getElementById('ttl');
+const all=[];let current='';
+function make(node,hue){
+  const li=document.createElement('li');li.className='node';li.style.setProperty('--h',hue);
+  if(typeof node==='string'){
+    const d=document.createElement('div');d.className='self leafself';d.textContent=node;li.appendChild(d);return li;
+  }
+  const kids=node.slice(1);
+  const b=document.createElement('button');b.className='self';b.setAttribute('aria-expanded','false');
+  const t=document.createElement('span');t.textContent=node[0];
+  const dot=document.createElement('span');dot.className='dot';dot.textContent=kids.length;
+  b.append(t,dot);li.appendChild(b);
+  const ul=document.createElement('ul');ul.className='kids';
+  kids.forEach(k=>ul.appendChild(make(k,hue)));
+  li.appendChild(ul);
+  b.onclick=()=>{set(li,!li.classList.contains('open'));if(li.classList.contains('open'))reveal(li);};
+  all.push(li);return li;
+}
+function set(li,open,skip){
+  li.classList.toggle('open',open);li.classList.remove('hint');
+  li.querySelector(':scope>.self').setAttribute('aria-expanded',open);
+  if(!skip)draw();
+}
+function draw(){
+  requestAnimationFrame(()=>{
+    const ir=inner.getBoundingClientRect();
+    svg.setAttribute('width',inner.scrollWidth);svg.setAttribute('height',inner.scrollHeight);
+    let h='';
+    inner.querySelectorAll('li.open').forEach(li=>{
+      const p=li.querySelector(':scope>.self').getBoundingClientRect();
+      const x1=p.right-ir.left,y1=p.bottom-ir.top-1;
+      li.querySelectorAll(':scope>.kids>li>.self').forEach(c=>{
+        const r=c.getBoundingClientRect();
+        const x2=r.left-ir.left,y2=r.bottom-ir.top-1,m=(x1+x2)/2;
+        const hue=getComputedStyle(c).getPropertyValue('--h')||200;
+        h+='<path d="M'+x1+' '+y1+'C'+m+' '+y1+' '+m+' '+y2+' '+x2+' '+y2+'" stroke="hsl('+hue+' 55% 50%)"/>';
+      });
+    });
+    svg.innerHTML=h;
+  });
+}
+function reveal(li){
+  setTimeout(()=>{
+    const cr=canvas.getBoundingClientRect(),s=li.querySelector(':scope>.self').getBoundingClientRect();
+    const k=li.querySelector(':scope>.kids').getBoundingClientRect();
+    let dx=0,dy=0;
+    if(cr.width<700)dx=s.left-cr.left-16;
+    else if(k.right>cr.right-20)dx=Math.min(k.right-cr.right+40,s.left-cr.left-16);
+    const cy=(k.top+k.bottom)/2;
+    dy=k.height<cr.height?cy-(cr.top+cr.height/2):k.top-cr.top-20;
+    canvas.scrollBy({left:dx,top:dy,behavior:'smooth'});
+  },60);
+}
+function build(D){
+  tree.innerHTML='';all.length=0;svg.innerHTML='';
+  const root=document.createElement('li');root.className='node root hint';root.style.setProperty('--h',200);
+  const rb=document.createElement('button');rb.className='self';rb.setAttribute('aria-expanded','false');
+  const rt=document.createElement('span');rt.textContent=D[0];
+  const rd=document.createElement('span');rd.className='dot';rd.textContent=D.length-1;
+  rb.append(rt,rd);root.appendChild(rb);
+  const ru=document.createElement('ul');ru.className='kids';
+  D.slice(1).forEach((n,i)=>ru.appendChild(make(n,(i*47+190)%360)));
+  root.appendChild(ru);all.push(root);
+  rb.onclick=()=>{set(root,!root.classList.contains('open'));if(root.classList.contains('open'))reveal(root);};
+  tree.appendChild(root);
+  canvas.scrollTo(0,0);draw();
+}
+function route(){
+  const k=location.hash.slice(1);
+  if(MAPS[k]){
+    if(k!==current){current=k;build(MAPS[k]);ttl.textContent=(k==='transmission'?'Data Transmission':'Data Representation');document.title=ttl.textContent+' – Mind Map Revision by Mr. Beda';}
+    document.body.classList.add('in-map');
+    setTimeout(draw,480);
+  }else{
+    document.body.classList.remove('in-map');current='';document.title='Mind Map Revision – Prepared by Mr. Beda';
+  }
+}
+document.querySelectorAll('.big').forEach(b=>b.onclick=()=>{location.hash=b.dataset.k;});
+document.getElementById('back').onclick=()=>{if(history.length>1&&location.hash){history.back();setTimeout(()=>{if(location.hash)location.hash='';},150);}else location.hash='';};
+document.getElementById('ex').onclick=()=>{all.forEach(l=>set(l,true,true));draw();};
+document.getElementById('co').onclick=()=>{all.forEach(l=>set(l,false,true));draw();canvas.scrollTo({left:0,top:0,behavior:'smooth'});};
+let pd=null;
+canvas.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'||e.target.closest('button'))return;pd={x:e.clientX,y:e.clientY,l:canvas.scrollLeft,t:canvas.scrollTop};canvas.classList.add('drag');canvas.setPointerCapture(e.pointerId);});
+canvas.addEventListener('pointermove',e=>{if(!pd)return;canvas.scrollLeft=pd.l-(e.clientX-pd.x);canvas.scrollTop=pd.t-(e.clientY-pd.y);});
+['pointerup','pointercancel'].forEach(t=>canvas.addEventListener(t,()=>{pd=null;canvas.classList.remove('drag');}));
+addEventListener('resize',draw);
+addEventListener('hashchange',route);
+if(document.fonts)document.fonts.ready.then(draw);
+route();
+</script>
+</body>
+</html>
